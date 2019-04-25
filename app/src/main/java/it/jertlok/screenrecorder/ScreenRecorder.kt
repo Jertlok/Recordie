@@ -34,6 +34,8 @@ open class ScreenRecorder (context: Context) {
     // Output file
     var mOutputFile: File? = null
         private set
+    // Whether we are recording or not
+    private var mIsRecording = false
 
 
     init {
@@ -49,23 +51,26 @@ open class ScreenRecorder (context: Context) {
 
     private fun initRecorder() {
         // TODO: Implement all the configurations
-        if (mMediaRecorder == null) {
-            mMediaRecorder = MediaRecorder()
-            mMediaRecorder?.setVideoSource(MediaRecorder.VideoSource.SURFACE)
-            mMediaRecorder?.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-            mOutputFile = getOutputMediaFile()
-            mMediaRecorder?.setOutputFile(getOutputMediaFile()?.path)
-            mMediaRecorder?.setVideoSize(1440, 2560)
-            mMediaRecorder?.setVideoEncoder(MediaRecorder.VideoEncoder.H264)
-            mMediaRecorder?.setVideoEncodingBitRate(16384 * 1000)
-            mMediaRecorder?.setVideoFrameRate(60)
-            // Prepare MediaRecorder
-            mMediaRecorder?.prepare()
-        }
+        mMediaRecorder = MediaRecorder()
+        mMediaRecorder?.setVideoSource(MediaRecorder.VideoSource.SURFACE)
+        mMediaRecorder?.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+        mOutputFile = getOutputMediaFile()
+        mMediaRecorder?.setOutputFile(getOutputMediaFile()?.path)
+        mMediaRecorder?.setVideoSize(1440, 2560)
+        mMediaRecorder?.setVideoEncoder(MediaRecorder.VideoEncoder.H264)
+        mMediaRecorder?.setVideoEncodingBitRate(16384 * 1000)
+        mMediaRecorder?.setVideoFrameRate(60)
+        // Prepare MediaRecorder
+        mMediaRecorder?.prepare()
     }
 
     fun startRecording(resultCode: Int, data: Intent?) {
+        // TODO: Improve user experience
+        if (mIsRecording) {
+            return
+        }
         Log.d(TAG, "startRecording()")
+        mIsRecording = true
         // TODO: try to figure the warning on data
         // Initialise MediaProjection
         mMediaProjection = mMediaProjectionManager.getMediaProjection(resultCode, data)
@@ -84,6 +89,7 @@ open class ScreenRecorder (context: Context) {
 
     fun stopRecording() {
         // Stopping the media recorder could lead to crash, let us be safe.
+        mIsRecording = false
         try {
             mMediaRecorder?.stop()
         } catch (e: RuntimeException) {
