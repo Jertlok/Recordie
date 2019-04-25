@@ -55,7 +55,7 @@ open class ScreenRecorder (context: Context) {
         mMediaRecorder?.setVideoSource(MediaRecorder.VideoSource.SURFACE)
         mMediaRecorder?.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
         mOutputFile = getOutputMediaFile()
-        mMediaRecorder?.setOutputFile(getOutputMediaFile()?.path)
+        mMediaRecorder?.setOutputFile(mOutputFile?.path)
         mMediaRecorder?.setVideoSize(1440, 2560)
         mMediaRecorder?.setVideoEncoder(MediaRecorder.VideoEncoder.H264)
         mMediaRecorder?.setVideoEncodingBitRate(16384 * 1000)
@@ -75,7 +75,7 @@ open class ScreenRecorder (context: Context) {
         // Initialise MediaProjection
         mMediaProjection = mMediaProjectionManager.getMediaProjection(resultCode, data)
         mMediaProjection?.registerCallback(mMediaProjectionCallback, null)
-        // Init recorder if necessary
+        // Init recorder
         initRecorder()
         // Create virtual display
         mVirtualDisplay = createVirtualDisplay()
