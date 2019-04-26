@@ -62,7 +62,6 @@ open class ScreenRecorder (context: Context) {
         // TODO: This will probably have to check for the shared preferences.
         mMediaRecorder = MediaRecorder()
         mMediaRecorder?.setVideoSource(MediaRecorder.VideoSource.SURFACE)
-        mMediaRecorder?.setAudioSource(MediaRecorder.AudioSource.MIC)
         mMediaRecorder?.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
         mOutputFile = getOutputMediaFile()
         mMediaRecorder?.setOutputFile(mOutputFile?.path)
@@ -75,12 +74,16 @@ open class ScreenRecorder (context: Context) {
         // Set video resolution with user preferences
         mMediaRecorder?.setVideoSize(mUserWidth, mUserHeight)
         mMediaRecorder?.setVideoEncoder(MediaRecorder.VideoEncoder.H264)
-        mMediaRecorder?.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
         mMediaRecorder?.setVideoEncodingBitRate(16384 * 1000)
         // Get user preference for frame rate
         val videoFrameRate = mSharedPreferences.getString("frame_rate",
                 "30")?.toInt() as Int
         mMediaRecorder?.setVideoFrameRate(videoFrameRate)
+        // Conditional audio recording
+        //val audioRecording
+        //if ()
+        mMediaRecorder?.setAudioSource(MediaRecorder.AudioSource.MIC)
+        mMediaRecorder?.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
         // Prepare MediaRecorder
         mMediaRecorder?.prepare()
     }

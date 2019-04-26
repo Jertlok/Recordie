@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreference
 import it.jertlok.screenrecorder.R
 
 class SettingsFragment: PreferenceFragmentCompat() {
@@ -21,6 +22,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
     // User interface
     private lateinit var videoListPref: ListPreference
     private lateinit var frameRateListPref: ListPreference
+    private lateinit var audioRecordingPref: SwitchPreference
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
