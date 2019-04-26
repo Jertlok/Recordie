@@ -3,4 +3,10 @@
 
     <string name="start_button">Start</string>
     <string name="stop_button">Stop</string>
+
+    <!-- Menu strings -->
+    <string name="menu_settings">Settings</string>
+
+    <!-- Permissions -->
+    <string name="permission_cast_denied">Cast permission not granted</string>
 </resources>
