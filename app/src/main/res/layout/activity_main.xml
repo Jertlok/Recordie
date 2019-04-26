@@ -3,15 +3,22 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_activity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".activities.MainActivity">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <!-- Other components and views -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/container">
+
+        </RelativeLayout>
 
         <com.google.android.material.bottomappbar.BottomAppBar
             android:id="@+id/bar"
@@ -19,7 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:backgroundTint="@color/colorPrimary"
-            app:navigationIcon="@drawable/ic_outline_menu"
+            app:navigationIcon="@drawable/ic_outline_settings"
             />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

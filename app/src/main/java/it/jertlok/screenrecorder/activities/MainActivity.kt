@@ -1,4 +1,4 @@
-package it.jertlok.screenrecorder
+package it.jertlok.screenrecorder.activities
 
 import android.Manifest
 import android.app.Activity
@@ -11,13 +11,16 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.view.ActionMode
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import it.jertlok.screenrecorder.R
+import it.jertlok.screenrecorder.common.ScreenRecorder
 
 class MainActivity : AppCompatActivity() {
 
     companion object {
-        // val TAG = "MainActivity"
+        val TAG = "MainActivity"
         // Permission request code
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL = 0
         // Request code for starting a screen record
@@ -79,8 +82,16 @@ class MainActivity : AppCompatActivity() {
                 notifyNewMedia(mScreenRecorder.getOutputFileName())
             }
         }
-    }
 
+        // TODO: this is indeed temporary, just for development purposes
+        // TODO: and also because I am being lazy in regards of the UI for now.
+        // Set something for menu
+        bottomBar.setOnClickListener {
+            // Start Settings activity
+            startActivity(Intent(this, SettingsActivity::class.java))
+            finish()
+        }
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -95,6 +106,10 @@ class MainActivity : AppCompatActivity() {
             mScreenRecorder.startRecording(resultCode, data)
             // We need to toggle the fab button
             fabButton.setImageDrawable(fabStopDrawable)
+            // At this point we can "hide" the application, so to give a better
+            // user experience
+            // TODO: Add some sort of timer...
+            moveTaskToBack(true)
         }
     }
 
