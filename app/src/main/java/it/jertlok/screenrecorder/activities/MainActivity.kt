@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         val TAG = "MainActivity"
         // Permission request code
-        private const val PERMISSION_REQUEST_WRITE_EXTERNAL = 0
+        private const val PERMISSION_REQUESTS = 0
         // Request code for starting a screen record
         private const val REQUEST_CODE_SCREEN_RECORD = 1
     }
@@ -49,13 +49,17 @@ class MainActivity : AppCompatActivity() {
         fabStopDrawable = getDrawable(R.drawable.ic_outline_stop)
 
         if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED
+                || checkSelfPermission(Manifest.permission.RECORD_AUDIO)
                 != PackageManager.PERMISSION_GRANTED) {
             // Permission is not granted
-            if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    || shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)) {
                 // Show the explanation
             } else {
-                requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                        PERMISSION_REQUEST_WRITE_EXTERNAL)
+                requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.RECORD_AUDIO),
+                        PERMISSION_REQUESTS)
             }
         }
 
