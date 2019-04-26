@@ -13,8 +13,8 @@
         app:entries="@array/frame_rate_aliases"
         app:entryValues="@array/frame_rate_values"/>
 
-    <SwitchPreferenceCompat
-        app:key="audio_recording"
+    <SwitchPreference
+        app:key="audio_recording_pref"
         app:title="@string/audio_recording_title"
         app:defaultValue="false"/>
 

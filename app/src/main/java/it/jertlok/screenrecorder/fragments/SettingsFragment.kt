@@ -34,22 +34,30 @@ class SettingsFragment: PreferenceFragmentCompat() {
         // TODO: we also need to set the descriptions.
         videoListPref = findPreference("video_resolution_pref") as ListPreference
         frameRateListPref = findPreference("frame_rate_pref") as ListPreference
+        audioRecordingPref = findPreference("audio_recording_pref") as SwitchPreference
 
         // We need to get the shared preferences and change the elements accordingly
         videoListPref.setValueIndex(videoListPref.findIndexOfValue(
                 mSharedPreferences.getString("video_resolution", "1920x1080")))
         frameRateListPref.setValueIndex(frameRateListPref.findIndexOfValue(
                 mSharedPreferences.getString("frame_rate", "30")))
+        audioRecordingPref.isChecked =
+                mSharedPreferences.getBoolean("audio_recording", false)
 
         // Set on list preference change listeners, that will write into the SharedPreferences
         videoListPref.setOnPreferenceChangeListener { _, newValue ->
-            mSharedPreferences.edit().putString("video_resolution", newValue.toString()).apply()
+            mSharedPreferences.edit().putString("video_resolution", newValue as String).apply()
             true
         }
         frameRateListPref.setOnPreferenceChangeListener { _, newValue ->
-            mSharedPreferences.edit().putString("frame_rate", newValue.toString()).apply()
+            mSharedPreferences.edit().putString("frame_rate", newValue as String).apply()
             true
         }
+        audioRecordingPref.setOnPreferenceChangeListener { _, newValue ->
+            mSharedPreferences.edit().putBoolean("audio_recording", newValue as Boolean).apply()
+            true
+        }
+
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 }
