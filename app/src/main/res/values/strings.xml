@@ -12,5 +12,6 @@
     <!-- Settings -->
 
     <!-- Video resolutions -->
-    <string name="title_video_resolution">Video resolution</string>
+    <string name="video_resolution_title">Video resolution</string>
+    <string name="frame_rate_title">Framerate</string>
 </resources>

@@ -66,7 +66,7 @@ open class ScreenRecorder (context: Context) {
         mOutputFile = getOutputMediaFile()
         mMediaRecorder?.setOutputFile(mOutputFile?.path)
 
-        // Let's try to set the video size with the parameters
+        // Get user preference for video resolution
         val videoResolution = mSharedPreferences.getString("video_resolution",
                 "1920x1080")?.split("x".toRegex())
         mUserWidth = videoResolution?.get(1)?.toInt() as Int
@@ -75,8 +75,10 @@ open class ScreenRecorder (context: Context) {
         mMediaRecorder?.setVideoSize(mUserWidth, mUserHeight)
         mMediaRecorder?.setVideoEncoder(MediaRecorder.VideoEncoder.H264)
         mMediaRecorder?.setVideoEncodingBitRate(16384 * 1000)
-        mMediaRecorder?.setVideoFrameRate(60)
-
+        // Get user preference for frame rate
+        val videoFrameRate = mSharedPreferences.getString("frame_rate",
+                "30")?.toInt() as Int
+        mMediaRecorder?.setVideoFrameRate(videoFrameRate)
         // Prepare MediaRecorder
         mMediaRecorder?.prepare()
     }
