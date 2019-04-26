@@ -32,7 +32,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
 
         // We need to get the shared preferences and change the elements accordingly
         mListPreference.setValueIndex(mListPreference.findIndexOfValue(
-                mSharedPreferences.getString("video_resolutions", "-1")))
+                mSharedPreferences.getString("video_resolution", "1920x1080")))
 
         // Set on list preference change listener, that will write into the SharedPreferences
         mListPreference.setOnPreferenceChangeListener { _, newValue ->
