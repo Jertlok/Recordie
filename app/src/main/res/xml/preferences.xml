@@ -13,8 +13,9 @@
         app:entries="@array/frame_rate_aliases"
         app:entryValues="@array/frame_rate_values"/>
 
-    <!--<SwitchPreferenceCompat
+    <SwitchPreferenceCompat
         app:key="audio_recording"
-        app:title="Enable audio recording"/>-->
+        app:title="@string/audio_recording_title"
+        app:defaultValue="false"/>
 
 </androidx.preference.PreferenceScreen>
