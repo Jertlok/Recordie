@@ -38,6 +38,7 @@ open class ScreenRecorder (context: Context) {
     private var mIsRecording = false
 
 
+
     init {
         // Get the media projection service
         mMediaProjectionManager = mContext.getSystemService(
@@ -102,7 +103,7 @@ open class ScreenRecorder (context: Context) {
         destroyMediaProjection()
     }
 
-    fun stopScreenSharing() {
+    private fun stopScreenSharing() {
         // We don't have a virtual display anymore
         if (mVirtualDisplay == null) {
             return
@@ -159,5 +160,13 @@ open class ScreenRecorder (context: Context) {
 
         return File(mediaStorageDir.path + File.separator +
                 "VID_" + timeStamp + ".mp4")
+    }
+
+    fun isRecording(): Boolean {
+        return mIsRecording
+    }
+
+    fun getOutputFileName(): String? {
+        return mOutputFile?.path
     }
 }
