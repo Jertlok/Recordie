@@ -2,10 +2,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ListPreference
-        app:key="video_resolutions"
-        app:title="@string/title_video_resolution"
+        app:key="video_resolution_pref"
+        app:title="@string/video_resolution_title"
         app:entries="@array/video_resolution_aliases"
         app:entryValues="@array/video_resolution_values"/>
+
+    <ListPreference
+        app:key="frame_rate_pref"
+        app:title="@string/frame_rate_title"
+        app:entries="@array/frame_rate_aliases"
+        app:entryValues="@array/frame_rate_values"/>
 
     <!--<SwitchPreferenceCompat
         app:key="audio_recording"

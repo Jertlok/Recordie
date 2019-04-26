@@ -19,7 +19,8 @@ class SettingsFragment: PreferenceFragmentCompat() {
     private lateinit var mSharedPreferences: SharedPreferences
 
     // User interface
-    private lateinit var mListPreference: ListPreference
+    private lateinit var videoListPref: ListPreference
+    private lateinit var frameRateListPref: ListPreference
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
@@ -28,18 +29,24 @@ class SettingsFragment: PreferenceFragmentCompat() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        mListPreference = findPreference("video_resolutions") as ListPreference
+        videoListPref = findPreference("video_resolution_pref") as ListPreference
+        frameRateListPref = findPreference("frame_rate_pref") as ListPreference
 
         // We need to get the shared preferences and change the elements accordingly
-        mListPreference.setValueIndex(mListPreference.findIndexOfValue(
+        videoListPref.setValueIndex(videoListPref.findIndexOfValue(
                 mSharedPreferences.getString("video_resolution", "1920x1080")))
+        frameRateListPref.setValueIndex(frameRateListPref.findIndexOfValue(
+                mSharedPreferences.getString("frame_rate", "30")))
 
-        // Set on list preference change listener, that will write into the SharedPreferences
-        mListPreference.setOnPreferenceChangeListener { _, newValue ->
+        // Set on list preference change listeners, that will write into the SharedPreferences
+        videoListPref.setOnPreferenceChangeListener { _, newValue ->
             mSharedPreferences.edit().putString("video_resolution", newValue.toString()).apply()
             true
         }
-
+        frameRateListPref.setOnPreferenceChangeListener { _, newValue ->
+            mSharedPreferences.edit().putString("frame_rate", newValue.toString()).apply()
+            true
+        }
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 }

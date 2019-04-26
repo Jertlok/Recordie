@@ -10,4 +10,15 @@
         <item>2560x1440</item>
         <item>1920x1080</item>
     </string-array>
+    <!-- Frame rate parameters -->
+    <string-array name="frame_rate_aliases">
+        <item>24 FPS</item>
+        <item>30 FPS</item>
+        <item>60 FPS</item>
+    </string-array>
+    <string-array name="frame_rate_values">
+        <item>24</item>
+        <item>30</item>
+        <item>60</item>
+    </string-array>
 </resources>
