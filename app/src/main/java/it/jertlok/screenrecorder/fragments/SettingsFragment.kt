@@ -29,6 +29,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        // TODO: we also need to set the descriptions.
         videoListPref = findPreference("video_resolution_pref") as ListPreference
         frameRateListPref = findPreference("frame_rate_pref") as ListPreference
 
