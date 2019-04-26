@@ -1,13 +1,15 @@
-package it.jertlok.screenrecorder
+package it.jertlok.screenrecorder.common
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.hardware.display.DisplayManager
 import android.hardware.display.VirtualDisplay
 import android.media.MediaRecorder
 import android.media.projection.MediaProjection
 import android.media.projection.MediaProjectionManager
 import android.os.Environment
+import android.preference.PreferenceManager
 import android.util.DisplayMetrics
 import android.util.Log
 import java.io.File
@@ -37,7 +39,8 @@ open class ScreenRecorder (context: Context) {
     // Whether we are recording or not
     private var mIsRecording = false
 
-
+    // SharedPreference
+    private var mSharedPreferences: SharedPreferences
 
     init {
         // Get the media projection service
@@ -47,20 +50,28 @@ open class ScreenRecorder (context: Context) {
         mDisplayMetrics = mContext.resources.displayMetrics
         // Instantiate media projection callbacks
         mMediaProjectionCallback = MediaProjectionCallback()
-
+        // Get SharedPreference
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext)
     }
 
     private fun initRecorder() {
-        // TODO: Implement all the configurations
+        // TODO: This will probably have to check for the shared preferences.
         mMediaRecorder = MediaRecorder()
         mMediaRecorder?.setVideoSource(MediaRecorder.VideoSource.SURFACE)
         mMediaRecorder?.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
         mOutputFile = getOutputMediaFile()
         mMediaRecorder?.setOutputFile(mOutputFile?.path)
-        mMediaRecorder?.setVideoSize(1440, 2560)
+
+        // Let's try to set the video size with the parameters
+        val videoResolution = mSharedPreferences.getString("video_resolutions",
+                "2560x1400")?.split("x".toRegex())
+        mMediaRecorder?.setVideoSize(videoResolution?.get(1)?.toInt() as Int,
+                videoResolution[0].toInt())
+
         mMediaRecorder?.setVideoEncoder(MediaRecorder.VideoEncoder.H264)
         mMediaRecorder?.setVideoEncodingBitRate(16384 * 1000)
         mMediaRecorder?.setVideoFrameRate(60)
+
         // Prepare MediaRecorder
         mMediaRecorder?.prepare()
     }
