@@ -48,18 +48,20 @@ class MainActivity : AppCompatActivity() {
         fabStartDrawable = getDrawable(R.drawable.ic_outline_record)
         fabStopDrawable = getDrawable(R.drawable.ic_outline_stop)
 
-        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED
-                || checkSelfPermission(Manifest.permission.RECORD_AUDIO)
-                != PackageManager.PERMISSION_GRANTED) {
-            // Permission is not granted
-            if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    || shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)) {
-                // Show the explanation
-            } else {
-                requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.RECORD_AUDIO),
-                        PERMISSION_REQUESTS)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED
+                    || checkSelfPermission(Manifest.permission.RECORD_AUDIO)
+                    != PackageManager.PERMISSION_GRANTED) {
+                // Permission is not granted
+                if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        || shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)) {
+                    // Show the explanation
+                } else {
+                    requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            Manifest.permission.RECORD_AUDIO),
+                            PERMISSION_REQUESTS)
+                }
             }
         }
 
