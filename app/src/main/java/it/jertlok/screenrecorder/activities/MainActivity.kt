@@ -10,6 +10,7 @@ import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.widget.Toast
 import androidx.appcompat.view.ActionMode
 import com.google.android.material.bottomappbar.BottomAppBar
@@ -65,8 +66,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Instantiate Screen Recorder class
-        mScreenRecorder = ScreenRecorder(applicationContext)
+
+        // Instantiate Screen Recorder class with real display metrics
+        val realMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getRealMetrics(realMetrics)
+        mScreenRecorder = ScreenRecorder(applicationContext, realMetrics)
 
         // TODO: Make this variable local if I realise it's not needed elsewhere.
         mMediaProjectionManager = applicationContext.getSystemService(
