@@ -17,4 +17,6 @@
     <!-- Audio configurations -->
     <string name="audio_recording_title">Audio recording</string>
 
+    <!-- QS Tile -->
+    <string name="qs_record_title">Start recording</string>
 </resources>

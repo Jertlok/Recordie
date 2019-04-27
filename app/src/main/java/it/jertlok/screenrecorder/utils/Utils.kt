@@ -13,7 +13,7 @@ open class Utils {
          *
          *  @param metrics The display metrics got from the windowManager
          */
-        open fun getDisplayResolution(realMetrics: DisplayMetrics): String {
+        fun getDisplayResolution(realMetrics: DisplayMetrics): String {
             // Let's get the display values
             val width = realMetrics.widthPixels
             val height = realMetrics.heightPixels
