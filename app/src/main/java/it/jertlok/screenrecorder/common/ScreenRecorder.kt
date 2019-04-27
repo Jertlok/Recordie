@@ -12,12 +12,13 @@ import android.os.Environment
 import android.preference.PreferenceManager
 import android.util.DisplayMetrics
 import android.util.Log
+import it.jertlok.screenrecorder.utils.Utils
 import java.io.File
 import java.lang.RuntimeException
 import java.text.SimpleDateFormat
 import java.util.*
 
-open class ScreenRecorder (context: Context) {
+open class ScreenRecorder (context: Context, realMetrics: DisplayMetrics) {
 
     companion object {
         const val TAG = "ScreenRecorder"
@@ -32,7 +33,7 @@ open class ScreenRecorder (context: Context) {
     private var mVirtualDisplay: VirtualDisplay? = null
     private var mMediaProjectionCallback: MediaProjectionCallback
     // Display metrics
-    private var mDisplayMetrics: DisplayMetrics
+    private var mDisplayMetrics = realMetrics
     // Output file
     var mOutputFile: File? = null
         private set
@@ -51,7 +52,7 @@ open class ScreenRecorder (context: Context) {
         mMediaProjectionManager = mContext.getSystemService(
                 Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
         // Get display metrics
-        mDisplayMetrics = mContext.resources.displayMetrics
+        mDisplayMetrics = realMetrics
         // Instantiate media projection callbacks
         mMediaProjectionCallback = MediaProjectionCallback()
         // Get SharedPreference
@@ -74,7 +75,7 @@ open class ScreenRecorder (context: Context) {
 
         // Get user preference for video resolution
         val videoResolution = mSharedPreferences.getString("video_resolution",
-                "1920x1080")?.split("x".toRegex())
+                Utils.getDisplayResolution(mDisplayMetrics))?.split("x".toRegex())
         mUserWidth = videoResolution?.get(1)?.toInt() as Int
         mUserHeight = videoResolution[0].toInt()
         // Set video resolution with user preferences

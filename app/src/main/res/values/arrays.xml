@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Video configuration -->
+    <!-- Video configuration that will be conditionally available -->
     <string-array name="video_resolution_aliases">
+        <item>QHD 18:9 (2880 x 1440)</item>
         <item>QHD (2560 x 1440)</item>
         <item>Full HD (1920 x 1080)</item>
+        <item>HD (1280 x 720)</item>
     </string-array>
     <!-- These values will be interpreted as [height] x [width], 'x' is the separator -->
     <string-array name="video_resolution_values">
+        <item>2880x1440</item>
         <item>2560x1440</item>
         <item>1920x1080</item>
+        <item>1280x720</item>
     </string-array>
     <!-- Frame rate parameters -->
     <string-array name="frame_rate_aliases">
