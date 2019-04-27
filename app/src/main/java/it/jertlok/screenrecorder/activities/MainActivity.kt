@@ -9,7 +9,6 @@ import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.DisplayMetrics
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import it.jertlok.screenrecorder.R
@@ -56,9 +55,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Instantiate Screen Recorder class with real display metrics
-        val realMetrics = DisplayMetrics()
-        windowManager.defaultDisplay.getRealMetrics(realMetrics)
+        // Instantiate Screen Recorder class
         mScreenRecorder = ScreenRecorder.getInstance(applicationContext)
 
         // TODO: Make this variable local if I realise it's not needed elsewhere.
@@ -99,6 +96,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // TODO: I hate to repeat my self, check @link{RecordingActivity} - we have
+    // TODO: the same method down there.
     private fun notifyNewMedia(file: File?) {
         // TODO: make a better check
         if (file != null) {
