@@ -4,6 +4,7 @@
     <string-array name="video_resolution_aliases">
         <item>QHD 18:9 (2880 x 1440)</item>
         <item>QHD (2560 x 1440)</item>
+        <item>Full HD 18:9 (2160 x 1080)</item>
         <item>Full HD (1920 x 1080)</item>
         <item>HD (1280 x 720)</item>
     </string-array>
@@ -11,6 +12,7 @@
     <string-array name="video_resolution_values">
         <item>2880x1440</item>
         <item>2560x1440</item>
+        <item>2160x1080</item>
         <item>1920x1080</item>
         <item>1280x720</item>
     </string-array>
