@@ -61,7 +61,6 @@ open class ScreenRecorder (context: Context) {
     }
 
     private fun initRecorder() {
-        // TODO: This will probably have to check for the shared preferences.
         // Conditional audio recording
         val isAudioRecEnabled = mSharedPreferences.getBoolean("audio_recording", false)
 
@@ -187,6 +186,7 @@ open class ScreenRecorder (context: Context) {
         }
 
         // Create a media file name
+        // TODO: Do not always use italian local
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ITALIAN).format(Date())
 
         return File(mediaStorageDir.path + File.separator +
