@@ -7,11 +7,12 @@ open class Utils {
     // Most of them will be static methods, we will see what to do later.
 
     companion object {
-        /** This function will give us the maximum resolution available, which
+        /**
+         * This function will give us the maximum resolution available, which
          *  will be useful for trimming down the other resolutions available and
          *  set the default resolution for the video configuration.
          *
-         *  @param metrics The display metrics got from the windowManager
+         *  @param realMetrics The display metrics got from the windowManager
          */
         fun getDisplayResolution(realMetrics: DisplayMetrics): String {
             // Let's get the display values

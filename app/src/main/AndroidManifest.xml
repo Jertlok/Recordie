@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="it.jertlok.screenrecorder" >
 
+    <!-- Permissions -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
@@ -21,8 +22,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <!-- SettingsActivity -->
         <activity android:name=".activities.SettingsActivity" />
+
         <!-- Activity for starting the recording from a QS Tile -->
         <activity android:name=".activities.RecordingActivity"
             android:theme="@style/InvisibleActivity"
@@ -42,6 +45,5 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
-
     </application>
 </manifest>

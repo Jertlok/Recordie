@@ -6,7 +6,6 @@ import android.content.Intent
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import android.os.Bundle
-import android.util.DisplayMetrics
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import it.jertlok.screenrecorder.R
@@ -21,8 +20,6 @@ open class RecordingActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val mediaProjectionManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE)
                 as MediaProjectionManager
-        val realMetrics = DisplayMetrics()
-        windowManager.defaultDisplay.getRealMetrics(realMetrics)
         mScreenRecorder = ScreenRecorder.getInstance(applicationContext)
         if(!mScreenRecorder.isRecording()) {
             startActivityForResult(mediaProjectionManager.createScreenCaptureIntent(),
@@ -47,9 +44,7 @@ open class RecordingActivity: AppCompatActivity() {
             }
             // Otherwise we can start the screen record
             mScreenRecorder.startRecording(resultCode, data)
-            // At this point we can "hide" the application, so to give a better
-            // user experience
-            // TODO: Add some sort of timer...
+            // Terminate activity
             finish()
         }
     }
