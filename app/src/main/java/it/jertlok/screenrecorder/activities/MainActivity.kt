@@ -1,7 +1,6 @@
 package it.jertlok.screenrecorder.activities
 
 import android.Manifest
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -11,22 +10,13 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.DisplayMetrics
-import android.widget.Toast
-import androidx.appcompat.view.ActionMode
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import it.jertlok.screenrecorder.R
 import it.jertlok.screenrecorder.common.ScreenRecorder
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
-
-    companion object {
-        val TAG = "MainActivity"
-        // Permission request code
-        private const val PERMISSION_REQUESTS = 0
-        // Request code for starting a screen record
-        private const val REQUEST_CODE_SCREEN_RECORD = 1
-    }
 
     private lateinit var mScreenRecorder: ScreenRecorder
     // MediaProjection API
@@ -66,11 +56,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
         // Instantiate Screen Recorder class with real display metrics
         val realMetrics = DisplayMetrics()
         windowManager.defaultDisplay.getRealMetrics(realMetrics)
-        mScreenRecorder = ScreenRecorder(applicationContext, realMetrics)
+        mScreenRecorder = ScreenRecorder.getInstance(applicationContext)
 
         // TODO: Make this variable local if I realise it's not needed elsewhere.
         mMediaProjectionManager = applicationContext.getSystemService(
@@ -82,14 +71,14 @@ class MainActivity : AppCompatActivity() {
             // If we are not recording we can send the intent for recording
             // otherwise we will try to stop the recording.
             if (!mScreenRecorder.isRecording()) {
-                val recorderIntent = mMediaProjectionManager.createScreenCaptureIntent()
-                startActivityForResult(recorderIntent, REQUEST_CODE_SCREEN_RECORD)
+                // Start invisible activity
+                startActivity(Intent(this, RecordingActivity::class.java))
             } else {
                 mScreenRecorder.stopRecording()
                 // Let's reset the FAB icon to start
                 fabButton.setImageDrawable(fabStartDrawable)
                 // Try to notify that we have created a new file
-                notifyNewMedia(mScreenRecorder.getOutputFileName())
+                notifyNewMedia(mScreenRecorder.mOutputFile)
             }
         }
 
@@ -103,32 +92,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_SCREEN_RECORD) {
-            if (resultCode != Activity.RESULT_OK) {
-                // The user did not grant the permission
-                Toast.makeText(this, getString(R.string.permission_cast_denied),
-                        Toast.LENGTH_SHORT).show()
-                return
-            }
-            // Otherwise we can start the screen record
-            mScreenRecorder.startRecording(resultCode, data)
-            // We need to toggle the fab button
+    override fun onResume() {
+        super.onResume()
+        if (mScreenRecorder.isRecording()) {
             fabButton.setImageDrawable(fabStopDrawable)
-            // At this point we can "hide" the application, so to give a better
-            // user experience
-            // TODO: Add some sort of timer...
-            moveTaskToBack(true)
         }
     }
 
-    private fun notifyNewMedia(filePath: String?) {
+    private fun notifyNewMedia(file: File?) {
         // TODO: make a better check
-        if (filePath != null) {
-            val contentUri = Uri.fromFile(mScreenRecorder.mOutputFile)
+        if (file != null) {
+            val contentUri = Uri.fromFile(file)
             val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, contentUri)
             sendBroadcast(mediaScanIntent)
         }
+    }
+
+    companion object {
+        val TAG = "MainActivity"
+        // Permission request code
+        private const val PERMISSION_REQUESTS = 0
     }
 }

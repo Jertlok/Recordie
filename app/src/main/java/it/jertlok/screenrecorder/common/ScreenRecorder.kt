@@ -12,17 +12,15 @@ import android.os.Environment
 import android.preference.PreferenceManager
 import android.util.DisplayMetrics
 import android.util.Log
+import android.view.WindowManager
+import it.jertlok.screenrecorder.utils.SingletonHolder
 import it.jertlok.screenrecorder.utils.Utils
 import java.io.File
 import java.lang.RuntimeException
 import java.text.SimpleDateFormat
 import java.util.*
 
-open class ScreenRecorder (context: Context, realMetrics: DisplayMetrics) {
-
-    companion object {
-        const val TAG = "ScreenRecorder"
-    }
+open class ScreenRecorder (context: Context) {
 
     // Activity context
     private var mContext: Context = context
@@ -33,7 +31,7 @@ open class ScreenRecorder (context: Context, realMetrics: DisplayMetrics) {
     private var mVirtualDisplay: VirtualDisplay? = null
     private var mMediaProjectionCallback: MediaProjectionCallback
     // Display metrics
-    private var mDisplayMetrics = realMetrics
+    private var mDisplayMetrics: DisplayMetrics
     // Output file
     var mOutputFile: File? = null
         private set
@@ -51,8 +49,11 @@ open class ScreenRecorder (context: Context, realMetrics: DisplayMetrics) {
         // Get the media projection service
         mMediaProjectionManager = mContext.getSystemService(
                 Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
+        // Get windowManager
+        val windowManager = mContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         // Get display metrics
-        mDisplayMetrics = realMetrics
+        mDisplayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getRealMetrics(mDisplayMetrics)
         // Instantiate media projection callbacks
         mMediaProjectionCallback = MediaProjectionCallback()
         // Get SharedPreference
@@ -194,7 +195,9 @@ open class ScreenRecorder (context: Context, realMetrics: DisplayMetrics) {
         return mIsRecording
     }
 
-    fun getOutputFileName(): String? {
-        return mOutputFile?.path
+    companion object: SingletonHolder<ScreenRecorder, Context> (::ScreenRecorder){
+        private const val TAG = "ScreenRecorder"
+        // Request code for starting a screen record
+        const val REQUEST_CODE_SCREEN_RECORD = 1
     }
 }
