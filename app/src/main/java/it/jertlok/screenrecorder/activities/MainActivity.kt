@@ -70,6 +70,8 @@ class MainActivity : AppCompatActivity() {
             if (!mScreenRecorder.isRecording()) {
                 // Start invisible activity
                 startActivity(Intent(this, RecordingActivity::class.java))
+                // Terminate MainActivity
+                finish()
             } else {
                 mScreenRecorder.stopRecording()
                 // Let's reset the FAB icon to start
