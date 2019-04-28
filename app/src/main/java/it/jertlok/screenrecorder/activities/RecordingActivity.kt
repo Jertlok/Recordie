@@ -39,8 +39,13 @@ open class RecordingActivity: AppCompatActivity() {
                 // The user did not grant the permission
                 Toast.makeText(this, getString(R.string.permission_cast_denied),
                         Toast.LENGTH_SHORT).show()
-                // Terminate activity
+                // We will now reopen the main activity
+                val openMainActivity = Intent(this, MainActivity::class.java)
+                openMainActivity.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(openMainActivity)
+                // Terminate RecordingActivity and get out of here!
                 finish()
+                return
             }
             // Otherwise we can start the screen record
             mScreenRecorder.startRecording(resultCode, data)
