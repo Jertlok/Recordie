@@ -187,10 +187,10 @@ open class ScreenRecorder (context: Context) {
 
         // Create a media file name
         // TODO: Do not always use italian local
-        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ITALIAN).format(Date())
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
 
         return File(mediaStorageDir.path + File.separator +
-                "VID_" + timeStamp + ".mp4")
+                "SCR_" + timeStamp + ".mp4")
     }
 
     fun isRecording(): Boolean {

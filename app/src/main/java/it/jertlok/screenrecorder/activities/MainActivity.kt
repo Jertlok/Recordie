@@ -9,10 +9,17 @@ import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
+import android.util.Log
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import it.jertlok.screenrecorder.R
+import it.jertlok.screenrecorder.adapters.VideoAdapter
 import it.jertlok.screenrecorder.common.ScreenRecorder
+import it.jertlok.screenrecorder.common.ScreenVideo
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -23,6 +30,11 @@ class MainActivity : AppCompatActivity() {
     // User interface
     private lateinit var bottomBar: BottomAppBar
     private lateinit var fabButton: FloatingActionButton
+    // Video list
+    private lateinit var mRecyclerView: RecyclerView
+    private lateinit var mVideoAdapter: VideoAdapter
+    private lateinit var mVideoArray: ArrayList<ScreenVideo>
+    private lateinit var mLayoutManager: LinearLayoutManager
     // Drawables
     private var fabStartDrawable: Drawable? = null
     private var fabStopDrawable: Drawable? = null
@@ -34,6 +46,16 @@ class MainActivity : AppCompatActivity() {
         // User interface
         bottomBar = findViewById(R.id.bar)
         fabButton = findViewById(R.id.fab)
+        mRecyclerView = findViewById(R.id.recycler_video_view)
+        // Set video array
+        mVideoArray = getVideos()
+        mVideoAdapter = VideoAdapter(mVideoArray)
+        mLayoutManager = LinearLayoutManager(applicationContext)
+
+        mRecyclerView.layoutManager = mLayoutManager
+        mRecyclerView.itemAnimator = DefaultItemAnimator()
+        mRecyclerView.adapter = mVideoAdapter
+
         // Drawables
         fabStartDrawable = getDrawable(R.drawable.ic_outline_record)
         fabStopDrawable = getDrawable(R.drawable.ic_outline_stop)
@@ -70,8 +92,7 @@ class MainActivity : AppCompatActivity() {
             if (!mScreenRecorder.isRecording()) {
                 // Start invisible activity
                 startActivity(Intent(this, RecordingActivity::class.java))
-                // Terminate MainActivity
-                finish()
+                moveTaskToBack(true)
             } else {
                 mScreenRecorder.stopRecording()
                 // Let's reset the FAB icon to start
@@ -89,6 +110,19 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, SettingsActivity::class.java))
             finish()
         }
+
+        // TODO: This is actually interesting, we will see if I will keep it.
+        // Set on scroll listener for recycler view so we can hide the fab button
+        // when scrolling
+        mRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy < 0 && !fabButton.isShown) {
+                    fabButton.show()
+                } else if (dy > 0 && fabButton.isShown){
+                    fabButton.hide()
+                }
+            }
+        })
     }
 
     override fun onResume() {
@@ -107,6 +141,39 @@ class MainActivity : AppCompatActivity() {
             val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, contentUri)
             sendBroadcast(mediaScanIntent)
         }
+    }
+
+    private fun getVideos(): ArrayList<ScreenVideo> {
+        val projection = arrayOf(
+                MediaStore.Video.Media.DATA, // index: 0
+                MediaStore.Video.Media.TITLE, // index: 1
+                MediaStore.Video.Media.DURATION, // index: 2
+                MediaStore.Video.Media.DATE_TAKEN)
+        // Set cursor
+        val cursor = contentResolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                projection, MediaStore.Video.Media.DATA + " LIKE '%Screen Recorder/SCR%'",
+                null,
+                // Sort from newest to oldest
+                MediaStore.Video.Media.DATE_TAKEN + " DESC")
+        // Array List that we will return
+        val arrayList = ArrayList<ScreenVideo>()
+        // Go through list
+        cursor?.apply {
+            while (moveToNext()) {
+                arrayList.add(ScreenVideo(
+                        getString(/* DATA */ 0),
+                        getString(/* TITLE */ 1),
+                        getString(/* DURATION */ 2)))
+
+                // Let's see what we can get.
+                Log.d(TAG, "Data: " + getString(0) + " Duration: "
+                        + getString(2))
+            }
+        }
+        // Close the cursor
+        cursor?.close()
+        // Return array
+        return arrayList
     }
 
     companion object {
