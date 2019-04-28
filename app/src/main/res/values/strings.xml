@@ -19,4 +19,5 @@
 
     <!-- QS Tile -->
     <string name="qs_record_title">Start recording</string>
+    <string name="content_description">contentDescription</string>
 </resources>
