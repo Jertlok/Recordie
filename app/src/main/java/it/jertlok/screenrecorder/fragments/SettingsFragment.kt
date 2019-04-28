@@ -27,8 +27,6 @@ class SettingsFragment: PreferenceFragmentCompat() {
     private lateinit var frameRateListPref: ListPreference
     private lateinit var audioRecordingPref: SwitchPreference
 
-    // Display metrics
-    private lateinit var mDisplayMetrics: DisplayMetrics
     // Display resolution
     private lateinit var mDisplayRes: String
 
@@ -38,26 +36,35 @@ class SettingsFragment: PreferenceFragmentCompat() {
         mSharedPreferences = preferenceManager.sharedPreferences
 
         // Get display metrics
-        val mDisplayMetrics = DisplayMetrics()
-        activity?.windowManager?.defaultDisplay?.getRealMetrics(mDisplayMetrics)
-        mDisplayRes = Utils.getDisplayResolution(mDisplayMetrics)
+        val metrics = DisplayMetrics()
+        activity?.windowManager?.defaultDisplay?.getRealMetrics(metrics)
+        mDisplayRes = Utils.getDisplayResolution(metrics)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
         // TODO: we also need to set the descriptions.
         videoListPref = findPreference("video_resolution_pref") as ListPreference
         frameRateListPref = findPreference("frame_rate_pref") as ListPreference
         audioRecordingPref = findPreference("audio_recording_pref") as SwitchPreference
 
-        // We need to trim down the videoListPref, so I need to create the new arrays that will
-        // take place
-        val fromIndex = videoListPref.findIndexOfValue(mDisplayRes)
-        val supportedVideoEntries = Arrays.copyOfRange(videoListPref.entries, fromIndex,
-                videoListPref.entries.size)
-        val supportedVideoEntryValues = Arrays.copyOfRange(videoListPref.entryValues, fromIndex,
-                videoListPref.entryValues.size)
-        videoListPref.entries = supportedVideoEntries
-        videoListPref.entryValues = supportedVideoEntryValues
+        // TODO: Let's remove the XML arrays and put programmatically arrays
+        // TODO: down here or some sort of Settings controller.
+        // TODO: as it doesn't make any sense to play this lil' game.
+        // We need to inject to the videoListPreference the mDisplayRes
+        if (!videoListPref.entryValues.contains(mDisplayRes)) {
+            videoListPref.entryValues[0] = mDisplayRes
+        } else {
+            // Exclude "Device screen resolution" as it's a supported one, which means
+            // that it's inside our list.
+            val supportedVideoEntries = Arrays.copyOfRange(videoListPref.entries, 1,
+                    videoListPref.entries.size)
+            val supportedVideoEntryValues = Arrays.copyOfRange(videoListPref.entryValues, 1,
+                    videoListPref.entryValues.size)
+            // Let's set the values
+            videoListPref.entries = supportedVideoEntries
+            videoListPref.entryValues = supportedVideoEntryValues
+        }
 
         // We need to get the shared preferences and change the elements accordingly
         videoListPref.setValueIndex(videoListPref.findIndexOfValue(
