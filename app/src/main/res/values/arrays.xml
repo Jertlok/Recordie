@@ -2,6 +2,7 @@
 <resources>
     <!-- Video configuration that will be conditionally available -->
     <string-array name="video_resolution_aliases">
+        <item>Device screen resolution</item>
         <item>QHD 18:9 (2880 x 1440)</item>
         <item>QHD (2560 x 1440)</item>
         <item>Full HD 18:9 (2160 x 1080)</item>
@@ -10,6 +11,8 @@
     </string-array>
     <!-- These values will be interpreted as [height] x [width], 'x' is the separator -->
     <string-array name="video_resolution_values">
+        <!-- Here we will inject the native screen resolution -->
+        <item>0x0</item>
         <item>2880x1440</item>
         <item>2560x1440</item>
         <item>2160x1080</item>
