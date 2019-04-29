@@ -127,6 +127,7 @@ open class ScreenRecorder (context: Context) {
             Log.d(TAG, e.toString())
         }
         mMediaRecorder?.reset()
+        mMediaRecorder?.release()
         // Stop screen sharing
         stopScreenSharing()
         // Destroy media projection session
@@ -165,6 +166,7 @@ open class ScreenRecorder (context: Context) {
                 Log.d(TAG, e.toString())
             }
             mMediaRecorder?.reset()
+            mMediaRecorder?.release()
             mMediaProjection = null
         }
     }
