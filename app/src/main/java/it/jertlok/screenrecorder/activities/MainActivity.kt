@@ -11,11 +11,14 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
+import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import it.jertlok.screenrecorder.BuildConfig
 import it.jertlok.screenrecorder.R
 import it.jertlok.screenrecorder.adapters.VideoAdapter
 import it.jertlok.screenrecorder.common.ScreenRecorder
@@ -23,6 +26,11 @@ import it.jertlok.screenrecorder.common.ScreenVideo
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
+
+    // TODO: find a way to update the video adapter after a recording has stopped
+    // TODO: the problem so far is related to how android updates the content resolver.
+    // TODO: maybe I need to manually add a list of files with their correspondent things
+    // TODO: without relying on the ContentObserver?
 
     private lateinit var mScreenRecorder: ScreenRecorder
     // MediaProjection API
@@ -33,7 +41,7 @@ class MainActivity : AppCompatActivity() {
     // Video list
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mVideoAdapter: VideoAdapter
-    private lateinit var mVideoArray: ArrayList<ScreenVideo>
+    private var mVideoArray = ArrayList<ScreenVideo>()
     private lateinit var mLayoutManager: LinearLayoutManager
     // Drawables
     private var fabStartDrawable: Drawable? = null
@@ -47,9 +55,10 @@ class MainActivity : AppCompatActivity() {
         bottomBar = findViewById(R.id.bar)
         fabButton = findViewById(R.id.fab)
         mRecyclerView = findViewById(R.id.recycler_video_view)
-        // Set video array
-        mVideoArray = getVideos()
-        mVideoAdapter = VideoAdapter(mVideoArray)
+        // Update videos available
+        updateVideos()
+        // Set adapter
+        mVideoAdapter = VideoAdapter(mVideoArray, EventInterfaceImpl())
         mLayoutManager = LinearLayoutManager(applicationContext)
 
         mRecyclerView.layoutManager = mLayoutManager
@@ -110,19 +119,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, SettingsActivity::class.java))
             finish()
         }
-
-        // TODO: This is actually interesting, we will see if I will keep it.
-        // Set on scroll listener for recycler view so we can hide the fab button
-        // when scrolling
-        mRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (dy < 0 && !fabButton.isShown) {
-                    fabButton.show()
-                } else if (dy > 0 && fabButton.isShown){
-                    fabButton.hide()
-                }
-            }
-        })
     }
 
     override fun onResume() {
@@ -143,7 +139,32 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun getVideos(): ArrayList<ScreenVideo> {
+//    private fun addSingleFile(filePath: String) {
+//        val projection = arrayOf(
+//                MediaStore.Video.Media.DATA, // index: 0
+//                MediaStore.Video.Media.TITLE, // index: 1
+//                MediaStore.Video.Media.DURATION, // index: 2
+//                MediaStore.Video.Media.DATE_TAKEN)
+//        // Set where
+//        val where = "${MediaStore.Video.Media.DATA} = '$filePath'"
+//        // Set cursor
+//        val cursor = contentResolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+//                projection,
+//                where, null, null)
+//        // Apply
+//        cursor?.apply {
+//            if (moveToFirst()) {
+//                Log.d(TAG, "Title: ${cursor.getString(0)}")
+//            }
+//        }
+//        // Close cursor
+//        cursor?.close()
+//    }
+
+    private fun updateVideos() {
+        // TODO: reduce overhead
+        // Let's clear our video array
+        mVideoArray.clear()
         val projection = arrayOf(
                 MediaStore.Video.Media.DATA, // index: 0
                 MediaStore.Video.Media.TITLE, // index: 1
@@ -155,12 +176,10 @@ class MainActivity : AppCompatActivity() {
                 null,
                 // Sort from newest to oldest
                 MediaStore.Video.Media.DATE_TAKEN + " DESC")
-        // Array List that we will return
-        val arrayList = ArrayList<ScreenVideo>()
         // Go through list
         cursor?.apply {
             while (moveToNext()) {
-                arrayList.add(ScreenVideo(
+                mVideoArray.add(ScreenVideo(
                         getString(/* DATA */ 0),
                         getString(/* TITLE */ 1),
                         getString(/* DURATION */ 2)))
@@ -172,13 +191,28 @@ class MainActivity : AppCompatActivity() {
         }
         // Close the cursor
         cursor?.close()
-        // Return array
-        return arrayList
     }
 
     companion object {
-        val TAG = "MainActivity"
+        private const val TAG = "MainActivity"
         // Permission request code
         private const val PERMISSION_REQUESTS = 0
+    }
+
+    private inner class EventInterfaceImpl : VideoAdapter.EventInterface {
+        override fun deleteEvent() {
+            updateVideos()
+            mVideoAdapter.notifyDataSetChanged()
+        }
+
+        override fun playVideo(videoData: String) {
+            val videoFile = File(videoData)
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            val uri = FileProvider.getUriForFile(this@MainActivity,
+                    BuildConfig.APPLICATION_ID + ".provider", videoFile)
+            intent.setDataAndType(uri, "video/mpeg")
+            startActivity(intent)
+        }
     }
 }

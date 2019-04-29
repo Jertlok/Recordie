@@ -1,16 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:showIn="@layout/activity_main"
-    tools:context=".activities.MainActivity">
+    tools:showIn="@layout/activity_main">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_video_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="vertical" />
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
-</RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:showIn="@layout/activity_main"
+            tools:context=".activities.MainActivity">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_video_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="vertical" />
+
+        </RelativeLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
