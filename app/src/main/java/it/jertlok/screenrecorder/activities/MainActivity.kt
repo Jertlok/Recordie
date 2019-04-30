@@ -193,13 +193,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private class UpdateVideoTask(context: MainActivity): AsyncTask<Void, Void, Void>() {
+    private class UpdateVideoTask(context: MainActivity): AsyncTask<Void, Void, Boolean>() {
         private val activityRef: WeakReference<MainActivity> = WeakReference(context)
 
-        override fun doInBackground(vararg params: Void?): Void? {
+        override fun doInBackground(vararg params: Void?): Boolean {
             val activity = activityRef.get()
             if (activity == null || activity.isFinishing) {
-                return null
+                return false
             }
 
             val contentResolver = activity.contentResolver
@@ -227,10 +227,10 @@ class MainActivity : AppCompatActivity() {
             }
             // Close the cursor
             cursor?.close()
-            return null
+            return true
         }
 
-        override fun onPostExecute(result: Void?) {
+        override fun onPostExecute(result: Boolean?) {
             super.onPostExecute(result)
             val activity = activityRef.get()
             if (activity == null || activity.isFinishing) {
