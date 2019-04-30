@@ -4,14 +4,14 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.database.ContentObserver
 import android.graphics.drawable.Drawable
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.provider.MediaStore
-import android.util.Log
-import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,10 +27,8 @@ import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
-    // TODO: find a way to update the video adapter after a recording has stopped
-    // TODO: the problem so far is related to how android updates the content resolver.
-    // TODO: maybe I need to manually add a list of files with their correspondent things
-    // TODO: without relying on the ContentObserver?
+    // TODO: Learn about the various AsyncTask and start using them
+    // TODO: we can't potentially block the UI thread.
 
     private var mPermissionsGranted = false
     private lateinit var mScreenRecorder: ScreenRecorder
@@ -48,12 +46,18 @@ class MainActivity : AppCompatActivity() {
     private var fabStartDrawable: Drawable? = null
     private var fabStopDrawable: Drawable? = null
 
+    // Content Observer
+    private lateinit var mContentObserver: VideoContentObserver
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         // Grant permissions if needed
         checkPermissions()
+
+        contentResolver.registerContentObserver(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                true, VideoContentObserver(Handler()))
 
         // User interface
         bottomBar = findViewById(R.id.bar)
@@ -102,7 +106,6 @@ class MainActivity : AppCompatActivity() {
         bottomBar.setOnClickListener {
             // Start Settings activity
             startActivity(Intent(this, SettingsActivity::class.java))
-            finish()
         }
     }
 
@@ -112,6 +115,11 @@ class MainActivity : AppCompatActivity() {
             fabButton.setImageDrawable(fabStopDrawable)
         }
         updateVideos()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        contentResolver.unregisterContentObserver(mContentObserver)
     }
 
     private fun checkPermissions() {
@@ -147,28 +155,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-//    private fun addSingleFile(filePath: String) {
-//        val projection = arrayOf(
-//                MediaStore.Video.Media.DATA, // index: 0
-//                MediaStore.Video.Media.TITLE, // index: 1
-//                MediaStore.Video.Media.DURATION, // index: 2
-//                MediaStore.Video.Media.DATE_TAKEN)
-//        // Set where
-//        val where = "${MediaStore.Video.Media.DATA} = '$filePath'"
-//        // Set cursor
-//        val cursor = contentResolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-//                projection,
-//                where, null, null)
-//        // Apply
-//        cursor?.apply {
-//            if (moveToFirst()) {
-//                Log.d(TAG, "Title: ${cursor.getString(0)}")
-//            }
-//        }
-//        // Close cursor
-//        cursor?.close()
-//    }
-
     private fun updateVideos() {
         if (!mPermissionsGranted) {
             return
@@ -194,22 +180,12 @@ class MainActivity : AppCompatActivity() {
                         getString(/* DATA */ 0),
                         getString(/* TITLE */ 1),
                         getString(/* DURATION */ 2)))
-
-                // Let's see what we can get.
-                Log.d(TAG, "Data: " + getString(0) + " Duration: "
-                        + getString(2))
             }
         }
         // Close the cursor
         cursor?.close()
         // Notify adapter
         mVideoAdapter.notifyDataSetChanged()
-    }
-
-    companion object {
-        private const val TAG = "MainActivity"
-        // Permission request code
-        private const val PERMISSION_REQUESTS = 0
     }
 
     private inner class EventInterfaceImpl : VideoAdapter.EventInterface {
@@ -226,5 +202,21 @@ class MainActivity : AppCompatActivity() {
             intent.setDataAndType(uri, "video/mpeg")
             startActivity(intent)
         }
+    }
+
+    private inner class VideoContentObserver(handler: Handler) : ContentObserver(handler) {
+
+        override fun onChange(selfChange: Boolean, uri: Uri?) {
+            // Update video adapter when something changes in the content database
+            if (uri == MediaStore.Video.Media.EXTERNAL_CONTENT_URI) {
+                updateVideos()
+            }
+        }
+    }
+
+    companion object {
+        private const val TAG = "MainActivity"
+        // Permission request code
+        private const val PERMISSION_REQUESTS = 0
     }
 }
