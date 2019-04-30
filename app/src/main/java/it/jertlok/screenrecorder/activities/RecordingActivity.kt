@@ -33,6 +33,9 @@ open class RecordingActivity: AppCompatActivity() {
         }
     }
 
+    /* Here we will check whether we got the casting permission and eventually
+     * start the recording.
+     */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == ScreenRecorder.REQUEST_CODE_SCREEN_RECORD) {
@@ -56,6 +59,12 @@ open class RecordingActivity: AppCompatActivity() {
         }
     }
 
+    /**
+     * Function that sends a Broadcast and triggers a media scan with
+     * a file URI, so it will be added down gallery apps.
+     *
+     * @param file: the file that will be used for extracting the URI
+     */
     private fun notifyNewMedia(file: File?) {
         // TODO: make a better check
         if (file != null) {
