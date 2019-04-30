@@ -1,8 +1,6 @@
 package it.jertlok.screenrecorder.adapters
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater

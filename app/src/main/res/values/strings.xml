@@ -4,7 +4,6 @@
     <string name="settings_activity_name">Settings</string>
 
     <!-- Menu strings -->
-    <string name="menu_settings">Settings</string>
 
     <!-- Toast message for casting permission denied -->
     <string name="permission_cast_denied">Cast permission not granted</string>
@@ -19,5 +18,4 @@
 
     <!-- QS Tile -->
     <string name="qs_record_title">Start recording</string>
-    <string name="content_description">contentDescription</string>
 </resources>
