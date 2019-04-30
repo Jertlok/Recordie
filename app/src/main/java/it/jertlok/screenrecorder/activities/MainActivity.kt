@@ -8,6 +8,7 @@ import android.database.ContentObserver
 import android.graphics.drawable.Drawable
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
+import android.os.AsyncTask
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -24,11 +25,13 @@ import it.jertlok.screenrecorder.adapters.VideoAdapter
 import it.jertlok.screenrecorder.common.ScreenRecorder
 import it.jertlok.screenrecorder.common.ScreenVideo
 import java.io.File
+import java.lang.ref.WeakReference
 
 class MainActivity : AppCompatActivity() {
 
-    // TODO: Learn about the various AsyncTask and start using them
-    // TODO: we can't potentially block the UI thread.
+    // TODO: when removing an element there's no need to query once again
+    // TODO: the content resolver, we can just remove the element directly
+    // TODO: on the mVideoArray and then notify the adapter!
 
     private var mPermissionsGranted = false
     private lateinit var mScreenRecorder: ScreenRecorder
@@ -159,37 +162,13 @@ class MainActivity : AppCompatActivity() {
         if (!mPermissionsGranted) {
             return
         }
-        // TODO: reduce overhead
-        // Let's clear our video array
-        mVideoArray.clear()
-        val projection = arrayOf(
-                MediaStore.Video.Media.DATA, // index: 0
-                MediaStore.Video.Media.TITLE, // index: 1
-                MediaStore.Video.Media.DURATION, // index: 2
-                MediaStore.Video.Media.DATE_TAKEN)
-        // Set cursor
-        val cursor = contentResolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-                projection, MediaStore.Video.Media.DATA + " LIKE '%Screen Recorder/SCR%'",
-                null,
-                // Sort from newest to oldest
-                MediaStore.Video.Media.DATE_TAKEN + " DESC")
-        // Go through list
-        cursor?.apply {
-            while (moveToNext()) {
-                mVideoArray.add(ScreenVideo(
-                        getString(/* DATA */ 0),
-                        getString(/* TITLE */ 1),
-                        getString(/* DURATION */ 2)))
-            }
-        }
-        // Close the cursor
-        cursor?.close()
-        // Notify adapter
-        mVideoAdapter.notifyDataSetChanged()
+        // This task will update the video array in the background
+        UpdateVideoTask(this).execute()
     }
 
     private inner class EventInterfaceImpl : VideoAdapter.EventInterface {
         override fun deleteEvent() {
+            // TODO: add delete task
             updateVideos()
         }
 
@@ -212,6 +191,55 @@ class MainActivity : AppCompatActivity() {
                 updateVideos()
             }
         }
+    }
+
+    private class UpdateVideoTask(context: MainActivity): AsyncTask<Void, Void, Void>() {
+        private val activityRef: WeakReference<MainActivity> = WeakReference(context)
+
+        override fun doInBackground(vararg params: Void?): Void? {
+            val activity = activityRef.get()
+            if (activity == null || activity.isFinishing) {
+                return null
+            }
+
+            val contentResolver = activity.contentResolver
+            // Clear array
+            activity.mVideoArray.clear()
+            val projection = arrayOf(
+                    MediaStore.Video.Media.DATA, // index: 0
+                    MediaStore.Video.Media.TITLE, // index: 1
+                    MediaStore.Video.Media.DURATION, // index: 2
+                    MediaStore.Video.Media.DATE_TAKEN)
+            // Set cursor
+            val cursor = contentResolver?.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                    projection, MediaStore.Video.Media.DATA + " LIKE '%Screen Recorder/SCR%'",
+                    null,
+                    // Sort from newest to oldest
+                    MediaStore.Video.Media.DATE_TAKEN + " DESC")
+            // Go through list
+            cursor?.apply {
+                while (moveToNext()) {
+                    activity.mVideoArray.add(ScreenVideo(
+                            getString(/* DATA */ 0),
+                            getString(/* TITLE */ 1),
+                            getString(/* DURATION */ 2)))
+                }
+            }
+            // Close the cursor
+            cursor?.close()
+            return null
+        }
+
+        override fun onPostExecute(result: Void?) {
+            super.onPostExecute(result)
+            val activity = activityRef.get()
+            if (activity == null || activity.isFinishing) {
+                return
+            }
+            // Notify that the data has changed
+            activity.mVideoAdapter.notifyDataSetChanged()
+        }
+
     }
 
     companion object {
