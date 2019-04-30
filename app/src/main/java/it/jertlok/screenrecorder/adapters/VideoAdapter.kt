@@ -75,10 +75,6 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
             return false
         }
 
-        private fun startVideo(videoData: String) {
-
-        }
-
         companion object {
             private const val TAG = "VideoAdapter"
         }
@@ -87,7 +83,6 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.video_list_row,
                 parent, false)
-//        mThumbnail = LoadImageAsync().execute(videos as String).get()
         return VideoHolder(parent.context, itemView)
     }
 
@@ -116,23 +111,4 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
 
         fun playVideo(videoData: String)
     }
-
-//    class LoadImageAsync : AsyncTask<String, Int, ArrayList<Bitmap>>() {
-////        override fun doInBackground(var): Bitmap {
-////            var bitmapArr = Array<Bitmap>(videos.size)
-////            return ThumbnailUtils.createVideoThumbnail(videos,
-////                    MediaStore.Video.Thumbnails.MINI_KIND)
-////        }
-//
-//        override fun doInBackground(vararg params: String?): ArrayList<Bitmap> {
-//            val videos = params[0] as ArrayList<ScreenVideo>
-//
-//            val bitmapArray = ArrayList<Bitmap>()
-//
-//            videos.forEach { vid -> bitmapArray.add(ThumbnailUtils.createVideoThumbnail(vid.data,
-//                    MediaStore.Video.Thumbnails.MINI_KIND))}
-//
-//            return bitmapArray
-//        }
-//    }
 }
