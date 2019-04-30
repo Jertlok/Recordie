@@ -6,6 +6,7 @@ import android.content.Intent
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import it.jertlok.screenrecorder.R
@@ -39,12 +40,17 @@ open class RecordingActivity: AppCompatActivity() {
                 // The user did not grant the permission
                 Toast.makeText(this, getString(R.string.permission_cast_denied),
                         Toast.LENGTH_SHORT).show()
-                // Terminate RecordingActivity and get out of here!
+                // Terminate RecordingActivity, at this time we will still be
+                // with the MainActivity on the Foreground.
                 finish()
                 return
             }
-            // Otherwise we can start the screen record
-            mScreenRecorder.startRecording(resultCode, data)
+            // Let's hide the main task and start a delayed shit
+            moveTaskToBack(true)
+            Handler().postDelayed({
+                // Start screen recorder after 1.5 second
+                mScreenRecorder.startRecording(resultCode, data)
+            }, 1500)
             // Terminate activity
             finish()
         }
