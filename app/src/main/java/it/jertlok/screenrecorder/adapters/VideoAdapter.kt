@@ -1,6 +1,9 @@
 package it.jertlok.screenrecorder.adapters
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.media.ThumbnailUtils
+import android.os.AsyncTask
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,6 +18,7 @@ import it.jertlok.screenrecorder.R
 import it.jertlok.screenrecorder.common.ScreenVideo
 import java.io.File
 import java.lang.Exception
+import java.lang.ref.WeakReference
 
 class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInterface: EventInterface) :
         RecyclerView.Adapter<VideoAdapter.VideoHolder>() {
@@ -97,7 +101,7 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
 //        holder.image.setImageBitmap(mThumbnail[position])
         holder.title.text = video.title
         holder.deleteButton.setTag(R.id.fileUri, video.data)
-
+        CreateThumbnailTask(holder).execute(video.data)
         // So we can communicate from others activity
         holder.bindView(mInterface)
     }
@@ -110,5 +114,27 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
         fun deleteEvent()
 
         fun playVideo(videoData: String)
+    }
+
+    private class CreateThumbnailTask(context: VideoHolder): AsyncTask<String, Void, Boolean>() {
+        val holderRef: WeakReference<VideoHolder> = WeakReference(context)
+        private lateinit var mThumbnail: Bitmap
+
+        override fun doInBackground(vararg params: String?): Boolean {
+            if (params.size > 1) {
+                return false
+            }
+            val fileUri = params[0]
+            mThumbnail =
+                    ThumbnailUtils.createVideoThumbnail(fileUri, MediaStore.Video.Thumbnails.MINI_KIND)
+            return true
+        }
+
+        override fun onPostExecute(result: Boolean) {
+            super.onPostExecute(result)
+            // Set out thumbnail to be center crop
+            holderRef.get()?.image?.setImageBitmap(mThumbnail)
+            holderRef.get()?.image?.scaleType = ImageView.ScaleType.CENTER_CROP
+        }
     }
 }
