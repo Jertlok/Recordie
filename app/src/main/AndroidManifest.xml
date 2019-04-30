@@ -29,10 +29,7 @@
         <!-- Activity for starting the recording from a QS Tile -->
         <activity android:name=".activities.RecordingActivity"
             android:theme="@style/InvisibleActivity"
-            android:excludeFromRecents="true"
-            android:noHistory="true"
-            android:launchMode="singleTask"
-            android:taskAffinity="">
+            android:excludeFromRecents="true">
         </activity>
 
         <!-- QS Tile service -->

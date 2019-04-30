@@ -6,6 +6,7 @@ import android.content.Intent
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import it.jertlok.screenrecorder.R
@@ -39,10 +40,6 @@ open class RecordingActivity: AppCompatActivity() {
                 // The user did not grant the permission
                 Toast.makeText(this, getString(R.string.permission_cast_denied),
                         Toast.LENGTH_SHORT).show()
-                // We will now reopen the main activity
-                val openMainActivity = Intent(this, MainActivity::class.java)
-                openMainActivity.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                startActivity(openMainActivity)
                 // Terminate RecordingActivity and get out of here!
                 finish()
                 return
@@ -61,5 +58,9 @@ open class RecordingActivity: AppCompatActivity() {
             val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, contentUri)
             sendBroadcast(mediaScanIntent)
         }
+    }
+
+    companion object {
+        private const val TAG = "RecordingActivity"
     }
 }

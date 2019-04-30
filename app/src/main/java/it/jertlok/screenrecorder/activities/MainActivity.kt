@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity() {
     // TODO: maybe I need to manually add a list of files with their correspondent things
     // TODO: without relying on the ContentObserver?
 
+    private var mPermissionsGranted = false
     private lateinit var mScreenRecorder: ScreenRecorder
     // MediaProjection API
     private lateinit var mMediaProjectionManager: MediaProjectionManager
@@ -51,12 +52,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Grant permissions if needed
+        checkPermissions()
+
         // User interface
         bottomBar = findViewById(R.id.bar)
         fabButton = findViewById(R.id.fab)
         mRecyclerView = findViewById(R.id.recycler_video_view)
-        // Update videos available
-        updateVideos()
+
         // Set adapter
         mVideoAdapter = VideoAdapter(mVideoArray, EventInterfaceImpl())
         mLayoutManager = LinearLayoutManager(applicationContext)
@@ -68,23 +71,6 @@ class MainActivity : AppCompatActivity() {
         // Drawables
         fabStartDrawable = getDrawable(R.drawable.ic_outline_record)
         fabStopDrawable = getDrawable(R.drawable.ic_outline_stop)
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED
-                    || checkSelfPermission(Manifest.permission.RECORD_AUDIO)
-                    != PackageManager.PERMISSION_GRANTED) {
-                // Permission is not granted
-                if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        || shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)) {
-                    // Show the explanation
-                } else {
-                    requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                            Manifest.permission.RECORD_AUDIO),
-                            PERMISSION_REQUESTS)
-                }
-            }
-        }
 
         // Instantiate Screen Recorder class
         mScreenRecorder = ScreenRecorder.getInstance(applicationContext)
@@ -101,7 +87,6 @@ class MainActivity : AppCompatActivity() {
             if (!mScreenRecorder.isRecording()) {
                 // Start invisible activity
                 startActivity(Intent(this, RecordingActivity::class.java))
-                moveTaskToBack(true)
             } else {
                 mScreenRecorder.stopRecording()
                 // Let's reset the FAB icon to start
@@ -125,6 +110,29 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         if (mScreenRecorder.isRecording()) {
             fabButton.setImageDrawable(fabStopDrawable)
+        }
+        updateVideos()
+    }
+
+    private fun checkPermissions() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED
+                    || checkSelfPermission(Manifest.permission.RECORD_AUDIO)
+                    != PackageManager.PERMISSION_GRANTED) {
+                // Permission is not granted
+                if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        || shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)) {
+                    // Show the explanation
+                } else {
+                    requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            Manifest.permission.RECORD_AUDIO),
+                            PERMISSION_REQUESTS)
+                }
+            } else {
+                // Permissions granted, we can now do operations with the permissions.
+                mPermissionsGranted = true
+            }
         }
     }
 
@@ -162,6 +170,9 @@ class MainActivity : AppCompatActivity() {
 //    }
 
     private fun updateVideos() {
+        if (!mPermissionsGranted) {
+            return
+        }
         // TODO: reduce overhead
         // Let's clear our video array
         mVideoArray.clear()
@@ -191,6 +202,8 @@ class MainActivity : AppCompatActivity() {
         }
         // Close the cursor
         cursor?.close()
+        // Notify adapter
+        mVideoAdapter.notifyDataSetChanged()
     }
 
     companion object {
@@ -202,7 +215,6 @@ class MainActivity : AppCompatActivity() {
     private inner class EventInterfaceImpl : VideoAdapter.EventInterface {
         override fun deleteEvent() {
             updateVideos()
-            mVideoAdapter.notifyDataSetChanged()
         }
 
         override fun playVideo(videoData: String) {
