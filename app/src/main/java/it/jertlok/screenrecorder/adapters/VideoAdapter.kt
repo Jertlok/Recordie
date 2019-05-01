@@ -118,7 +118,7 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
 
     private class CreateThumbnailTask(context: VideoHolder): AsyncTask<String, Void, Boolean>() {
         val holderRef: WeakReference<VideoHolder> = WeakReference(context)
-        private lateinit var mThumbnail: Bitmap
+        private var mThumbnail: Bitmap? = null
 
         override fun doInBackground(vararg params: String?): Boolean {
             if (params.size > 1) {
@@ -133,8 +133,10 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
         override fun onPostExecute(result: Boolean) {
             super.onPostExecute(result)
             // Set out thumbnail to be center crop
-            holderRef.get()?.image?.setImageBitmap(mThumbnail)
-            holderRef.get()?.image?.scaleType = ImageView.ScaleType.CENTER_CROP
+            if (mThumbnail != null) {
+                holderRef.get()?.image?.setImageBitmap(mThumbnail)
+                holderRef.get()?.image?.scaleType = ImageView.ScaleType.CENTER_CROP
+            }
         }
     }
 }
