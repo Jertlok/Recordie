@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
     private var fabStopDrawable: Drawable? = null
 
     // Content Observer
-    private lateinit var mContentObserver: VideoContentObserver
+    private lateinit var mVideoContentObserver: VideoContentObserver
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,8 +59,10 @@ class MainActivity : AppCompatActivity() {
         // Grant permissions if needed
         checkPermissions()
 
+        mVideoContentObserver = VideoContentObserver(Handler())
+
         contentResolver.registerContentObserver(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-                true, VideoContentObserver(Handler()))
+                true, mVideoContentObserver)
 
         // User interface
         bottomBar = findViewById(R.id.bar)
@@ -125,7 +127,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        contentResolver.unregisterContentObserver(mContentObserver)
+        contentResolver.unregisterContentObserver(mVideoContentObserver)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
