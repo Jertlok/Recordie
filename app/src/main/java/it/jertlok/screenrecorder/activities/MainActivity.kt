@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
     // TODO: the content resolver, we can just remove the element directly
     // TODO: on the mVideoArray and then notify the adapter!
 
-    private var mPermissionsGranted = false
+    private var mStoragePermissionGranted = false
     private lateinit var mScreenRecorder: ScreenRecorder
     // MediaProjection API
     private lateinit var mMediaProjectionManager: MediaProjectionManager
@@ -74,6 +74,9 @@ class MainActivity : AppCompatActivity() {
         mRecyclerView.layoutManager = mLayoutManager
         mRecyclerView.itemAnimator = DefaultItemAnimator()
         mRecyclerView.adapter = mVideoAdapter
+
+        // Update videos
+        updateVideos()
 
         // Drawables
         fabStartDrawable = getDrawable(R.drawable.ic_outline_record)
@@ -125,11 +128,26 @@ class MainActivity : AppCompatActivity() {
         contentResolver.unregisterContentObserver(mContentObserver)
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
+                                            grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        // If we got the the WRITE_EXTERNAL_STORAGE permission granted
+        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            // Let's set the global variable
+            mStoragePermissionGranted = true
+            updateVideos()
+        }
+    }
+
     private fun checkPermissions() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED
-                    || checkSelfPermission(Manifest.permission.RECORD_AUDIO)
+            // We need to know if at least the storage permission got granted, it will be useful
+            // for allowing to update videos asynchronously.
+            mStoragePermissionGranted = checkSelfPermission(
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+            // Check permissions
+            if (!mStoragePermissionGranted || checkSelfPermission(Manifest.permission.RECORD_AUDIO)
                     != PackageManager.PERMISSION_GRANTED) {
                 // Permission is not granted
                 if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -140,9 +158,6 @@ class MainActivity : AppCompatActivity() {
                             Manifest.permission.RECORD_AUDIO),
                             PERMISSION_REQUESTS)
                 }
-            } else {
-                // Permissions granted, we can now do operations with the permissions.
-                mPermissionsGranted = true
             }
         }
     }
@@ -159,7 +174,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateVideos() {
-        if (!mPermissionsGranted) {
+        if (!mStoragePermissionGranted) {
             return
         }
         // This task will update the video array in the background
