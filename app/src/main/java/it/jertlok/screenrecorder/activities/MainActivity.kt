@@ -1,6 +1,7 @@
 package it.jertlok.screenrecorder.activities
 
 import android.Manifest
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -52,6 +53,9 @@ class MainActivity : AppCompatActivity() {
     // Content Observer
     private lateinit var mVideoContentObserver: VideoContentObserver
 
+    // Notification manager
+    private lateinit var mNotificationManager: NotificationManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -88,8 +92,10 @@ class MainActivity : AppCompatActivity() {
         mScreenRecorder = ScreenRecorder.getInstance(applicationContext)
 
         // TODO: Make this variable local if I realise it's not needed elsewhere.
-        mMediaProjectionManager = applicationContext.getSystemService(
+        mMediaProjectionManager = getSystemService(
                 Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
+
+        mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         // Set actions for the FAB
         fabButton.setOnClickListener {
@@ -103,6 +109,8 @@ class MainActivity : AppCompatActivity() {
                 mScreenRecorder.stopRecording()
                 // Let's reset the FAB icon to start
                 fabButton.setImageDrawable(fabStartDrawable)
+                // Cancel notification
+                mNotificationManager.cancel(RecordingActivity.NOTIFICATION_RECORD_ID)
                 // Try to notify that we have created a new file
                 notifyNewMedia(mScreenRecorder.mOutputFile)
             }
