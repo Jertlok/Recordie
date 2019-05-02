@@ -4,6 +4,12 @@
     <PreferenceCategory
         android:title="@string/video_category"/>
     <ListPreference
+        app:key="bit_rate_pref"
+        app:title="@string/bit_rate_title"
+        app:entries="@array/bit_rate_aliases"
+        app:entryValues="@array/bit_rate_values"/>
+    
+    <ListPreference
         app:key="frame_rate_pref"
         app:title="@string/frame_rate_title"
         app:entries="@array/frame_rate_aliases"

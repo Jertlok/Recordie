@@ -23,6 +23,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
     private lateinit var mSharedPreferences: SharedPreferences
 
     // User interface
+    private lateinit var bitRatePref: ListPreference
     private lateinit var frameRateListPref: ListPreference
     private lateinit var audioRecordingPref: SwitchPreference
     private lateinit var shakeStopPref: SwitchPreference
@@ -44,11 +45,14 @@ class SettingsFragment: PreferenceFragmentCompat() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // TODO: we also need to set the descriptions.
+        bitRatePref = findPreference("bit_rate_pref") as ListPreference
         frameRateListPref = findPreference("frame_rate_pref") as ListPreference
         audioRecordingPref = findPreference("audio_recording_pref") as SwitchPreference
         shakeStopPref = findPreference("shake_stop_pref") as SwitchPreference
 
         // We need to get the shared preferences and change the elements accordingly
+        bitRatePref.setValueIndex(bitRatePref.findIndexOfValue(
+                mSharedPreferences.getString("bit_rate", "16384000")))
         frameRateListPref.setValueIndex(frameRateListPref.findIndexOfValue(
                 mSharedPreferences.getString("frame_rate", "30")))
         audioRecordingPref.isChecked =
@@ -57,6 +61,10 @@ class SettingsFragment: PreferenceFragmentCompat() {
                 mSharedPreferences.getBoolean("shake_stop", false)
 
         // On preference change listeners
+        bitRatePref.setOnPreferenceChangeListener { _, newValue ->
+            mSharedPreferences.edit().putString("bit_rate", newValue as String).apply()
+            true
+        }
         frameRateListPref.setOnPreferenceChangeListener { _, newValue ->
             mSharedPreferences.edit().putString("frame_rate", newValue as String).apply()
             true
