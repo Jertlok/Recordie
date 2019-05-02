@@ -41,10 +41,6 @@ open class ScreenRecorder (context: Context) {
     // SharedPreference
     private var mSharedPreferences: SharedPreferences
 
-    // User preferences
-    private var mUserHeight: Int = 1
-    private var mUserWidth: Int = -1
-
     init {
         // Get the media projection service
         mMediaProjectionManager = mContext.getSystemService(
@@ -72,14 +68,8 @@ open class ScreenRecorder (context: Context) {
         mMediaRecorder?.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
         mOutputFile = getOutputMediaFile()
         mMediaRecorder?.setOutputFile(mOutputFile?.path)
-
-        // Get user preference for video resolution
-        val videoResolution = mSharedPreferences.getString("video_resolution",
-                Utils.getDisplayResolution(mDisplayMetrics))?.split("x".toRegex())
-        mUserWidth = videoResolution?.get(1)?.toInt() as Int
-        mUserHeight = videoResolution[0].toInt()
-        // Set video resolution with user preferences
-        mMediaRecorder?.setVideoSize(mUserWidth, mUserHeight)
+        // Set video size
+        mMediaRecorder?.setVideoSize(mDisplayMetrics.widthPixels, mDisplayMetrics.heightPixels)
         mMediaRecorder?.setVideoEncoder(MediaRecorder.VideoEncoder.H264)
         mMediaRecorder?.setVideoEncodingBitRate(16384 * 1000)
         if (isAudioRecEnabled) {
@@ -152,8 +142,9 @@ open class ScreenRecorder (context: Context) {
     }
 
     private fun createVirtualDisplay(): VirtualDisplay? {
-        return mMediaProjection?.createVirtualDisplay(TAG, mUserWidth, mUserHeight,
-                mDisplayMetrics.densityDpi, DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
+        return mMediaProjection?.createVirtualDisplay(TAG, mDisplayMetrics.widthPixels,
+                mDisplayMetrics.heightPixels, mDisplayMetrics.densityDpi,
+                DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
                 mMediaRecorder?.surface, null, null)
     }
 
