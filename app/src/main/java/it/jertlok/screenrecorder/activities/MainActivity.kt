@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.ContentObserver
 import android.graphics.drawable.Drawable
+import android.hardware.SensorManager
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import android.os.AsyncTask
@@ -27,8 +28,9 @@ import it.jertlok.screenrecorder.common.ScreenRecorder
 import it.jertlok.screenrecorder.common.ScreenVideo
 import java.io.File
 import java.lang.ref.WeakReference
+import com.squareup.seismic.ShakeDetector
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
 
     // TODO: when removing an element there's no need to query once again
     // TODO: the content resolver, we can just remove the element directly
@@ -55,6 +57,10 @@ class MainActivity : AppCompatActivity() {
 
     // Notification manager
     private lateinit var mNotificationManager: NotificationManager
+
+    // Shake detecor
+    private lateinit var mSensorManager: SensorManager
+    private lateinit var mShakeDetector: ShakeDetector
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,13 +112,7 @@ class MainActivity : AppCompatActivity() {
                 // Start invisible activity
                 startActivity(Intent(this, RecordingActivity::class.java))
             } else {
-                mScreenRecorder.stopRecording()
-                // Let's reset the FAB icon to start
-                fabButton.setImageDrawable(fabStartDrawable)
-                // Cancel notification
-                mNotificationManager.cancel(RecordingActivity.NOTIFICATION_RECORD_ID)
-                // Try to notify that we have created a new file
-                notifyNewMedia(mScreenRecorder.mOutputFile)
+                stopRecording()
             }
         }
 
@@ -123,6 +123,12 @@ class MainActivity : AppCompatActivity() {
             // Start Settings activity
             startActivity(Intent(this, SettingsActivity::class.java))
         }
+
+        // Shake detector
+
+        mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        mShakeDetector = ShakeDetector(this)
+        mShakeDetector.start(mSensorManager)
     }
 
     override fun onResume() {
@@ -136,6 +142,7 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         contentResolver.unregisterContentObserver(mVideoContentObserver)
+        mShakeDetector.stop()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
@@ -189,6 +196,26 @@ class MainActivity : AppCompatActivity() {
         }
         // This task will update the video array in the background
         UpdateVideoTask(this).execute()
+    }
+
+    private fun stopRecording() {
+        mScreenRecorder.stopRecording()
+        // Let's reset the FAB icon to start
+        fabButton.setImageDrawable(fabStartDrawable)
+        // Cancel notification
+        mNotificationManager.cancel(RecordingActivity.NOTIFICATION_RECORD_ID)
+        // Try to notify that we have created a new file
+        notifyNewMedia(mScreenRecorder.mOutputFile)
+    }
+
+    override fun hearShake() {
+        if (mScreenRecorder.isRecording()) {
+            stopRecording()
+            // In this case it would be great to return on the main activity
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+            startActivity(intent)
+        }
     }
 
     private inner class EventInterfaceImpl : VideoAdapter.EventInterface {

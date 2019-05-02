@@ -35,4 +35,7 @@ dependencies {
 
     // Material design
     implementation 'com.google.android.material:material:1.0.0'
+
+    // Shake detector
+    implementation 'com.squareup:seismic:1.0.2'
 }
