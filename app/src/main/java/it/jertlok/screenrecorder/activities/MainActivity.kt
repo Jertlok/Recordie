@@ -184,9 +184,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private inner class EventInterfaceImpl : VideoAdapter.EventInterface {
-        override fun deleteEvent() {
-            // TODO: add delete task
-            updateVideos()
+        override fun deleteEvent(videoData: String) {
+            UpdateVideoTask(this@MainActivity).execute(videoData)
         }
 
         override fun playVideo(videoData: String) {
@@ -210,15 +209,34 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private class UpdateVideoTask(context: MainActivity): AsyncTask<Void, Void, Boolean>() {
+    private class UpdateVideoTask(context: MainActivity): AsyncTask<String, Void, Boolean>() {
         private val activityRef: WeakReference<MainActivity> = WeakReference(context)
 
-        override fun doInBackground(vararg params: Void?): Boolean {
+        override fun doInBackground(vararg params: String?): Boolean {
             val activity = activityRef.get()
             if (activity == null || activity.isFinishing) {
                 return false
             }
 
+            // Deletion mode
+            if (params.size == 1) {
+                // Get the videoData criteria
+                val videoData = params[0]
+                // Get iterator from main video array list
+                val videoIterator = activity.mVideoArray.iterator()
+                while (videoIterator.hasNext()) {
+                    val video = videoIterator.next()
+                    if (video.data == videoData) {
+                        // Remove the video
+                        activity.mVideoArray.remove(video)
+                        return true
+                    }
+                }
+                // We did not find the video
+                return false
+            }
+
+            // Global update mode
             val contentResolver = activity.contentResolver
             // Clear array
             activity.mVideoArray.clear()
