@@ -12,7 +12,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import it.jertlok.screenrecorder.R
@@ -31,13 +30,14 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
         var shareButton: Button = view.findViewById(R.id.share)
 
         fun bindView(eventInterface: EventInterface) {
+            // TODO: move this thing into image
+            val videoData = deleteButton.getTag(R.id.fileUri).toString()
             deleteButton.setOnClickListener {
                 val builder = AlertDialog.Builder(context,
                         R.style.Theme_MaterialComponents_Dialog_Alert)
                 // Set positive button
                 builder.setTitle("Delete screen record")
                 builder.setPositiveButton(android.R.string.yes) { _, _ ->
-                    val videoData = deleteButton.getTag(R.id.fileUri).toString()
                     deleteFile(videoData)
                     eventInterface.deleteEvent(videoData)
                 }
@@ -50,12 +50,12 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
             }
 
             shareButton.setOnClickListener {
-                Toast.makeText(context, "To be implemented...", Toast.LENGTH_SHORT).show()
+                eventInterface.shareVideo(videoData)
             }
 
             image.setOnClickListener {
                 // Toast.makeText(context, "To be implemented...", Toast.LENGTH_SHORT).show()
-                eventInterface.playVideo(deleteButton.getTag(R.id.fileUri).toString())
+                eventInterface.playVideo(videoData)
             }
         }
 
@@ -122,6 +122,8 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
         fun deleteEvent(videoData: String)
         // Called when we click on play button
         fun playVideo(videoData: String)
+        // Called when we click on share button
+        fun shareVideo(videoData: String)
     }
 
     private class CreateThumbnailTask(context: VideoHolder): AsyncTask<String, Void, Boolean>() {
