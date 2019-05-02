@@ -46,6 +46,13 @@ class SettingsFragment: PreferenceFragmentCompat() {
         frameRateListPref = findPreference("frame_rate_pref") as ListPreference
         audioRecordingPref = findPreference("audio_recording_pref") as SwitchPreference
 
+
+        // We need to get the shared preferences and change the elements accordingly
+        frameRateListPref.setValueIndex(frameRateListPref.findIndexOfValue(
+                mSharedPreferences.getString("frame_rate", "30")))
+        audioRecordingPref.isChecked =
+                mSharedPreferences.getBoolean("audio_recording", false)
+
         frameRateListPref.setOnPreferenceChangeListener { _, newValue ->
             mSharedPreferences.edit().putString("frame_rate", newValue as String).apply()
             true
