@@ -25,6 +25,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
     // User interface
     private lateinit var frameRateListPref: ListPreference
     private lateinit var audioRecordingPref: SwitchPreference
+    private lateinit var shakeStopPref: SwitchPreference
 
     // Display resolution
     private lateinit var mDisplayRes: String
@@ -45,20 +46,27 @@ class SettingsFragment: PreferenceFragmentCompat() {
         // TODO: we also need to set the descriptions.
         frameRateListPref = findPreference("frame_rate_pref") as ListPreference
         audioRecordingPref = findPreference("audio_recording_pref") as SwitchPreference
-
+        shakeStopPref = findPreference("shake_stop_pref") as SwitchPreference
 
         // We need to get the shared preferences and change the elements accordingly
         frameRateListPref.setValueIndex(frameRateListPref.findIndexOfValue(
                 mSharedPreferences.getString("frame_rate", "30")))
         audioRecordingPref.isChecked =
                 mSharedPreferences.getBoolean("audio_recording", false)
+        shakeStopPref.isChecked =
+                mSharedPreferences.getBoolean("shake_stop", false)
 
+        // On preference change listeners
         frameRateListPref.setOnPreferenceChangeListener { _, newValue ->
             mSharedPreferences.edit().putString("frame_rate", newValue as String).apply()
             true
         }
         audioRecordingPref.setOnPreferenceChangeListener { _, newValue ->
             mSharedPreferences.edit().putBoolean("audio_recording", newValue as Boolean).apply()
+            true
+        }
+        shakeStopPref.setOnPreferenceChangeListener { _, newValue ->
+            mSharedPreferences.edit().putBoolean("shake_stop", newValue as Boolean).apply()
             true
         }
 
