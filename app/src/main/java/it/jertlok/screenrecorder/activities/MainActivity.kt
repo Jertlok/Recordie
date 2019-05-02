@@ -52,16 +52,15 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
     // Drawables
     private var fabStartDrawable: Drawable? = null
     private var fabStopDrawable: Drawable? = null
-
     // Content Observer
     private lateinit var mVideoContentObserver: VideoContentObserver
-
     // Notification manager
     private lateinit var mNotificationManager: NotificationManager
-
     // Shake detecor
     private lateinit var mSensorManager: SensorManager
     private lateinit var mShakeDetector: ShakeDetector
+    // Regex for updating video files
+    private val mPattern = "content://media/external/video/media.*".toRegex()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -221,7 +220,7 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
 
     private inner class EventInterfaceImpl : VideoAdapter.EventInterface {
         override fun deleteEvent(videoData: String) {
-            UpdateVideoTask(this@MainActivity).execute(videoData)
+            // Do nothing
         }
 
         override fun playVideo(videoData: String) {
@@ -238,8 +237,7 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
     private inner class VideoContentObserver(handler: Handler) : ContentObserver(handler) {
 
         override fun onChange(selfChange: Boolean, uri: Uri?) {
-            // Update video adapter when something changes in the content database
-            if (uri == MediaStore.Video.Media.EXTERNAL_CONTENT_URI) {
+            if (mPattern.containsMatchIn(MediaStore.Video.Media.EXTERNAL_CONTENT_URI.toString())) {
                 updateVideos()
             }
         }
@@ -254,25 +252,6 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
                 return false
             }
 
-            // Deletion mode
-            if (params.size == 1) {
-                // Get the videoData criteria
-                val videoData = params[0]
-                // Get iterator from main video array list
-                val videoIterator = activity.mVideoArray.iterator()
-                while (videoIterator.hasNext()) {
-                    val video = videoIterator.next()
-                    if (video.data == videoData) {
-                        // Remove the video
-                        activity.mVideoArray.remove(video)
-                        return true
-                    }
-                }
-                // We did not find the video
-                return false
-            }
-
-            // Global update mode
             val contentResolver = activity.contentResolver
             // Clear array
             activity.mVideoArray.clear()
@@ -314,7 +293,6 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
     }
 
     companion object {
-        private const val TAG = "MainActivity"
         // Permission request code
         private const val PERMISSION_REQUESTS = 0
     }

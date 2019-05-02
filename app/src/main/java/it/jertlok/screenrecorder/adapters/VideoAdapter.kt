@@ -106,14 +106,9 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
     override fun onBindViewHolder(holder: VideoHolder, position: Int) {
         // We need to set the values, for now I am going to put something hardcoded.
         val video = videos[position]
-        // Let's create the thumbnail
-        // TODO: We need to do some sort of async task...
-        // TODO: We need to add onClickListener for images and actions
-//        val thumbnail = ThumbnailUtils.createVideoThumbnail(video.data,
-//              MediaStore.Video.Thumbnails.MINI_KIND)
-//        holder.image.setImageBitmap(mThumbnail[position])
         holder.title.text = video.title
         holder.deleteButton.setTag(R.id.fileUri, video.data)
+        // Let's create the thumbnail
         CreateThumbnailTask(holder).execute(video.data)
         // So we can communicate from others activity
         holder.bindView(mInterface)
@@ -124,8 +119,9 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
     }
 
     interface EventInterface {
+        // Called when we click on delete button
         fun deleteEvent(videoData: String)
-
+        // Called when we click on play button
         fun playVideo(videoData: String)
     }
 
