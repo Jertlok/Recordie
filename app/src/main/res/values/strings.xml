@@ -11,11 +11,15 @@
     <!-- Settings -->
 
     <!-- Video configurations -->
+    <string name="video_category">Video</string>
     <string name="video_resolution_title">Video resolution</string>
     <string name="frame_rate_title">Frame rate</string>
     <!-- Audio configurations -->
+    <string name="audio_category">Audio</string>
     <string name="audio_recording_title">Audio recording</string>
-
+    <!-- Misc configurations -->
+    <string name="misc_category">Miscellaneous</string>
+    <string name="shake_stop_title">Shake to stop</string>
     <!-- QS Tile -->
     <string name="qs_record_title">Toggle recording</string>
 

@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.database.ContentObserver
 import android.graphics.drawable.Drawable
@@ -15,6 +16,7 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.preference.PreferenceManager
 import android.provider.MediaStore
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -59,8 +61,12 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
     // Shake detecor
     private lateinit var mSensorManager: SensorManager
     private lateinit var mShakeDetector: ShakeDetector
+    private var mIsShakeActive = false
     // Regex for updating video files
     private val mPattern = "content://media/external/video/media.*".toRegex()
+    // Shared preference
+    private lateinit var mSharedPreferences: SharedPreferences
+    private lateinit var mSharedPrefListener: SharedPreferences.OnSharedPreferenceChangeListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,10 +75,41 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
         // Grant permissions if needed
         checkPermissions()
 
-        mVideoContentObserver = VideoContentObserver(Handler())
+        // Instantiate Screen Recorder class
+        mScreenRecorder = ScreenRecorder.getInstance(applicationContext)
 
+        // Get various system services
+        mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        mMediaProjectionManager = getSystemService(
+                Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
+
+        // Register video content observer
+        mVideoContentObserver = VideoContentObserver(Handler())
         contentResolver.registerContentObserver(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
                 true, mVideoContentObserver)
+
+        // Initialise shared preferences
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        // Set shared preference listener
+        mSharedPrefListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if ("shake_stop" == key) {
+                // Get the new value for the preference
+                mIsShakeActive = mSharedPreferences.getBoolean("shake_stop", false)
+                // Our preference has changed, we also need to either start / stop the service
+                if (mIsShakeActive) mShakeDetector.start(mSensorManager) else mShakeDetector.stop()
+            }
+        }
+        // Register shared preference listener
+        mSharedPreferences.registerOnSharedPreferenceChangeListener(mSharedPrefListener)
+
+        // Shake detector
+        mIsShakeActive = mSharedPreferences.getBoolean("shake_stop", false)
+        mShakeDetector = ShakeDetector(this)
+        // Start ShakeDetector only if needed
+        if (mIsShakeActive) {
+            mShakeDetector.start(mSensorManager)
+        }
 
         // User interface
         bottomBar = findViewById(R.id.bar)
@@ -94,15 +131,6 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
         fabStartDrawable = getDrawable(R.drawable.ic_outline_record)
         fabStopDrawable = getDrawable(R.drawable.ic_outline_stop)
 
-        // Instantiate Screen Recorder class
-        mScreenRecorder = ScreenRecorder.getInstance(applicationContext)
-
-        // TODO: Make this variable local if I realise it's not needed elsewhere.
-        mMediaProjectionManager = getSystemService(
-                Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
-
-        mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
         // Set actions for the FAB
         fabButton.setOnClickListener {
             // Here we need to understand whether we are recording or not.
@@ -123,12 +151,6 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
             // Start Settings activity
             startActivity(Intent(this, SettingsActivity::class.java))
         }
-
-        // Shake detector
-
-        mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        mShakeDetector = ShakeDetector(this)
-        mShakeDetector.start(mSensorManager)
     }
 
     override fun onResume() {
@@ -141,7 +163,11 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
 
     override fun onDestroy() {
         super.onDestroy()
+        // Unregister video content observer
         contentResolver.unregisterContentObserver(mVideoContentObserver)
+        // Unregister shared preference listener
+        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPrefListener)
+        // Stop shaking service if it's active
         mShakeDetector.stop()
     }
 

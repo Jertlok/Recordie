@@ -1,15 +1,26 @@
-<androidx.preference.PreferenceScreen
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.preference.PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <PreferenceCategory
+        android:title="@string/video_category"/>
     <ListPreference
         app:key="frame_rate_pref"
         app:title="@string/frame_rate_title"
         app:entries="@array/frame_rate_aliases"
         app:entryValues="@array/frame_rate_values"/>
 
+    <PreferenceCategory
+        android:title="@string/audio_category"/>
     <SwitchPreference
         app:key="audio_recording_pref"
         app:title="@string/audio_recording_title"
+        app:defaultValue="false"/>
+
+    <PreferenceCategory
+        android:title="@string/misc_category"/>
+    <SwitchPreference
+        app:key="shake_stop_pref"
+        app:title="@string/shake_stop_title"
         app:defaultValue="false"/>
 
 </androidx.preference.PreferenceScreen>
