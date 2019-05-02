@@ -263,9 +263,12 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
         }
 
         override fun shareVideo(videoData: String) {
+            val videoFile = File(videoData)
             val shareIntent = Intent(Intent.ACTION_SEND)
             shareIntent.type = "video/*"
-            val fileToShare = Uri.fromFile(File(videoData))
+            shareIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            val fileToShare = FileProvider.getUriForFile(this@MainActivity,
+                    BuildConfig.APPLICATION_ID + ".provider", videoFile)
             shareIntent.putExtra(Intent.EXTRA_STREAM, fileToShare)
             startActivity(Intent.createChooser(shareIntent, getString(R.string.share_title)))
         }
