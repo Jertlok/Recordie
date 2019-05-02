@@ -1,6 +1,8 @@
 package it.jertlok.screenrecorder.activities
 
 import android.app.Activity
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.media.projection.MediaProjectionManager
@@ -9,18 +11,22 @@ import android.os.Bundle
 import android.os.Handler
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
 import it.jertlok.screenrecorder.R
 import it.jertlok.screenrecorder.common.ScreenRecorder
 import java.io.File
 
+
 open class RecordingActivity: AppCompatActivity() {
 
     private lateinit var mScreenRecorder: ScreenRecorder
+    private lateinit var mNotificationManager: NotificationManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val mediaProjectionManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE)
                 as MediaProjectionManager
+        mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         mScreenRecorder = ScreenRecorder.getInstance(applicationContext)
         if(!mScreenRecorder.isRecording()) {
             startActivityForResult(mediaProjectionManager.createScreenCaptureIntent(),
@@ -28,6 +34,7 @@ open class RecordingActivity: AppCompatActivity() {
         } else {
             // We need to stop the recording
             mScreenRecorder.stopRecording()
+            mNotificationManager.cancel(NOTIFICATION_RECORD_ID)
             notifyNewMedia(mScreenRecorder.mOutputFile)
             finish()
         }
@@ -54,6 +61,20 @@ open class RecordingActivity: AppCompatActivity() {
                 // Start screen recorder after 1.5 second
                 mScreenRecorder.startRecording(resultCode, data)
             }, 1500)
+            // When the recording activity gets recalled while the recording is in progress, the
+            // recording gets stopped.
+            val intent = Intent(this, RecordingActivity::class.java)
+            val stopPendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
+            val builder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL)
+                    .setSmallIcon(R.drawable.ic_outline_record)
+                    .setContentTitle(getString(R.string.app_name))
+                    .setContentText(getString(R.string.notif_rec_progress))
+                    .setWhen(System.currentTimeMillis())
+                    .setUsesChronometer(true)
+                    .setOngoing(true)
+                    .addAction(R.drawable.ic_outline_stop, getString(R.string.notif_rec_stop), stopPendingIntent)
+                    .build()
+            mNotificationManager.notify(NOTIFICATION_RECORD_ID, builder)
             // Terminate activity
             finish()
         }
@@ -76,5 +97,9 @@ open class RecordingActivity: AppCompatActivity() {
 
     companion object {
         private const val TAG = "RecordingActivity"
+
+        // Notification channel id
+        private const val NOTIFICATION_CHANNEL = "ScreenRecorder_notificationChannel"
+        const val NOTIFICATION_RECORD_ID = 0
     }
 }
