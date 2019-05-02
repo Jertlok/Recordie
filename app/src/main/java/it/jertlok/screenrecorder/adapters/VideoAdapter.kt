@@ -24,12 +24,11 @@ import java.lang.ref.WeakReference
 class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInterface: EventInterface) :
         RecyclerView.Adapter<VideoAdapter.VideoHolder>() {
 
-    class VideoHolder(private val context: Context, private val view: View) : RecyclerView.ViewHolder(view) {
+    class VideoHolder(private val context: Context, view: View) : RecyclerView.ViewHolder(view) {
         var image: ImageView = view.findViewById(R.id.image)
         var title: TextView = view.findViewById(R.id.title)
         var deleteButton: Button = view.findViewById(R.id.delete)
         var shareButton: Button = view.findViewById(R.id.share)
-        // var duration: TextView = view.findViewById(R.id.duration)
 
         fun bindView(eventInterface: EventInterface) {
             deleteButton.setOnClickListener {
