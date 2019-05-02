@@ -38,8 +38,9 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
                 // Set positive button
                 builder.setTitle("Delete screen record")
                 builder.setPositiveButton(android.R.string.yes) { _, _ ->
-                    deleteFile(deleteButton.getTag(R.id.fileUri).toString())
-                    eventInterface.deleteEvent()
+                    val videoData = deleteButton.getTag(R.id.fileUri).toString()
+                    deleteFile(videoData)
+                    eventInterface.deleteEvent(videoData)
                 }
                 // Set negative button
                 builder.setNeutralButton(android.R.string.cancel) { dialog, _ ->
@@ -123,7 +124,7 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
     }
 
     interface EventInterface {
-        fun deleteEvent()
+        fun deleteEvent(videoData: String)
 
         fun playVideo(videoData: String)
     }
