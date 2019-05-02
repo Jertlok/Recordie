@@ -71,15 +71,15 @@ open class ScreenRecorder (context: Context) {
         // Set video size
         mMediaRecorder?.setVideoSize(mDisplayMetrics.widthPixels, mDisplayMetrics.heightPixels)
         mMediaRecorder?.setVideoEncoder(MediaRecorder.VideoEncoder.H264)
-        mMediaRecorder?.setVideoEncodingBitRate(16384 * 1000)
+        val bitRate = mSharedPreferences.getString("bit_rate", "16384000")!!.toInt()
+        mMediaRecorder?.setVideoEncodingBitRate(bitRate)
         if (isAudioRecEnabled) {
             mMediaRecorder?.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
             mMediaRecorder?.setAudioEncodingBitRate(320 * 1000)
             mMediaRecorder?.setAudioSamplingRate(44100)
         }
         // Get user preference for frame rate
-        val videoFrameRate = mSharedPreferences.getString("frame_rate",
-                "30")?.toInt() as Int
+        val videoFrameRate = mSharedPreferences.getString("frame_rate", "30")!!.toInt()
         mMediaRecorder?.setVideoFrameRate(videoFrameRate)
         // Prepare MediaRecorder
         mMediaRecorder?.prepare()
