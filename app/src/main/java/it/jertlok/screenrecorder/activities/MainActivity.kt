@@ -155,8 +155,11 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
 
     override fun onResume() {
         super.onResume()
+        // TODO: create toggle method
         if (mScreenRecorder.isRecording()) {
             fabButton.setImageDrawable(fabStopDrawable)
+        } else {
+            fabButton.setImageDrawable(fabStartDrawable)
         }
         updateVideos()
     }
