@@ -194,7 +194,7 @@ class MainActivity : AppCompatActivity() {
             intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
             val uri = FileProvider.getUriForFile(this@MainActivity,
                     BuildConfig.APPLICATION_ID + ".provider", videoFile)
-            intent.setDataAndType(uri, "video/mpeg")
+            intent.setDataAndType(uri, "video/mp4")
             startActivity(intent)
         }
     }
