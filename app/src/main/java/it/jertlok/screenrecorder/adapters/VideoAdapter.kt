@@ -13,6 +13,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import it.jertlok.screenrecorder.R
 import it.jertlok.screenrecorder.common.ScreenVideo
@@ -32,9 +33,20 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
 
         fun bindView(eventInterface: EventInterface) {
             deleteButton.setOnClickListener {
-                // TODO: Add confirmation dialog
-                deleteFile(deleteButton.getTag(R.id.fileUri).toString())
-                eventInterface.deleteEvent()
+                val builder = AlertDialog.Builder(context,
+                        R.style.Theme_MaterialComponents_Dialog_Alert)
+                // Set positive button
+                builder.setTitle("Delete screen record")
+                builder.setPositiveButton(android.R.string.yes) { _, _ ->
+                    deleteFile(deleteButton.getTag(R.id.fileUri).toString())
+                    eventInterface.deleteEvent()
+                }
+                // Set negative button
+                builder.setNeutralButton(android.R.string.cancel) { dialog, _ ->
+                    dialog.cancel()
+                }
+                // Show the dialog
+                builder.show()
             }
 
             shareButton.setOnClickListener {
