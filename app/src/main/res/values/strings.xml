@@ -17,7 +17,7 @@
     <string name="audio_recording_title">Audio recording</string>
 
     <!-- QS Tile -->
-    <string name="qs_record_title">Start recording</string>
+    <string name="qs_record_title">Toggle recording</string>
 
     <!-- Notification -->
     <string name="notif_rec_progress">Recording in progress</string>
