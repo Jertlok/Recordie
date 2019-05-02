@@ -16,6 +16,7 @@ import android.view.WindowManager
 import it.jertlok.screenrecorder.utils.SingletonHolder
 import it.jertlok.screenrecorder.utils.Utils
 import java.io.File
+import java.io.IOException
 import java.lang.RuntimeException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -82,8 +83,12 @@ open class ScreenRecorder (context: Context) {
         val videoFrameRate = mSharedPreferences.getString("frame_rate", "30")!!.toInt()
         mMediaRecorder?.setVideoFrameRate(videoFrameRate)
         // Prepare MediaRecorder
-        mMediaRecorder?.prepare()
-    }
+        try {
+            mMediaRecorder?.prepare()
+        } catch (e: IOException) {
+            Log.e(TAG, "prepare() failed")
+            }
+        }
 
     fun startRecording(resultCode: Int, data: Intent?) {
         // TODO: Improve user experience
@@ -101,23 +106,17 @@ open class ScreenRecorder (context: Context) {
         // Create virtual display
         mVirtualDisplay = createVirtualDisplay()
         // Start recording
-        try {
-            mMediaRecorder?.start()
-        } catch (e: RuntimeException) {
-            Log.e(TAG, e.toString())
-        }
+        mMediaRecorder?.start()
     }
 
     fun stopRecording() {
         // Stopping the media recorder could lead to crash, let us be safe.
         mIsRecording = false
-        try {
-            mMediaRecorder?.stop()
-        } catch (e: RuntimeException) {
-            Log.d(TAG, e.toString())
+        mMediaRecorder?.apply {
+            stop()
+            release()
         }
-        mMediaRecorder?.reset()
-        mMediaRecorder?.release()
+        mMediaRecorder = null
         // Stop screen sharing
         stopScreenSharing()
         // Destroy media projection session
@@ -151,13 +150,11 @@ open class ScreenRecorder (context: Context) {
     private inner class MediaProjectionCallback : MediaProjection.Callback() {
         override fun onStop() {
             super.onStop()
-            try {
-                mMediaRecorder?.stop()
-            } catch (e: RuntimeException) {
-                Log.d(TAG, e.toString())
+            mMediaRecorder?.apply {
+                stop()
+                release()
             }
-            mMediaRecorder?.reset()
-            mMediaRecorder?.release()
+            mMediaRecorder = null
             mMediaProjection = null
         }
     }
