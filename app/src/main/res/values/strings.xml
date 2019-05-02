@@ -26,4 +26,7 @@
     <!-- Notification -->
     <string name="notif_rec_progress">Recording in progress</string>
     <string name="notif_rec_stop">Stop</string>
+
+    <!-- Share intent -->
+    <string name="share_title">Share video</string>
 </resources>
