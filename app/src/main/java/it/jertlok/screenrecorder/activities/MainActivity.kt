@@ -11,6 +11,7 @@ import android.hardware.SensorManager
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import android.os.AsyncTask
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -158,7 +159,7 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
     }
 
     private fun checkPermissions() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // We need to know if at least the storage permission got granted, it will be useful
             // for allowing to update videos asynchronously.
             mStoragePermissionGranted = checkSelfPermission(
