@@ -1,23 +1,20 @@
 package it.jertlok.screenrecorder.activities
 
 import android.Manifest
+import android.app.Activity
 import android.app.NotificationManager
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
+import android.content.*
 import android.content.pm.PackageManager
 import android.database.ContentObserver
 import android.graphics.drawable.Drawable
 import android.hardware.SensorManager
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
-import android.os.AsyncTask
-import android.os.Build
+import android.os.*
 import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.os.Handler
 import android.preference.PreferenceManager
 import android.provider.MediaStore
+import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,7 +24,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import it.jertlok.screenrecorder.BuildConfig
 import it.jertlok.screenrecorder.R
 import it.jertlok.screenrecorder.adapters.VideoAdapter
-import it.jertlok.screenrecorder.common.ScreenRecorder
+import it.jertlok.screenrecorder.services.ScreenRecorderService
 import it.jertlok.screenrecorder.common.ScreenVideo
 import java.io.File
 import java.lang.ref.WeakReference
@@ -40,12 +37,12 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
     // TODO: on the mVideoArray and then notify the adapter!
 
     private var mStoragePermissionGranted = false
-    private lateinit var mScreenRecorder: ScreenRecorder
     // MediaProjection API
     private lateinit var mMediaProjectionManager: MediaProjectionManager
     // User interface
     private lateinit var bottomBar: BottomAppBar
     private lateinit var fabButton: FloatingActionButton
+    private var mRecording = false
     // Video list
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mVideoAdapter: VideoAdapter
@@ -58,7 +55,7 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
     private lateinit var mVideoContentObserver: VideoContentObserver
     // Notification manager
     private lateinit var mNotificationManager: NotificationManager
-    // Shake detecor
+    // Shake detector
     private lateinit var mSensorManager: SensorManager
     private lateinit var mShakeDetector: ShakeDetector
     private var mIsShakeActive = false
@@ -67,6 +64,20 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
     // Shared preference
     private lateinit var mSharedPreferences: SharedPreferences
     private lateinit var mSharedPrefListener: SharedPreferences.OnSharedPreferenceChangeListener
+    // ScreenRecorderService
+    private var mBound = false
+    private lateinit var mBoundService: ScreenRecorderService
+
+    private val mConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName, service: IBinder) {
+            mBoundService = (service as ScreenRecorderService.LocalBinder).getService()
+            mBound = true
+        }
+
+        override fun onServiceDisconnected(name: ComponentName) {
+            mBound = false
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,9 +85,6 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
 
         // Grant permissions if needed
         checkPermissions()
-
-        // Instantiate Screen Recorder class
-        mScreenRecorder = ScreenRecorder.getInstance(applicationContext)
 
         // Get various system services
         mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -136,9 +144,11 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
             // Here we need to understand whether we are recording or not.
             // If we are not recording we can send the intent for recording
             // otherwise we will try to stop the recording.
-            if (!mScreenRecorder.isRecording()) {
+            if (!mBoundService.isRecording()) {
                 // Start invisible activity
-                startActivity(Intent(this, RecordingActivity::class.java))
+                startActivityForResult(mMediaProjectionManager.createScreenCaptureIntent(),
+                        ScreenRecorderService.REQUEST_CODE_SCREEN_RECORD)
+                mRecording = true
             } else {
                 stopRecording()
             }
@@ -153,10 +163,18 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        // Bind to ScreenRecorderService
+        val intent = Intent(this, ScreenRecorderService::class.java)
+        startService(intent)
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE)
+    }
+
     override fun onResume() {
         super.onResume()
         // TODO: create toggle method
-        if (mScreenRecorder.isRecording()) {
+        if (mRecording) {
             fabButton.setImageDrawable(fabStopDrawable)
         } else {
             fabButton.setImageDrawable(fabStartDrawable)
@@ -172,6 +190,12 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
         mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPrefListener)
         // Stop shaking service if it's active
         mShakeDetector.stop()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unbindService(mConnection)
+        mBound = false
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
@@ -208,8 +232,6 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
         }
     }
 
-    // TODO: I hate to repeat my self, check @link{RecordingActivity} - we have
-    // TODO: the same method down there.
     private fun notifyNewMedia(file: File?) {
         // TODO: make a better check
         if (file != null) {
@@ -228,17 +250,16 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
     }
 
     private fun stopRecording() {
-        mScreenRecorder.stopRecording()
+        mBoundService.stopRecording()
         // Let's reset the FAB icon to start
         fabButton.setImageDrawable(fabStartDrawable)
-        // Cancel notification
-        mNotificationManager.cancel(RecordingActivity.NOTIFICATION_RECORD_ID)
         // Try to notify that we have created a new file
-        notifyNewMedia(mScreenRecorder.mOutputFile)
+        notifyNewMedia(mBoundService.mOutputFile)
+        mRecording = false
     }
 
     override fun hearShake() {
-        if (mScreenRecorder.isRecording()) {
+        if (mBoundService.isRecording()) {
             stopRecording()
             // In this case it would be great to return on the main activity
             val intent = Intent(this, MainActivity::class.java)
@@ -271,6 +292,28 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
                     BuildConfig.APPLICATION_ID + ".provider", videoFile)
             shareIntent.putExtra(Intent.EXTRA_STREAM, fileToShare)
             startActivity(Intent.createChooser(shareIntent, getString(R.string.share_title)))
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == ScreenRecorderService.REQUEST_CODE_SCREEN_RECORD) {
+            if (resultCode != Activity.RESULT_OK) {
+                // The user did not grant the permission
+                Toast.makeText(this, getString(R.string.permission_cast_denied),
+                        Toast.LENGTH_SHORT).show()
+                // Terminate RecordingActivity, at this time we will still be
+                // with the MainActivity on the Foreground.
+                mRecording = false
+                return
+            }
+            // Let's hide the main task and start a delayed shit
+            moveTaskToBack(true)
+            Handler().postDelayed({
+                // Start screen recorder after 1.5 second
+                mBoundService.startRecording(resultCode, data)
+                mRecording = true
+            }, 1500)
         }
     }
 
@@ -329,7 +372,6 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
             // Notify that the data has changed
             activity.mVideoAdapter.notifyDataSetChanged()
         }
-
     }
 
     companion object {
