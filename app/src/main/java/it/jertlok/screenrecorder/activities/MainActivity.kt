@@ -1,7 +1,6 @@
 package it.jertlok.screenrecorder.activities
 
 import android.Manifest
-import android.app.Activity
 import android.app.NotificationManager
 import android.content.*
 import android.content.pm.PackageManager
@@ -14,7 +13,6 @@ import android.os.*
 import androidx.appcompat.app.AppCompatActivity
 import android.preference.PreferenceManager
 import android.provider.MediaStore
-import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -67,7 +65,6 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
     // ScreenRecorderService
     private var mBound = false
     private lateinit var mBoundService: ScreenRecorderService
-
     private val mConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
             mBoundService = (service as ScreenRecorderService.LocalBinder).getService()
@@ -146,8 +143,9 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
             // otherwise we will try to stop the recording.
             if (!mBoundService.isRecording()) {
                 // Start invisible activity
-                startActivityForResult(mMediaProjectionManager.createScreenCaptureIntent(),
-                        ScreenRecorderService.REQUEST_CODE_SCREEN_RECORD)
+                val startIntent = Intent(this, RecordingActivity::class.java)
+                        .setAction(RecordingActivity.ACTION_START)
+                startActivity(startIntent)
                 mRecording = true
             } else {
                 stopRecording()
@@ -232,15 +230,6 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
         }
     }
 
-    private fun notifyNewMedia(file: File?) {
-        // TODO: make a better check
-        if (file != null) {
-            val contentUri = Uri.fromFile(file)
-            val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, contentUri)
-            sendBroadcast(mediaScanIntent)
-        }
-    }
-
     private fun updateVideos() {
         if (!mStoragePermissionGranted) {
             return
@@ -253,8 +242,6 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
         mBoundService.stopRecording()
         // Let's reset the FAB icon to start
         fabButton.setImageDrawable(fabStartDrawable)
-        // Try to notify that we have created a new file
-        notifyNewMedia(mBoundService.mOutputFile)
         mRecording = false
     }
 
@@ -292,28 +279,6 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
                     BuildConfig.APPLICATION_ID + ".provider", videoFile)
             shareIntent.putExtra(Intent.EXTRA_STREAM, fileToShare)
             startActivity(Intent.createChooser(shareIntent, getString(R.string.share_title)))
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == ScreenRecorderService.REQUEST_CODE_SCREEN_RECORD) {
-            if (resultCode != Activity.RESULT_OK) {
-                // The user did not grant the permission
-                Toast.makeText(this, getString(R.string.permission_cast_denied),
-                        Toast.LENGTH_SHORT).show()
-                // Terminate RecordingActivity, at this time we will still be
-                // with the MainActivity on the Foreground.
-                mRecording = false
-                return
-            }
-            // Let's hide the main task and start a delayed shit
-            moveTaskToBack(true)
-            Handler().postDelayed({
-                // Start screen recorder after 1.5 second
-                mBoundService.startRecording(resultCode, data)
-                mRecording = true
-            }, 1500)
         }
     }
 

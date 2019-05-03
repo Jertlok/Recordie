@@ -1,5 +1,6 @@
 package it.jertlok.screenrecorder.services
 
+import android.app.Activity
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -9,6 +10,7 @@ import android.hardware.display.VirtualDisplay
 import android.media.MediaRecorder
 import android.media.projection.MediaProjection
 import android.media.projection.MediaProjectionManager
+import android.net.Uri
 import android.os.Binder
 import android.os.Environment
 import android.os.IBinder
@@ -60,7 +62,19 @@ open class ScreenRecorderService : Service() {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext)
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int = START_NOT_STICKY
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val action = intent?.action
+        // If we are requesting a start
+        if (action == ACTION_START) {
+            // Let's retrieve our parcelable
+            val mediaPermission = intent.getParcelableExtra<Intent>(Intent.EXTRA_INTENT)
+            startRecording(Activity.RESULT_OK, mediaPermission)
+        } // Otherwise, let's stop.
+        else if (action == ACTION_STOP) {
+            stopRecording()
+        }
+        return super.onStartCommand(intent, flags, startId)
+    }
 
     override fun onBind(intent: Intent?): IBinder? = mBinder
 
@@ -128,6 +142,8 @@ open class ScreenRecorderService : Service() {
         stopScreenSharing()
         // Destroy media projection session
         destroyMediaProjection()
+        // Notify new media file
+        notifyNewMedia()
     }
 
     private fun stopScreenSharing() {
@@ -163,6 +179,14 @@ open class ScreenRecorderService : Service() {
             }
             mMediaRecorder = null
             mMediaProjection = null
+        }
+    }
+
+    private fun notifyNewMedia() {
+        if (mOutputFile != null) {
+            val contentUri = Uri.fromFile(mOutputFile)
+            val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, contentUri)
+            sendBroadcast(mediaScanIntent)
         }
     }
 
@@ -202,5 +226,8 @@ open class ScreenRecorderService : Service() {
         private const val TAG = "ScreenRecorderService"
         // Request code for starting a screen record
         const val REQUEST_CODE_SCREEN_RECORD = 1
+        // Intent actions
+        const val ACTION_START = "it.jertlok.services.ScreenRecorderService.ACTION_START"
+        const val ACTION_STOP = "it.jertlok.services.ScreenRecorderService.ACTION_STOP"
     }
 }
