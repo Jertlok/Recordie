@@ -43,6 +43,8 @@
             </intent-filter>
         </service>
 
+        <service android:name=".services.ScreenRecorderService"/>
+
         <!-- File provider -->
         <provider
             android:name="androidx.core.content.FileProvider"

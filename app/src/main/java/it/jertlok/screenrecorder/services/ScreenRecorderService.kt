@@ -1,5 +1,6 @@
-package it.jertlok.screenrecorder.common
+package it.jertlok.screenrecorder.services
 
+import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -8,41 +9,43 @@ import android.hardware.display.VirtualDisplay
 import android.media.MediaRecorder
 import android.media.projection.MediaProjection
 import android.media.projection.MediaProjectionManager
+import android.os.Binder
 import android.os.Environment
+import android.os.IBinder
 import android.preference.PreferenceManager
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.WindowManager
-import it.jertlok.screenrecorder.utils.SingletonHolder
-import it.jertlok.screenrecorder.utils.Utils
 import java.io.File
 import java.io.IOException
-import java.lang.RuntimeException
 import java.text.SimpleDateFormat
 import java.util.*
 
-open class ScreenRecorder (context: Context) {
+open class ScreenRecorderService : Service() {
 
     // Activity context
-    private var mContext: Context = context
+    private lateinit var mContext: Context
     // MediaProjection API
     private var mMediaProjection: MediaProjection? = null
-    private var mMediaProjectionManager: MediaProjectionManager
+    private lateinit var mMediaProjectionManager: MediaProjectionManager
     private var mMediaRecorder: MediaRecorder? = null
     private var mVirtualDisplay: VirtualDisplay? = null
-    private var mMediaProjectionCallback: MediaProjectionCallback
+    private var mMediaProjectionCallback: MediaProjectionCallback? = null
     // Display metrics
-    private var mDisplayMetrics: DisplayMetrics
+    private lateinit var mDisplayMetrics: DisplayMetrics
     // Output file
     var mOutputFile: File? = null
         private set
     // Whether we are recording or not
     private var mIsRecording = false
-
     // SharedPreference
-    private var mSharedPreferences: SharedPreferences
+    private lateinit var mSharedPreferences: SharedPreferences
+    // Service binder
+    private var mBinder = LocalBinder()
 
-    init {
+    override fun onCreate() {
+        super.onCreate()
+        mContext = applicationContext
         // Get the media projection service
         mMediaProjectionManager = mContext.getSystemService(
                 Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
@@ -57,10 +60,14 @@ open class ScreenRecorder (context: Context) {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext)
     }
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int = START_NOT_STICKY
+
+    override fun onBind(intent: Intent?): IBinder? = mBinder
+
     private fun initRecorder() {
         // Conditional audio recording
         val isAudioRecEnabled = mSharedPreferences.getBoolean("audio_recording", false)
-
+        // Initialise MediaRecorder
         mMediaRecorder = MediaRecorder()
         mMediaRecorder?.setVideoSource(MediaRecorder.VideoSource.SURFACE)
         if (isAudioRecEnabled) {
@@ -87,8 +94,8 @@ open class ScreenRecorder (context: Context) {
             mMediaRecorder?.prepare()
         } catch (e: IOException) {
             Log.e(TAG, "prepare() failed")
-            }
         }
+    }
 
     fun startRecording(resultCode: Int, data: Intent?) {
         // TODO: Improve user experience
@@ -176,7 +183,8 @@ open class ScreenRecorder (context: Context) {
         }
 
         // Create a media file name
-        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
+                .format(Date())
 
         return File(mediaStorageDir.path + File.separator +
                 "SCR_" + timeStamp + ".mp4")
@@ -186,8 +194,12 @@ open class ScreenRecorder (context: Context) {
         return mIsRecording
     }
 
-    companion object: SingletonHolder<ScreenRecorder, Context> (::ScreenRecorder){
-        private const val TAG = "ScreenRecorder"
+    inner class LocalBinder : Binder() {
+        fun getService(): ScreenRecorderService = this@ScreenRecorderService
+    }
+
+    companion object {
+        private const val TAG = "ScreenRecorderService"
         // Request code for starting a screen record
         const val REQUEST_CODE_SCREEN_RECORD = 1
     }
