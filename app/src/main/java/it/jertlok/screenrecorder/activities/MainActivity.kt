@@ -62,6 +62,9 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
     // Shared preference
     private lateinit var mSharedPreferences: SharedPreferences
     private lateinit var mSharedPrefListener: SharedPreferences.OnSharedPreferenceChangeListener
+    // Broadcast receiver for updating FAB button from service
+    private val mBroadcastReceiver = LocalBroadcastReceiver()
+    private val mIntentFilter = IntentFilter(ACTION_UPDATE_FAB)
     // ScreenRecorderService
     private var mBound = false
     private lateinit var mBoundService: ScreenRecorderService
@@ -70,6 +73,8 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
             mBoundService = (service as ScreenRecorderService.LocalBinder).getService()
             mBound = true
+            // Conditional FAB update
+            conditionalFabToggle()
         }
 
         override fun onServiceDisconnected(name: ComponentName) {
@@ -147,7 +152,6 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
                 val startIntent = Intent(this, RecordingActivity::class.java)
                         .setAction(RecordingActivity.ACTION_START)
                 startActivity(startIntent)
-                mRecording = true
             } else {
                 stopRecording()
             }
@@ -172,12 +176,8 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
 
     override fun onResume() {
         super.onResume()
-        // TODO: create toggle method
-        if (mRecording) {
-            fabButton.setImageDrawable(fabStopDrawable)
-        } else {
-            fabButton.setImageDrawable(fabStartDrawable)
-        }
+        // Register broadcast receiver
+        registerReceiver(mBroadcastReceiver, mIntentFilter)
         updateVideos()
     }
 
@@ -198,6 +198,12 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
         super.onStop()
         unbindService(mConnection)
         mBound = false
+    }
+
+    override fun onPause() {
+        // Unregister broadcast receiver
+        unregisterReceiver(mBroadcastReceiver)
+        super.onPause()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
@@ -343,8 +349,26 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
         }
     }
 
+    private fun conditionalFabToggle() {
+        if (mBoundService.isRecording()) {
+            fabButton.setImageDrawable(fabStopDrawable)
+        } else {
+            fabButton.setImageDrawable(fabStartDrawable)
+        }
+    }
+
+    private inner class LocalBroadcastReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when (intent?.action) {
+                ACTION_UPDATE_FAB -> conditionalFabToggle()
+            }
+        }
+    }
+
     companion object {
         // Permission request code
         private const val PERMISSION_REQUESTS = 0
+        // Intent filter
+        const val ACTION_UPDATE_FAB = "it.jertlok.activities.MainActivity.ACTION_UPDATE_FAB"
     }
 }
