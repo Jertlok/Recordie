@@ -22,8 +22,9 @@
     <string name="misc_category">Miscellaneous</string>
     <string name="shake_stop_title">Shake to stop</string>
     <string name="screen_stop_title">Turn off screen to stop</string>
+
     <!-- QS Tile -->
-    <string name="qs_record_title">Toggle recording</string>
+    <string name="qs_record_title">Record</string>
 
     <!-- Notification -->
     <string name="notif_rec_progress">Recording in progress</string>
