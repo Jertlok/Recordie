@@ -1,7 +1,6 @@
 package it.jertlok.screenrecorder.services
 
-import android.app.Activity
-import android.app.Service
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -12,12 +11,15 @@ import android.media.projection.MediaProjection
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import android.os.Binder
+import android.os.Build
 import android.os.Environment
 import android.os.IBinder
 import android.preference.PreferenceManager
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.WindowManager
+import androidx.core.app.NotificationCompat
+import it.jertlok.screenrecorder.R
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -44,6 +46,9 @@ open class ScreenRecorderService : Service() {
     private lateinit var mSharedPreferences: SharedPreferences
     // Service binder
     private var mBinder = LocalBinder()
+    // Notification
+    private lateinit var mNotificationManager: NotificationManager
+    private lateinit var mNotificationChannel: NotificationChannel
 
     override fun onCreate() {
         super.onCreate()
@@ -60,6 +65,15 @@ open class ScreenRecorderService : Service() {
         mMediaProjectionCallback = MediaProjectionCallback()
         // Get SharedPreference
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext)
+        // Notification
+        mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        // Create notification channel if needed
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            mNotificationChannel = NotificationChannel(NOTIFICATION_CHANNEL_ID,
+                    NOTIFICATION_CHANNEL_NAME,
+                    NotificationManager.IMPORTANCE_LOW)
+            mNotificationManager.createNotificationChannel(mNotificationChannel)
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -69,6 +83,7 @@ open class ScreenRecorderService : Service() {
             // Let's retrieve our parcelable
             val mediaPermission = intent.getParcelableExtra<Intent>(Intent.EXTRA_INTENT)
             startRecording(Activity.RESULT_OK, mediaPermission)
+            createNotification()
             return START_STICKY
         } // Otherwise, let's stop.
         else if (action == ACTION_STOP) {
@@ -145,6 +160,8 @@ open class ScreenRecorderService : Service() {
         destroyMediaProjection()
         // Notify new media file
         notifyNewMedia()
+        // Stop notification
+        mNotificationManager.cancel(NOTIFICATION_RECORD_ID)
     }
 
     private fun stopScreenSharing() {
@@ -191,6 +208,25 @@ open class ScreenRecorderService : Service() {
         }
     }
 
+    /** Create notification */
+    private fun createNotification() {
+        val intent = Intent(this, ScreenRecorderService::class.java)
+                .setAction(ACTION_STOP)
+        val stopPendingIntent = PendingIntent.getService(this, 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT)
+        val builder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_outline_record)
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(getString(R.string.notif_rec_progress))
+                .setWhen(System.currentTimeMillis())
+                .setUsesChronometer(true)
+                .setOngoing(true)
+                .addAction(R.drawable.ic_outline_stop, getString(R.string.notif_rec_stop),
+                        stopPendingIntent)
+                .build()
+        mNotificationManager.notify(NOTIFICATION_RECORD_ID, builder)
+    }
+
     private fun getOutputMediaFile(): File? {
         if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED,
                         ignoreCase = true)) {
@@ -230,5 +266,10 @@ open class ScreenRecorderService : Service() {
         // Intent actions
         const val ACTION_START = "it.jertlok.services.ScreenRecorderService.ACTION_START"
         const val ACTION_STOP = "it.jertlok.services.ScreenRecorderService.ACTION_STOP"
+        // Notification constants
+        private const val NOTIFICATION_CHANNEL_NAME = "Screen Recorder"
+        private const val NOTIFICATION_CHANNEL_ID =
+                "it.jertlok.services.ScreenRecorderService.Recording"
+        const val NOTIFICATION_RECORD_ID = 0
     }
 }
