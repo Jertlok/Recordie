@@ -69,6 +69,7 @@ open class ScreenRecorderService : Service() {
             // Let's retrieve our parcelable
             val mediaPermission = intent.getParcelableExtra<Intent>(Intent.EXTRA_INTENT)
             startRecording(Activity.RESULT_OK, mediaPermission)
+            return START_STICKY
         } // Otherwise, let's stop.
         else if (action == ACTION_STOP) {
             stopRecording()
