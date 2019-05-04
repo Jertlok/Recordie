@@ -51,8 +51,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mVideoContentObserver: VideoContentObserver
     // Notification manager
     private lateinit var mNotificationManager: NotificationManager
-    // Regex for updating video files
-    private val mPattern = "content://media/external/video/media.*".toRegex()
     // Shared preference
     private lateinit var mSharedPreferences: SharedPreferences
     // Broadcast receiver for updating FAB button from service
@@ -252,11 +250,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private inner class VideoContentObserver(handler: Handler) : ContentObserver(handler) {
-
         override fun onChange(selfChange: Boolean, uri: Uri?) {
-            if (mPattern.containsMatchIn(uri.toString())) {
-                updateVideos()
-            }
+            // TODO: optimise updates
+            updateVideos()
         }
     }
 
