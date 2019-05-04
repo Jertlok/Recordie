@@ -29,4 +29,9 @@
         app:title="@string/shake_stop_title"
         app:defaultValue="false"/>
 
+    <SwitchPreference
+        app:key="screen_stop_pref"
+        app:title="@string/screen_stop_title"
+        app:defaultValue="false"/>
+
 </androidx.preference.PreferenceScreen>
