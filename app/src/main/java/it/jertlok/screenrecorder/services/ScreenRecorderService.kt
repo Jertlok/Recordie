@@ -1,9 +1,7 @@
 package it.jertlok.screenrecorder.services
 
 import android.app.*
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
+import android.content.*
 import android.hardware.SensorManager
 import android.hardware.display.DisplayManager
 import android.hardware.display.VirtualDisplay
@@ -56,6 +54,10 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
     private lateinit var mSensorManager: SensorManager
     private lateinit var mShakeDetector: ShakeDetector
     private var mIsShakeActive = false
+    // Broadcast receiver
+    private var mBroadcastReceiver = LocalBroadcastReceiver()
+    // Screen off stop
+    private var mIsScreenStopActive = false
 
     override fun onCreate() {
         super.onCreate()
@@ -85,11 +87,15 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         // Shake detector
         // Set shared preference listener
         mSharedPrefListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if ("shake_stop" == key) {
-                // Get the new value for the preference
-                mIsShakeActive = mSharedPreferences.getBoolean("shake_stop", false)
-                // Our preference has changed, we also need to either start / stop the service
-                if (mIsShakeActive) mShakeDetector.start(mSensorManager) else mShakeDetector.stop()
+            when (key) {
+                "shake_stop" -> {
+                    // Get the new value for the preference
+                    mIsShakeActive = mSharedPreferences.getBoolean("shake_stop", false)
+                    // Our preference has changed, we also need to either start / stop the service
+                    if (mIsShakeActive) mShakeDetector.start(mSensorManager) else mShakeDetector.stop()
+                }
+                "screen_off_stop" -> mIsScreenStopActive = mSharedPreferences.
+                        getBoolean("screen_off_stop", false)
             }
         }
         // Register shared preference listener
@@ -97,6 +103,8 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         // Initialise shake detector
         mIsShakeActive = mSharedPreferences.getBoolean("shake_stop", false)
         mShakeDetector = ShakeDetector(this)
+        // Broadcast receiver
+        registerReceiver(mBroadcastReceiver, IntentFilter(Intent.ACTION_SCREEN_OFF))
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -126,6 +134,8 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPrefListener)
         // Stop shaking service if it's active
         mShakeDetector.stop()
+        // Unregister broadcast receiver
+        unregisterReceiver(mBroadcastReceiver)
     }
 
     override fun onBind(intent: Intent?): IBinder? = mBinder
@@ -305,6 +315,15 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
     inner class LocalBinder : Binder() {
         fun getService(): ScreenRecorderService = this@ScreenRecorderService
     }
+
+    private inner class LocalBroadcastReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when (intent?.action) {
+                Intent.ACTION_SCREEN_OFF -> if (mIsScreenStopActive) stopRecording()
+            }
+        }
+    }
+
 
     companion object {
         private const val TAG = "ScreenRecorderService"

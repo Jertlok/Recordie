@@ -6,6 +6,7 @@ import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Switch
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
@@ -27,6 +28,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
     private lateinit var frameRateListPref: ListPreference
     private lateinit var audioRecordingPref: SwitchPreference
     private lateinit var shakeStopPref: SwitchPreference
+    private lateinit var screenStopPref: SwitchPreference
 
     // Display resolution
     private lateinit var mDisplayRes: String
@@ -49,6 +51,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
         frameRateListPref = findPreference("frame_rate_pref") as ListPreference
         audioRecordingPref = findPreference("audio_recording_pref") as SwitchPreference
         shakeStopPref = findPreference("shake_stop_pref") as SwitchPreference
+        screenStopPref = findPreference("screen_stop_pref") as SwitchPreference
 
         // We need to get the shared preferences and change the elements accordingly
         bitRatePref.setValueIndex(bitRatePref.findIndexOfValue(
@@ -59,6 +62,8 @@ class SettingsFragment: PreferenceFragmentCompat() {
                 mSharedPreferences.getBoolean("audio_recording", false)
         shakeStopPref.isChecked =
                 mSharedPreferences.getBoolean("shake_stop", false)
+        screenStopPref.isChecked =
+                mSharedPreferences.getBoolean("screen_off_stop", false)
 
         // On preference change listeners
         bitRatePref.setOnPreferenceChangeListener { _, newValue ->
@@ -75,6 +80,10 @@ class SettingsFragment: PreferenceFragmentCompat() {
         }
         shakeStopPref.setOnPreferenceChangeListener { _, newValue ->
             mSharedPreferences.edit().putBoolean("shake_stop", newValue as Boolean).apply()
+            true
+        }
+        screenStopPref.setOnPreferenceChangeListener { _, newValue ->
+            mSharedPreferences.edit().putBoolean("screen_off_stop", newValue as Boolean).apply()
             true
         }
 
