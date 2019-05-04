@@ -10,10 +10,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import it.jertlok.screenrecorder.R
 import it.jertlok.screenrecorder.common.ScreenVideo
 import java.io.File
@@ -26,15 +29,14 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
     class VideoHolder(private val context: Context, view: View) : RecyclerView.ViewHolder(view) {
         var image: ImageView = view.findViewById(R.id.image)
         var title: TextView = view.findViewById(R.id.title)
-        var deleteButton: Button = view.findViewById(R.id.delete)
-        var shareButton: Button = view.findViewById(R.id.share)
+        var deleteButton: MaterialButton = view.findViewById(R.id.delete)
+        var shareButton: MaterialButton = view.findViewById(R.id.share)
 
         fun bindView(eventInterface: EventInterface) {
             // TODO: move this thing into image
             val videoData = deleteButton.getTag(R.id.fileUri).toString()
             deleteButton.setOnClickListener {
-                val builder = AlertDialog.Builder(context,
-                        R.style.Theme_MaterialComponents_Dialog_Alert)
+                val builder = MaterialAlertDialogBuilder(context)
                 // Set positive button
                 builder.setTitle("Delete screen record")
                 builder.setPositiveButton(android.R.string.yes) { _, _ ->

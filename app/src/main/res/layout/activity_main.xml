@@ -16,20 +16,24 @@
         <include layout="@layout/content_main" />
 
         <com.google.android.material.bottomappbar.BottomAppBar
+            style="@style/Widget.MaterialComponents.BottomAppBar"
             android:id="@+id/bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:backgroundTint="@color/colorPrimary"
-            app:navigationIcon="@drawable/ic_outline_settings"
+            app:navigationIcon="@drawable/ic_settings"
             app:hideOnScroll="true"
             />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
+            style="@style/Widget.MaterialComponents.FloatingActionButton"
             android:id="@+id/fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_outline_record"
+            android:layout_margin="16dp"
+            app:backgroundTint="@color/colorAccent"
+            app:tint="@color/white"
+            app:srcCompat="@drawable/ic_record"
             app:layout_anchor="@id/bar"/>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

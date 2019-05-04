@@ -25,7 +25,8 @@
         </activity>
 
         <!-- SettingsActivity -->
-        <activity android:name=".activities.SettingsActivity" />
+        <activity android:name=".activities.SettingsActivity"
+            android:theme="@style/AppTheme.Settings" />
 
         <!-- Activity for starting the recording from a QS Tile -->
         <activity android:name=".activities.RecordingActivity"
@@ -37,7 +38,7 @@
         <service
             android:name=".services.RecordQSTileService"
             android:label="@string/qs_record_title"
-            android:icon="@drawable/ic_outline_record"
+            android:icon="@drawable/ic_record"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
