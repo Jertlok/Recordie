@@ -15,6 +15,7 @@ import android.os.Build
 import android.os.Environment
 import android.os.IBinder
 import android.preference.PreferenceManager
+import android.renderscript.RenderScript
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.WindowManager
@@ -71,7 +72,7 @@ open class ScreenRecorderService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             mNotificationChannel = NotificationChannel(NOTIFICATION_CHANNEL_ID,
                     NOTIFICATION_CHANNEL_NAME,
-                    NotificationManager.IMPORTANCE_LOW)
+                    NotificationManager.IMPORTANCE_HIGH)
             mNotificationManager.createNotificationChannel(mNotificationChannel)
         }
     }
@@ -161,7 +162,7 @@ open class ScreenRecorderService : Service() {
         // Notify new media file
         notifyNewMedia()
         // Stop notification
-        mNotificationManager.cancel(NOTIFICATION_RECORD_ID)
+        stopForeground(true)
     }
 
     private fun stopScreenSharing() {
@@ -224,7 +225,7 @@ open class ScreenRecorderService : Service() {
                 .addAction(R.drawable.ic_outline_stop, getString(R.string.notif_rec_stop),
                         stopPendingIntent)
                 .build()
-        mNotificationManager.notify(NOTIFICATION_RECORD_ID, builder)
+        startForeground(NOTIFICATION_RECORD_ID, builder)
     }
 
     private fun getOutputMediaFile(): File? {
@@ -270,6 +271,6 @@ open class ScreenRecorderService : Service() {
         private const val NOTIFICATION_CHANNEL_NAME = "Screen Recorder"
         private const val NOTIFICATION_CHANNEL_ID =
                 "it.jertlok.services.ScreenRecorderService.Recording"
-        const val NOTIFICATION_RECORD_ID = 0
+        const val NOTIFICATION_RECORD_ID = 1
     }
 }
