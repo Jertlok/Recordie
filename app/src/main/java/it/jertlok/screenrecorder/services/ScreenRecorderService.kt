@@ -21,6 +21,7 @@ import android.util.Log
 import android.view.WindowManager
 import androidx.core.app.NotificationCompat
 import it.jertlok.screenrecorder.R
+import it.jertlok.screenrecorder.activities.MainActivity
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -128,7 +129,7 @@ open class ScreenRecorderService : Service() {
         }
     }
 
-    fun startRecording(resultCode: Int, data: Intent?) {
+    private fun startRecording(resultCode: Int, data: Intent?) {
         // TODO: Improve user experience
         if (mIsRecording) {
             return
@@ -145,6 +146,8 @@ open class ScreenRecorderService : Service() {
         mVirtualDisplay = createVirtualDisplay()
         // Start recording
         mMediaRecorder?.start()
+        // Send broadcast for recording status
+        recStatusBroadcast()
     }
 
     fun stopRecording() {
@@ -163,6 +166,13 @@ open class ScreenRecorderService : Service() {
         notifyNewMedia()
         // Stop notification
         stopForeground(true)
+        // Send broadcast for recording status
+        recStatusBroadcast()
+    }
+
+    private fun recStatusBroadcast() {
+        val fabBroadcast = Intent().setAction(MainActivity.ACTION_UPDATE_FAB)
+        sendBroadcast(fabBroadcast)
     }
 
     private fun stopScreenSharing() {
