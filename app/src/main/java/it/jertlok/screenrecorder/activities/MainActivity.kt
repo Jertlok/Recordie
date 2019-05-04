@@ -65,6 +65,7 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
     // ScreenRecorderService
     private var mBound = false
     private lateinit var mBoundService: ScreenRecorderService
+    // Service connection
     private val mConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
             mBoundService = (service as ScreenRecorderService.LocalBinder).getService()
@@ -260,7 +261,7 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
 
     private inner class EventInterfaceImpl : VideoAdapter.EventInterface {
         override fun deleteEvent(videoData: String) {
-            // Do nothing
+            updateVideos()
         }
 
         override fun playVideo(videoData: String) {
