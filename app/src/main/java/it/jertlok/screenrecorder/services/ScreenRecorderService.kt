@@ -4,6 +4,7 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.hardware.SensorManager
 import android.hardware.display.DisplayManager
 import android.hardware.display.VirtualDisplay
 import android.media.MediaRecorder
@@ -15,11 +16,11 @@ import android.os.Build
 import android.os.Environment
 import android.os.IBinder
 import android.preference.PreferenceManager
-import android.renderscript.RenderScript
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.WindowManager
 import androidx.core.app.NotificationCompat
+import com.squareup.seismic.ShakeDetector
 import it.jertlok.screenrecorder.R
 import it.jertlok.screenrecorder.activities.MainActivity
 import java.io.File
@@ -27,7 +28,7 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
-open class ScreenRecorderService : Service() {
+open class ScreenRecorderService : Service(), ShakeDetector.Listener {
 
     // Activity context
     private lateinit var mContext: Context
@@ -40,17 +41,21 @@ open class ScreenRecorderService : Service() {
     // Display metrics
     private lateinit var mDisplayMetrics: DisplayMetrics
     // Output file
-    var mOutputFile: File? = null
-        private set
+    private var mOutputFile: File? = null
     // Whether we are recording or not
     private var mIsRecording = false
     // SharedPreference
     private lateinit var mSharedPreferences: SharedPreferences
+    private lateinit var mSharedPrefListener: SharedPreferences.OnSharedPreferenceChangeListener
     // Service binder
     private var mBinder = LocalBinder()
     // Notification
     private lateinit var mNotificationManager: NotificationManager
     private lateinit var mNotificationChannel: NotificationChannel
+    // Shake detector
+    private lateinit var mSensorManager: SensorManager
+    private lateinit var mShakeDetector: ShakeDetector
+    private var mIsShakeActive = false
 
     override fun onCreate() {
         super.onCreate()
@@ -60,6 +65,7 @@ open class ScreenRecorderService : Service() {
                 Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
         // Get windowManager
         val windowManager = mContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         // Get display metrics
         mDisplayMetrics = DisplayMetrics()
         windowManager.defaultDisplay.getRealMetrics(mDisplayMetrics)
@@ -76,6 +82,21 @@ open class ScreenRecorderService : Service() {
                     NotificationManager.IMPORTANCE_LOW)
             mNotificationManager.createNotificationChannel(mNotificationChannel)
         }
+        // Shake detector
+        // Set shared preference listener
+        mSharedPrefListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if ("shake_stop" == key) {
+                // Get the new value for the preference
+                mIsShakeActive = mSharedPreferences.getBoolean("shake_stop", false)
+                // Our preference has changed, we also need to either start / stop the service
+                if (mIsShakeActive) mShakeDetector.start(mSensorManager) else mShakeDetector.stop()
+            }
+        }
+        // Register shared preference listener
+        mSharedPreferences.registerOnSharedPreferenceChangeListener(mSharedPrefListener)
+        // Initialise shake detector
+        mIsShakeActive = mSharedPreferences.getBoolean("shake_stop", false)
+        mShakeDetector = ShakeDetector(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -84,14 +105,27 @@ open class ScreenRecorderService : Service() {
         if (action == ACTION_START) {
             // Let's retrieve our parcelable
             val mediaPermission = intent.getParcelableExtra<Intent>(Intent.EXTRA_INTENT)
-            startRecording(Activity.RESULT_OK, mediaPermission)
+            // Start ShakeDetector if active
+            if (mIsShakeActive) mShakeDetector.start(mSensorManager)
+            // Start recording
+            startRecording(mediaPermission)
             createNotification()
             return START_STICKY
         } // Otherwise, let's stop.
         else if (action == ACTION_STOP) {
             stopRecording()
+            // Stop shake detector
+            mShakeDetector.stop()
         }
         return super.onStartCommand(intent, flags, startId)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Unregister shared preference listener
+        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPrefListener)
+        // Stop shaking service if it's active
+        mShakeDetector.stop()
     }
 
     override fun onBind(intent: Intent?): IBinder? = mBinder
@@ -129,7 +163,7 @@ open class ScreenRecorderService : Service() {
         }
     }
 
-    private fun startRecording(resultCode: Int, data: Intent?) {
+    private fun startRecording(data: Intent) {
         // TODO: Improve user experience
         if (mIsRecording) {
             return
@@ -138,7 +172,7 @@ open class ScreenRecorderService : Service() {
         mIsRecording = true
         // TODO: try to figure the warning on data
         // Initialise MediaProjection
-        mMediaProjection = mMediaProjectionManager.getMediaProjection(resultCode, data)
+        mMediaProjection = mMediaProjectionManager.getMediaProjection(Activity.RESULT_OK, data)
         mMediaProjection?.registerCallback(mMediaProjectionCallback, null)
         // Init recorder
         initRecorder()
@@ -149,6 +183,9 @@ open class ScreenRecorderService : Service() {
         // Send broadcast for recording status
         recStatusBroadcast()
     }
+
+    // Implement shake listener
+    override fun hearShake() = stopRecording()
 
     fun stopRecording() {
         // Stopping the media recorder could lead to crash, let us be safe.
