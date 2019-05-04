@@ -4,15 +4,12 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.media.projection.MediaProjectionManager
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import it.jertlok.screenrecorder.R
 import it.jertlok.screenrecorder.services.ScreenRecorderService
-import java.io.File
-
 
 open class RecordingActivity: AppCompatActivity() {
 
