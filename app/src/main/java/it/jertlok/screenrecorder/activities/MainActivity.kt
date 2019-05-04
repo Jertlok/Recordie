@@ -6,7 +6,6 @@ import android.content.*
 import android.content.pm.PackageManager
 import android.database.ContentObserver
 import android.graphics.drawable.Drawable
-import android.hardware.SensorManager
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import android.os.*
@@ -26,9 +25,8 @@ import it.jertlok.screenrecorder.services.ScreenRecorderService
 import it.jertlok.screenrecorder.common.ScreenVideo
 import java.io.File
 import java.lang.ref.WeakReference
-import com.squareup.seismic.ShakeDetector
 
-class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
+class MainActivity : AppCompatActivity() {
 
     // TODO: when removing an element there's no need to query once again
     // TODO: the content resolver, we can just remove the element directly
@@ -53,15 +51,10 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
     private lateinit var mVideoContentObserver: VideoContentObserver
     // Notification manager
     private lateinit var mNotificationManager: NotificationManager
-    // Shake detector
-    private lateinit var mSensorManager: SensorManager
-    private lateinit var mShakeDetector: ShakeDetector
-    private var mIsShakeActive = false
     // Regex for updating video files
     private val mPattern = "content://media/external/video/media.*".toRegex()
     // Shared preference
     private lateinit var mSharedPreferences: SharedPreferences
-    private lateinit var mSharedPrefListener: SharedPreferences.OnSharedPreferenceChangeListener
     // Broadcast receiver for updating FAB button from service
     private val mBroadcastReceiver = LocalBroadcastReceiver()
     private val mIntentFilter = IntentFilter(ACTION_UPDATE_FAB)
@@ -90,7 +83,6 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
         checkPermissions()
 
         // Get various system services
-        mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         mMediaProjectionManager = getSystemService(
                 Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
@@ -102,25 +94,6 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
 
         // Initialise shared preferences
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        // Set shared preference listener
-        mSharedPrefListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if ("shake_stop" == key) {
-                // Get the new value for the preference
-                mIsShakeActive = mSharedPreferences.getBoolean("shake_stop", false)
-                // Our preference has changed, we also need to either start / stop the service
-                if (mIsShakeActive) mShakeDetector.start(mSensorManager) else mShakeDetector.stop()
-            }
-        }
-        // Register shared preference listener
-        mSharedPreferences.registerOnSharedPreferenceChangeListener(mSharedPrefListener)
-
-        // Shake detector
-        mIsShakeActive = mSharedPreferences.getBoolean("shake_stop", false)
-        mShakeDetector = ShakeDetector(this)
-        // Start ShakeDetector only if needed
-        if (mIsShakeActive) {
-            mShakeDetector.start(mSensorManager)
-        }
 
         // User interface
         bottomBar = findViewById(R.id.bar)
@@ -185,10 +158,6 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
         super.onDestroy()
         // Unregister video content observer
         contentResolver.unregisterContentObserver(mVideoContentObserver)
-        // Unregister shared preference listener
-        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPrefListener)
-        // Stop shaking service if it's active
-        mShakeDetector.stop()
         // Stop ScreenRecorder service
         val stopIntent = Intent(this, ScreenRecorderService::class.java)
         stopService(stopIntent)
@@ -253,16 +222,6 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
         // Let's reset the FAB icon to start
         fabButton.setImageDrawable(fabStartDrawable)
         mRecording = false
-    }
-
-    override fun hearShake() {
-        if (mBoundService.isRecording()) {
-            stopRecording()
-            // In this case it would be great to return on the main activity
-            val intent = Intent(this, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
-            startActivity(intent)
-        }
     }
 
     private inner class EventInterfaceImpl : VideoAdapter.EventInterface {
