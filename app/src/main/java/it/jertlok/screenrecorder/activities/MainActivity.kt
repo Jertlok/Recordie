@@ -133,7 +133,7 @@ class MainActivity : AppCompatActivity() {
         // TODO: this is indeed temporary, just for development purposes
         // TODO: and also because I am being lazy in regards of the UI for now.
         // Set something for menu
-        bottomBar.setOnClickListener {
+        bottomBar.setNavigationOnClickListener {
             // Start Settings activity
             startActivity(Intent(this, SettingsActivity::class.java))
         }
