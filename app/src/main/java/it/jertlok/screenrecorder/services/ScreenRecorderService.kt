@@ -73,7 +73,7 @@ open class ScreenRecorderService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             mNotificationChannel = NotificationChannel(NOTIFICATION_CHANNEL_ID,
                     NOTIFICATION_CHANNEL_NAME,
-                    NotificationManager.IMPORTANCE_HIGH)
+                    NotificationManager.IMPORTANCE_LOW)
             mNotificationManager.createNotificationChannel(mNotificationChannel)
         }
     }
@@ -231,7 +231,6 @@ open class ScreenRecorderService : Service() {
                 .setContentText(getString(R.string.notif_rec_progress))
                 .setWhen(System.currentTimeMillis())
                 .setUsesChronometer(true)
-                .setOngoing(true)
                 .addAction(R.drawable.ic_outline_stop, getString(R.string.notif_rec_stop),
                         stopPendingIntent)
                 .build()
