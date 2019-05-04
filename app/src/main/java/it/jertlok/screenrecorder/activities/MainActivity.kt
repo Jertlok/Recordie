@@ -188,6 +188,9 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
         mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPrefListener)
         // Stop shaking service if it's active
         mShakeDetector.stop()
+        // Stop ScreenRecorder service
+        val stopIntent = Intent(this, ScreenRecorderService::class.java)
+        stopService(stopIntent)
     }
 
     override fun onStop() {
@@ -285,7 +288,7 @@ class MainActivity : AppCompatActivity(), ShakeDetector.Listener {
     private inner class VideoContentObserver(handler: Handler) : ContentObserver(handler) {
 
         override fun onChange(selfChange: Boolean, uri: Uri?) {
-            if (mPattern.containsMatchIn(MediaStore.Video.Media.EXTERNAL_CONTENT_URI.toString())) {
+            if (mPattern.containsMatchIn(uri.toString())) {
                 updateVideos()
             }
         }
