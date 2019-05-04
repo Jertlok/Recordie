@@ -276,7 +276,7 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         val stopPendingIntent = PendingIntent.getService(this, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT)
         val builder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_outline_record)
+                .setSmallIcon(R.drawable.ic_record)
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText(getString(R.string.notif_rec_progress))
                 .setWhen(System.currentTimeMillis())
@@ -305,7 +305,7 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
                 deleteIntent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_CANCEL_CURRENT)
         // Build notification
         val builder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_outline_record)
+                .setSmallIcon(R.drawable.ic_record)
                 .setContentTitle(getString(R.string.notif_rec_complete))
                 .setContentText("Video")
                 .setWhen(System.currentTimeMillis())

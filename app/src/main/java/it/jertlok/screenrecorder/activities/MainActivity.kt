@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.content.*
 import android.content.pm.PackageManager
 import android.database.ContentObserver
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
@@ -12,6 +13,8 @@ import android.os.*
 import androidx.appcompat.app.AppCompatActivity
 import android.preference.PreferenceManager
 import android.provider.MediaStore
+import android.view.View
+import android.view.WindowManager
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -77,6 +80,22 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // TODO: move to when or something easier to read
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val baseFlags = WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            // Marshmallow conditions
+            window.decorView.systemUiVisibility = baseFlags
+            // If it's higher than O we need to add something else
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                window.decorView.systemUiVisibility = baseFlags or
+                        View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+
+            }
+            // Set status bar color
+            window.statusBarColor = Color.WHITE
+        }
+
         // Grant permissions if needed
         checkPermissions()
 
@@ -110,7 +129,7 @@ class MainActivity : AppCompatActivity() {
         updateVideos()
 
         // Drawables
-        fabStartDrawable = getDrawable(R.drawable.ic_outline_record)
+        fabStartDrawable = getDrawable(R.drawable.ic_record)
         fabStopDrawable = getDrawable(R.drawable.ic_outline_stop)
 
         // Set actions for the FAB
