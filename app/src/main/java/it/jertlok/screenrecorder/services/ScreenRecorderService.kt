@@ -9,20 +9,22 @@ import android.media.MediaRecorder
 import android.media.projection.MediaProjection
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
-import android.os.Binder
-import android.os.Build
-import android.os.Environment
-import android.os.IBinder
+import android.os.*
 import android.preference.PreferenceManager
+import android.provider.MediaStore
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.WindowManager
 import androidx.core.app.NotificationCompat
+import androidx.core.content.FileProvider
 import com.squareup.seismic.ShakeDetector
+import it.jertlok.screenrecorder.BuildConfig
 import it.jertlok.screenrecorder.R
 import it.jertlok.screenrecorder.activities.MainActivity
 import java.io.File
 import java.io.IOException
+import java.lang.Exception
+import java.lang.ref.WeakReference
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -84,7 +86,6 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
                     NotificationManager.IMPORTANCE_LOW)
             mNotificationManager.createNotificationChannel(mNotificationChannel)
         }
-        // Shake detector
         // Set shared preference listener
         mSharedPrefListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             when (key) {
@@ -104,7 +105,10 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         mIsShakeActive = mSharedPreferences.getBoolean("shake_stop", false)
         mShakeDetector = ShakeDetector(this)
         // Broadcast receiver
-        registerReceiver(mBroadcastReceiver, IntentFilter(Intent.ACTION_SCREEN_OFF))
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(Intent.ACTION_SCREEN_OFF)
+        intentFilter.addAction(ACTION_DELETE)
+        registerReceiver(mBroadcastReceiver, intentFilter)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -210,15 +214,17 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         // Destroy media projection session
         destroyMediaProjection()
         // Notify new media file
-        notifyNewMedia()
+        updateMedia(Uri.fromFile(mOutputFile))
         // Stop notification
         stopForeground(true)
         // Send broadcast for recording status
         recStatusBroadcast()
+        // Create notification
+        createFinalNotification()
     }
 
     private fun recStatusBroadcast() {
-        val fabBroadcast = Intent().setAction(MainActivity.ACTION_UPDATE_FAB)
+        val fabBroadcast = Intent(MainActivity.ACTION_UPDATE_FAB)
         sendBroadcast(fabBroadcast)
     }
 
@@ -258,12 +264,9 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         }
     }
 
-    private fun notifyNewMedia() {
-        if (mOutputFile != null) {
-            val contentUri = Uri.fromFile(mOutputFile)
-            val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, contentUri)
+    private fun updateMedia(uri: Uri) {
+            val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri)
             sendBroadcast(mediaScanIntent)
-        }
     }
 
     /** Create notification */
@@ -282,6 +285,34 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
                         stopPendingIntent)
                 .build()
         startForeground(NOTIFICATION_RECORD_ID, builder)
+    }
+
+    /** Final notification after the recording is complete */
+    private fun createFinalNotification() {
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        shareIntent.type = "video/*"
+        shareIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        val fileIntent = FileProvider.getUriForFile(this,
+                BuildConfig.APPLICATION_ID + ".provider", mOutputFile!!)
+        shareIntent.putExtra(Intent.EXTRA_STREAM, fileIntent)
+        val shareAction = PendingIntent.getActivity(this, 0,
+                Intent.createChooser(shareIntent, getString(R.string.share_title)),
+                PendingIntent.FLAG_UPDATE_CURRENT)
+        // Delete action
+        val deleteIntent = Intent(ACTION_DELETE)
+                .putExtra(SCREEN_RECORD_URI, Uri.fromFile(mOutputFile))
+        val deleteAction = PendingIntent.getBroadcast(this, 0,
+                deleteIntent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_CANCEL_CURRENT)
+        // Build notification
+        val builder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_outline_record)
+                .setContentTitle(getString(R.string.notif_rec_complete))
+                .setContentText("Video")
+                .setWhen(System.currentTimeMillis())
+                .addAction(R.drawable.ic_outline_delete, "Delete", deleteAction)
+                .addAction(R.drawable.ic_outline_share, "Share", shareAction)
+                .build()
+        mNotificationManager.notify(NOTIFICATION_RECORD_ID, builder)
     }
 
     private fun getOutputMediaFile(): File? {
@@ -318,12 +349,50 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
 
     private inner class LocalBroadcastReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
+            Log.d(TAG, "onReceive: ${intent?.action}")
             when (intent?.action) {
                 Intent.ACTION_SCREEN_OFF -> if (mIsScreenStopActive) stopRecording()
+                ACTION_DELETE -> {
+                    mNotificationManager.cancel(NOTIFICATION_RECORD_ID)
+                    val fileUri = intent.getParcelableExtra<Uri>(SCREEN_RECORD_URI)
+                    DeleteVideoTask(this@ScreenRecorderService).execute(fileUri)
+                }
             }
         }
     }
 
+    private class DeleteVideoTask(context: ScreenRecorderService): AsyncTask<Uri, Void, Boolean>() {
+        private val activityRef: WeakReference<ScreenRecorderService> = WeakReference(context)
+
+        override fun doInBackground(vararg params: Uri): Boolean {
+            val activity = activityRef.get()
+            if (params.size != 1 || activity == null) {
+                return false
+            }
+            // Get file uri
+            val fileUri = params[0].path
+            val contentResolver = activity.contentResolver
+            // The file we need to remove
+            val where = "${MediaStore.Video.Media.DATA} = '$fileUri'"
+            // The resulting rows, that in our case must be a single value
+            val rows = contentResolver.delete(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                    where, null)
+            // If we find the file inside our content resolver
+            if (rows != 0) {
+                // Let's try to remove the file
+                try {
+                    val file = File(fileUri)
+                    if (file.delete()) {
+                        return true
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Couldn't remove file: $fileUri")
+                }
+            }
+            // We did not find the file
+            return false
+        }
+    }
 
     companion object {
         private const val TAG = "ScreenRecorderService"
@@ -332,6 +401,8 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         // Intent actions
         const val ACTION_START = "it.jertlok.services.ScreenRecorderService.ACTION_START"
         const val ACTION_STOP = "it.jertlok.services.ScreenRecorderService.ACTION_STOP"
+        const val ACTION_DELETE = "it.jertlok.services.ScreenRecorderService.ACTION_DELETE"
+        const val SCREEN_RECORD_URI = "screen_record_file_uri"
         // Notification constants
         private const val NOTIFICATION_CHANNEL_NAME = "Screen Recorder"
         private const val NOTIFICATION_CHANNEL_ID =
