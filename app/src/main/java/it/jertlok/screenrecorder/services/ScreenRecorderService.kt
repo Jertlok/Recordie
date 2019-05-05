@@ -105,6 +105,8 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         // Initialise shake detector
         mIsShakeActive = mSharedPreferences.getBoolean("shake_stop", false)
         mShakeDetector = ShakeDetector(this)
+        // Initialisation for screen off feature
+        mIsScreenStopActive = mSharedPreferences.getBoolean("screen_off_stop", false)
         // Broadcast receiver
         val intentFilter = IntentFilter()
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF)
@@ -379,7 +381,6 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
 
     private inner class LocalBroadcastReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            Log.d(TAG, "onReceive: ${intent?.action}")
             when (intent?.action) {
                 Intent.ACTION_SCREEN_OFF -> if (mIsScreenStopActive) stopRecording()
                 ACTION_DELETE -> {
