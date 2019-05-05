@@ -26,7 +26,9 @@
 
     <!-- Special theme for Tile -->
     <style name ="InvisibleActivity" parent="Theme.MaterialComponents.NoActionBar">
-        <item name="android:background">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/white</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
