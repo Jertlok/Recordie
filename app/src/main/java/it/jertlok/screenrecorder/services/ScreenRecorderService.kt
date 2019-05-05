@@ -66,10 +66,14 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
     var mRecScheduled = false
         private set
     private var mHandler = Handler()
+    // Vibration
+    private lateinit var mVibrator: Vibrator
 
     override fun onCreate() {
         super.onCreate()
         mContext = applicationContext
+        // Get vibrator service
+        mVibrator = mContext.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         // Get the media projection service
         mMediaProjectionManager = mContext.getSystemService(
                 Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
@@ -247,6 +251,8 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         recStatusBroadcast()
         // Create notification
         createFinalNotification()
+        // Send vibration
+        sendVibrationCompat()
     }
 
     private fun recStatusBroadcast() {
@@ -357,6 +363,16 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
                 .build()
         // Send notification
         mNotificationManager.notify(NOTIFICATION_RECORD_ID, builder)
+    }
+
+    /** Compatibility function for sending a vibration */
+    private fun sendVibrationCompat() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            mVibrator.vibrate(VibrationEffect.createOneShot(250,
+                    VibrationEffect.DEFAULT_AMPLITUDE))
+        } else {
+            mVibrator.vibrate(250)
+        }
     }
 
     /** Get an output file for the recording process */
