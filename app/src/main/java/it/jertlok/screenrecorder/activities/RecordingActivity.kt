@@ -80,9 +80,7 @@ open class RecordingActivity: AppCompatActivity() {
                 finish()
                 return
             }
-            // Let's hide the main task and start a delayed shit
-            moveTaskToBack(true)
-            // Start screen recorder after 1.5 second
+            // Start screen recorder after the user preference
             Handler().postDelayed({
                 // Encapsulate media permission
                 val startIntent = Intent(this, ScreenRecorderService::class.java)
