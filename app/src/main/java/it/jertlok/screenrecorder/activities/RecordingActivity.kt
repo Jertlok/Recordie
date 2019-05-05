@@ -3,11 +3,13 @@ package it.jertlok.screenrecorder.activities
 import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.media.projection.MediaProjectionManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.preference.PreferenceManager
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
@@ -18,6 +20,9 @@ import it.jertlok.screenrecorder.services.ScreenRecorderService
 open class RecordingActivity: AppCompatActivity() {
 
     private lateinit var mNotificationManager: NotificationManager
+    private lateinit var mSharedPreferences: SharedPreferences
+    // User preference for recording delay
+    private var mRecDelay = 2
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +42,10 @@ open class RecordingActivity: AppCompatActivity() {
             // Set status bar color
             window.statusBarColor = Color.TRANSPARENT
         }
+
+        // Initialise shared preferences
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        mRecDelay = mSharedPreferences.getInt("rec_delay", 2)
 
         val mediaProjectionManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE)
                 as MediaProjectionManager
@@ -80,7 +89,7 @@ open class RecordingActivity: AppCompatActivity() {
                         .setAction(ScreenRecorderService.ACTION_START)
                 startIntent.putExtra(Intent.EXTRA_INTENT, data)
                 startService(startIntent)
-            }, 1500)
+            }, (mRecDelay * 1000).toLong())
             // Terminate activity
             finish()
         }
