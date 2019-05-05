@@ -33,4 +33,8 @@
 
     <!-- Share intent -->
     <string name="share_title">Share video</string>
+
+    <!-- Material card -->
+    <string name="share">Share</string>
+    <string name="delete">Delete</string>
 </resources>
