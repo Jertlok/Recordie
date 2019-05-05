@@ -13,6 +13,7 @@ import android.os.*
 import androidx.appcompat.app.AppCompatActivity
 import android.preference.PreferenceManager
 import android.provider.MediaStore
+import android.view.KeyEvent
 import android.view.View
 import android.view.WindowManager
 import androidx.core.content.FileProvider
@@ -191,6 +192,10 @@ class MainActivity : AppCompatActivity() {
         // Unregister broadcast receiver
         unregisterReceiver(mBroadcastReceiver)
         super.onPause()
+    }
+
+    override fun onBackPressed() {
+        moveTaskToBack(true)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
