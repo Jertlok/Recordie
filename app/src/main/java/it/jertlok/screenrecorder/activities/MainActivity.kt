@@ -130,7 +130,7 @@ class MainActivity : AppCompatActivity() {
 
         // Drawables
         fabStartDrawable = getDrawable(R.drawable.ic_record)
-        fabStopDrawable = getDrawable(R.drawable.ic_outline_stop)
+        fabStopDrawable = getDrawable(R.drawable.ic_stop)
 
         // Set actions for the FAB
         fabButton.setOnClickListener {
