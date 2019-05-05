@@ -6,13 +6,9 @@ import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Switch
-import androidx.preference.ListPreference
-import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.SwitchPreference
+import androidx.preference.*
 import it.jertlok.screenrecorder.R
 import it.jertlok.screenrecorder.utils.Utils
-import java.util.Arrays
 
 class SettingsFragment: PreferenceFragmentCompat() {
     // TODO: Make the resolutions available according to the
@@ -29,6 +25,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
     private lateinit var audioRecordingPref: SwitchPreference
     private lateinit var shakeStopPref: SwitchPreference
     private lateinit var screenStopPref: SwitchPreference
+    private lateinit var recDelayPref: SeekBarPreference
 
     // Display resolution
     private lateinit var mDisplayRes: String
@@ -47,11 +44,12 @@ class SettingsFragment: PreferenceFragmentCompat() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // TODO: we also need to set the descriptions.
-        bitRatePref = findPreference("bit_rate_pref") as ListPreference
-        frameRateListPref = findPreference("frame_rate_pref") as ListPreference
-        audioRecordingPref = findPreference("audio_recording_pref") as SwitchPreference
-        shakeStopPref = findPreference("shake_stop_pref") as SwitchPreference
-        screenStopPref = findPreference("screen_stop_pref") as SwitchPreference
+        bitRatePref = findPreference("bit_rate_pref")!!
+        frameRateListPref = findPreference("frame_rate_pref")!!
+        audioRecordingPref = findPreference("audio_recording_pref")!!
+        shakeStopPref = findPreference("shake_stop_pref")!!
+        screenStopPref = findPreference("screen_stop_pref")!!
+        recDelayPref = findPreference("rec_delay_pref")!!
 
         // We need to get the shared preferences and change the elements accordingly
         bitRatePref.setValueIndex(bitRatePref.findIndexOfValue(
@@ -64,6 +62,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
                 mSharedPreferences.getBoolean("shake_stop", false)
         screenStopPref.isChecked =
                 mSharedPreferences.getBoolean("screen_off_stop", false)
+        recDelayPref.value = mSharedPreferences.getInt("rec_delay", 2)
 
         // On preference change listeners
         bitRatePref.setOnPreferenceChangeListener { _, newValue ->
@@ -84,6 +83,10 @@ class SettingsFragment: PreferenceFragmentCompat() {
         }
         screenStopPref.setOnPreferenceChangeListener { _, newValue ->
             mSharedPreferences.edit().putBoolean("screen_off_stop", newValue as Boolean).apply()
+            true
+        }
+        recDelayPref.setOnPreferenceChangeListener { _, newValue ->
+            mSharedPreferences.edit().putInt("rec_delay", newValue as Int).apply()
             true
         }
 

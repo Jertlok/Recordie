@@ -194,6 +194,7 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
     }
 
+    // TODO: investigate on app being killed for some reasons.
     override fun onBackPressed() {
         moveTaskToBack(true)
     }

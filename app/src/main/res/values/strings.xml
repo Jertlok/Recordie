@@ -22,6 +22,7 @@
     <string name="misc_category">Miscellaneous</string>
     <string name="shake_stop_title">Shake to stop</string>
     <string name="screen_stop_title">Turn off screen to stop</string>
+    <string name="rec_delay_title">Recording delay (seconds)</string>
 
     <!-- QS Tile -->
     <string name="qs_record_title">Record</string>
