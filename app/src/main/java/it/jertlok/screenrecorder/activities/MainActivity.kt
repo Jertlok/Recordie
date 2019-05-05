@@ -17,6 +17,7 @@ import android.view.View
 import android.view.WindowManager
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomappbar.BottomAppBar
@@ -119,7 +120,7 @@ class MainActivity : AppCompatActivity() {
 
         // Set adapter
         mVideoAdapter = VideoAdapter(mVideoArray, EventInterfaceImpl())
-        mLayoutManager = LinearLayoutManager(applicationContext)
+        mLayoutManager = GridLayoutManager(applicationContext, 2)
 
         mRecyclerView.layoutManager = mLayoutManager
         mRecyclerView.itemAnimator = DefaultItemAnimator()
