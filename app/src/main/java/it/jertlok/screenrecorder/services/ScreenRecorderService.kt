@@ -145,6 +145,11 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
     override fun onBind(intent: Intent?): IBinder? = mBinder
 
     private fun initRecorder() {
+        mOutputFile = getOutputMediaFile()
+        if (mOutputFile == null) {
+            Log.e(TAG, "Failed to get the file.")
+            return
+        }
         // Conditional audio recording
         val isAudioRecEnabled = mSharedPreferences.getBoolean("audio_recording", false)
         // Initialise MediaRecorder
@@ -154,7 +159,6 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
             mMediaRecorder?.setAudioSource(MediaRecorder.AudioSource.MIC)
         }
         mMediaRecorder?.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-        mOutputFile = getOutputMediaFile()
         mMediaRecorder?.setOutputFile(mOutputFile?.path)
         // Set video size
         mMediaRecorder?.setVideoSize(mDisplayMetrics.widthPixels, mDisplayMetrics.heightPixels)
@@ -330,13 +334,17 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
                 return null
             }
         }
-
         // Create a media file name
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
                 .format(Date())
-
-        return File(mediaStorageDir.path + File.separator +
-                "SCR_" + timeStamp + ".mp4")
+        var file: File? = null
+        try {
+            file = File(mediaStorageDir.path + File.separator +
+                    "SCR_" + timeStamp + ".mp4")
+        } catch (e: IOException) {
+            Log.d(TAG, "Failed to create file, error: $e")
+        }
+        return file
     }
 
     fun isRecording(): Boolean {
