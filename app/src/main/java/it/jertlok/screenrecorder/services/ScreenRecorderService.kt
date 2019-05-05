@@ -61,6 +61,11 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
     private var mBroadcastReceiver = LocalBroadcastReceiver()
     // Screen off stop
     private var mIsScreenStopActive = false
+    // Some way to handle a scheduled recording
+    private var mRecDelay = 2
+    var mRecScheduled = false
+        private set
+    private var mHandler = Handler()
 
     override fun onCreate() {
         super.onCreate()
@@ -98,6 +103,7 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
                 }
                 "screen_off_stop" -> mIsScreenStopActive = mSharedPreferences.
                         getBoolean("screen_off_stop", false)
+                "rec_delay" -> mRecDelay = mSharedPreferences.getInt("rec_delay", 2)
             }
         }
         // Register shared preference listener
@@ -112,25 +118,36 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF)
         intentFilter.addAction(ACTION_DELETE)
         registerReceiver(mBroadcastReceiver, intentFilter)
+        // Delay for recording
+        mRecDelay = mSharedPreferences.getInt("rec_delay", 2)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val action = intent?.action
         // If we are requesting a start
-        if (action == ACTION_START) {
-            // Let's retrieve our parcelable
-            val mediaPermission = intent.getParcelableExtra<Intent>(Intent.EXTRA_INTENT)
-            // Start ShakeDetector if active
-            if (mIsShakeActive) mShakeDetector.start(mSensorManager)
-            // Start recording
-            startRecording(mediaPermission)
-            createNotification()
-            return START_STICKY
-        } // Otherwise, let's stop.
-        else if (action == ACTION_STOP) {
-            stopRecording()
-            // Stop shake detector
-            mShakeDetector.stop()
+        when (intent?.action) {
+            ACTION_START -> {
+                mRecScheduled = true
+                // Let's retrieve our parcelable
+                val mediaPermission = intent.getParcelableExtra<Intent>(Intent.EXTRA_INTENT)
+                // Start ShakeDetector if active
+                if (mIsShakeActive) mShakeDetector.start(mSensorManager)
+                // Start recording after user preference
+                mHandler.postDelayed({
+                    startRecording(mediaPermission)
+                    createNotification()
+                }, (mRecDelay * 1000).toLong())
+                return START_STICKY
+            }
+            ACTION_STOP -> {
+                stopRecording()
+                // Stop shake detector
+                mShakeDetector.stop()
+            }
+            ACTION_STOP_DELAYED -> {
+                // Block everything
+                mHandler.removeCallbacksAndMessages(null)
+                mRecScheduled = false
+            }
         }
         return super.onStartCommand(intent, flags, startId)
     }
@@ -189,7 +206,9 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         if (mIsRecording) {
             return
         }
-        Log.d(TAG, "startRecording()")
+        // We have started the recording, no more pending recordings.
+        mRecScheduled = false
+        // We are recording
         mIsRecording = true
         // TODO: try to figure the warning on data
         // Initialise MediaProjection
@@ -438,6 +457,8 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         // Intent actions
         const val ACTION_START = "it.jertlok.services.ScreenRecorderService.ACTION_START"
         const val ACTION_STOP = "it.jertlok.services.ScreenRecorderService.ACTION_STOP"
+        const val ACTION_STOP_DELAYED =
+                "it.jertlok.services.ScreenRecorderService.ACTION_STOP_DELAYED"
         const val ACTION_DELETE = "it.jertlok.services.ScreenRecorderService.ACTION_DELETE"
         const val SCREEN_RECORD_URI = "screen_record_file_uri"
     }

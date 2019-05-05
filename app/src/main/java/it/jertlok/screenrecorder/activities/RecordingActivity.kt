@@ -21,8 +21,7 @@ open class RecordingActivity: AppCompatActivity() {
 
     private lateinit var mNotificationManager: NotificationManager
     private lateinit var mSharedPreferences: SharedPreferences
-    // User preference for recording delay
-    private var mRecDelay = 2
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +44,6 @@ open class RecordingActivity: AppCompatActivity() {
 
         // Initialise shared preferences
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        mRecDelay = mSharedPreferences.getInt("rec_delay", 2)
 
         val mediaProjectionManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE)
                 as MediaProjectionManager
@@ -81,13 +79,11 @@ open class RecordingActivity: AppCompatActivity() {
                 return
             }
             // Start screen recorder after the user preference
-            Handler().postDelayed({
-                // Encapsulate media permission
-                val startIntent = Intent(this, ScreenRecorderService::class.java)
-                        .setAction(ScreenRecorderService.ACTION_START)
-                startIntent.putExtra(Intent.EXTRA_INTENT, data)
-                startService(startIntent)
-            }, (mRecDelay * 1000).toLong())
+            // Encapsulate media permission
+            val startIntent = Intent(this, ScreenRecorderService::class.java)
+                    .setAction(ScreenRecorderService.ACTION_START)
+            startIntent.putExtra(Intent.EXTRA_INTENT, data)
+            startService(startIntent)
             // Terminate activity
             finish()
         }

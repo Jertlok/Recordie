@@ -43,7 +43,6 @@ class MainActivity : AppCompatActivity() {
     // User interface
     private lateinit var bottomBar: BottomAppBar
     private lateinit var fabButton: FloatingActionButton
-    private var mRecording = false
     // Video list
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mVideoAdapter: VideoAdapter
@@ -139,12 +138,12 @@ class MainActivity : AppCompatActivity() {
             // Here we need to understand whether we are recording or not.
             // If we are not recording we can send the intent for recording
             // otherwise we will try to stop the recording.
-            if (!mBoundService.isRecording()) {
+            if (!mBoundService.isRecording() && !mBoundService.mRecScheduled) {
                 // Start invisible activity
                 val startIntent = Intent(this, RecordingActivity::class.java)
                         .setAction(RecordingActivity.ACTION_START)
                 startActivity(startIntent)
-            } else {
+            } else if (mBoundService.isRecording()) {
                 stopRecording()
             }
         }
@@ -245,7 +244,6 @@ class MainActivity : AppCompatActivity() {
         mBoundService.stopRecording()
         // Let's reset the FAB icon to start
         fabButton.setImageDrawable(fabStartDrawable)
-        mRecording = false
     }
 
     private inner class EventInterfaceImpl : VideoAdapter.EventInterface {
