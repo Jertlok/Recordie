@@ -440,7 +440,7 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
             when (intent?.action) {
                 Intent.ACTION_SCREEN_OFF -> if (mIsScreenStopActive) stopRecording()
                 ACTION_DELETE -> {
-                    mNotificationManager.cancel(NOTIFICATION_RECORD_ID)
+                    mNotificationManager.cancel(NOTIFICATION_RECORD_FINAL_ID)
                     val fileUri = intent.getParcelableExtra<Uri>(SCREEN_RECORD_URI)
                     DeleteVideoTask(this@ScreenRecorderService).execute(fileUri)
                 }
