@@ -8,13 +8,14 @@
     </style>
 
     <style name="AppTheme.Settings" parent="Theme.MaterialComponents.Light.DarkActionBar">
-        <item name="actionBarTheme">@style/AppTheme.ActionBar</item>
+        <item name="backgroundColor">@android:color/white</item>
+        <item name="actionBarTheme">@style/AppTheme.Settings.ActionBar</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="AppTheme.ActionBar" parent="Theme.MaterialComponents.Light.DarkActionBar">
+    <style name="AppTheme.Settings.ActionBar" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <item name="android:background">@color/white</item>
     </style>
 
@@ -29,4 +30,24 @@
         <item name="android:windowAnimationStyle">@android:style/Animation</item>
     </style>
 
+    <!-- Dark theme -->
+    <style name="AppTheme.Dark" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="AppTheme.Settings.Dark" parent="Theme.MaterialComponents">
+        <item name="backgroundColor">#141414</item>
+        <item name="actionBarTheme">@style/AppTheme.Settings.Dark.ActionBar</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:statusBarColor">#141414</item>
+        <item name="android:navigationBarColor">#141414</item>
+    </style>
+
+    <style name="AppTheme.Settings.Dark.ActionBar" parent="Theme.MaterialComponents">
+        <item name="android:background">#141414</item>
+    </style>
 </resources>
