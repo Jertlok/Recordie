@@ -441,17 +441,17 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
     /** Asynchronous task for deleting a video in the background */
     private class DeleteVideoTask(context: ScreenRecorderService): AsyncTask<Uri, Void, Boolean>() {
         private val activityRef: WeakReference<ScreenRecorderService> = WeakReference(context)
-
+        private lateinit var mFileUri: String
         override fun doInBackground(vararg params: Uri): Boolean {
             val activity = activityRef.get()
             if (params.size != 1 || activity == null) {
                 return false
             }
             // Get file uri
-            val fileUri = params[0].path
+            mFileUri = params[0].path!!
             val contentResolver = activity.contentResolver
             // The file we need to remove
-            val where = "${MediaStore.Video.Media.DATA} = '$fileUri'"
+            val where = "${MediaStore.Video.Media.DATA} = '$mFileUri'"
             // The resulting rows, that in our case must be a single value
             val rows = contentResolver.delete(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
                     where, null)
@@ -459,16 +459,27 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
             if (rows != 0) {
                 // Let's try to remove the file
                 try {
-                    val file = File(fileUri)
+                    val file = File(mFileUri)
                     if (file.delete()) {
                         return true
                     }
                 } catch (e: Exception) {
-                    Log.e(TAG, "Couldn't remove file: $fileUri")
+                    Log.e(TAG, "Couldn't remove file: $mFileUri")
                 }
             }
             // We did not find the file
             return false
+        }
+
+        override fun onPostExecute(result: Boolean?) {
+            super.onPostExecute(result)
+            // If the activity is null, get out of here.
+            val activity = activityRef.get() ?: return
+            // Notify to update the video removed
+            val deleteBroadcast = Intent(MainActivity.ACTION_DELETE_VIDEO)
+                    .putExtra(SCREEN_RECORD_URI, mFileUri)
+            // Send broadcast, this will be listened the MainActivity
+            activity.sendBroadcast(deleteBroadcast)
         }
     }
 

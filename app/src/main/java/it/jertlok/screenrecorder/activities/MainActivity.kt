@@ -5,7 +5,6 @@ import android.app.NotificationManager
 import android.content.*
 import android.content.pm.PackageManager
 import android.database.ContentObserver
-import android.database.Cursor
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.media.projection.MediaProjectionManager
@@ -14,7 +13,6 @@ import android.os.*
 import androidx.appcompat.app.AppCompatActivity
 import android.preference.PreferenceManager
 import android.provider.MediaStore
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.core.content.FileProvider
@@ -30,7 +28,6 @@ import it.jertlok.screenrecorder.adapters.VideoAdapter
 import it.jertlok.screenrecorder.services.ScreenRecorderService
 import it.jertlok.screenrecorder.common.ScreenVideo
 import java.io.File
-import java.lang.Exception
 import java.lang.ref.WeakReference
 
 class MainActivity : AppCompatActivity() {
@@ -63,7 +60,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mSharedPreferences: SharedPreferences
     // Broadcast receiver for updating FAB button from service
     private val mBroadcastReceiver = LocalBroadcastReceiver()
-    private val mIntentFilter = IntentFilter(ACTION_UPDATE_FAB)
+    private val mIntentFilter = IntentFilter()
     // ScreenRecorderService
     private var mBound = false
     private lateinit var mBoundService: ScreenRecorderService
@@ -103,6 +100,11 @@ class MainActivity : AppCompatActivity() {
 
         // Grant permissions if needed
         checkPermissions()
+
+        // TODO: move to android manifest asap
+        // Set the various intent filters
+        mIntentFilter.addAction(ACTION_DELETE_VIDEO)
+        mIntentFilter.addAction(ACTION_UPDATE_FAB)
 
         // Get various system services
         mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -252,6 +254,12 @@ class MainActivity : AppCompatActivity() {
         UpdateSingleVideoTask(this).execute()
     }
 
+    private fun updateDelete(videoData: String) {
+        val position = mVideoArray.indexOf(mVideoArray.find { s -> s.data == videoData})
+        mVideoArray.removeAt(position)
+        mVideoAdapter.notifyItemRemoved(position)
+    }
+
     private fun stopRecording() {
         mBoundService.stopRecording()
         // Let's reset the FAB icon to start
@@ -260,9 +268,7 @@ class MainActivity : AppCompatActivity() {
 
     private inner class EventInterfaceImpl : VideoAdapter.EventInterface {
         override fun deleteEvent(videoData: String) {
-            val position = mVideoArray.indexOf(mVideoArray.find { s -> s.data == videoData})
-            mVideoArray.removeAt(position)
-            mVideoAdapter.notifyItemRemoved(position)
+            updateDelete(videoData)
         }
 
         override fun playVideo(videoData: String) {
@@ -404,6 +410,11 @@ class MainActivity : AppCompatActivity() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
                 ACTION_UPDATE_FAB -> conditionalFabToggle()
+                ACTION_DELETE_VIDEO -> {
+                    // Let's get the fileUri from the intent
+                    val videoData = intent.getStringExtra(ScreenRecorderService.SCREEN_RECORD_URI)
+                    updateDelete(videoData)
+                }
             }
         }
     }
@@ -414,5 +425,6 @@ class MainActivity : AppCompatActivity() {
         private const val PERMISSION_REQUESTS = 0
         // Intent filter
         const val ACTION_UPDATE_FAB = "it.jertlok.activities.MainActivity.ACTION_UPDATE_FAB"
+        const val ACTION_DELETE_VIDEO = "it.jertlok.activities.MainActivity.ACTION_DELETE_VIDEO"
     }
 }
