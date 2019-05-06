@@ -38,4 +38,5 @@
     <!-- Material card -->
     <string name="share">Share</string>
     <string name="delete">Delete</string>
+    <string name="yes">Yes</string>
 </resources>
