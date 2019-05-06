@@ -23,7 +23,6 @@
                 android:layout_height="160dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_movie"
-                android:tint="@color/gray"
                 android:clickable="true"
                 android:focusable="true" />
 
