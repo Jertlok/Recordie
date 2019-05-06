@@ -173,6 +173,9 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         // Register broadcast receiver
         registerReceiver(mBroadcastReceiver, mIntentFilter)
+        // Remove all the app notifications
+        mNotificationManager.cancel(ScreenRecorderService.NOTIFICATION_RECORD_FINAL_ID)
+        // Update videos
         updateVideos()
     }
 
