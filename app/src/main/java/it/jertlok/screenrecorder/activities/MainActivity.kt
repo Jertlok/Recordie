@@ -2,10 +2,10 @@ package it.jertlok.screenrecorder.activities
 
 import android.Manifest
 import android.app.NotificationManager
+import android.app.UiModeManager
 import android.content.*
 import android.content.pm.PackageManager
 import android.database.ContentObserver
-import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
@@ -64,6 +64,9 @@ class MainActivity : AppCompatActivity() {
     // Broadcast receiver for updating FAB button from service
     private val mBroadcastReceiver = LocalBroadcastReceiver()
     private val mIntentFilter = IntentFilter()
+    // UiModeManager
+    private lateinit var mUiModeManager: UiModeManager
+    private var mStockWindowFlags: Int = 16
     // ScreenRecorderService
     private var mBound = false
     private lateinit var mBoundService: ScreenRecorderService
@@ -83,23 +86,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Set theme
+        mUiModeManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
+        setUiTheme()
+
+        // Set contents
         setContentView(R.layout.activity_main)
-
-        // TODO: move to when or something easier to read
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val baseFlags = WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or
-                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-            // Marshmallow conditions
-            window.decorView.systemUiVisibility = baseFlags
-            // If it's higher than O we need to add something else
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                window.decorView.systemUiVisibility = baseFlags or
-                        View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-
-            }
-            // Set status bar color
-            window.statusBarColor = Color.WHITE
-        }
 
         // Grant permissions if needed
         checkPermissions()
@@ -206,6 +199,33 @@ class MainActivity : AppCompatActivity() {
     // TODO: investigate on app being killed for some reasons.
     override fun onBackPressed() {
         moveTaskToBack(true)
+    }
+
+    private fun setUiTheme() {
+        when (mUiModeManager.nightMode) {
+            UiModeManager.MODE_NIGHT_AUTO -> {
+                setTheme(R.style.AppTheme)
+                whiteHelper()
+            }
+            UiModeManager.MODE_NIGHT_YES -> setTheme(R.style.AppTheme_Dark)
+            UiModeManager.MODE_NIGHT_NO -> whiteHelper()
+        }
+    }
+
+    private fun whiteHelper() {
+        // TODO: move to when or something easier to read
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val baseFlags = WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            // Marshmallow conditions
+            window.decorView.systemUiVisibility = baseFlags
+            // If it's higher than O we need to add something else
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                window.decorView.systemUiVisibility = baseFlags or
+                        View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+
+            }
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,

@@ -21,26 +21,14 @@ open class RecordingActivity: AppCompatActivity() {
 
     private lateinit var mNotificationManager: NotificationManager
     private lateinit var mSharedPreferences: SharedPreferences
-
+    private lateinit var mUiModeManager: UiModeManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // TODO: move to when or something easier to read
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val baseFlags = WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or
-                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-            // Marshmallow conditions
-            window.decorView.systemUiVisibility = baseFlags
-            // If it's higher than O we need to add something else
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                window.decorView.systemUiVisibility = baseFlags or
-                        View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-
-            }
-            // Set status bar color
-            window.statusBarColor = Color.TRANSPARENT
-        }
+        // Set theme
+        mUiModeManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
+        setUiTheme()
 
         // Initialise shared preferences
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
@@ -60,6 +48,33 @@ open class RecordingActivity: AppCompatActivity() {
                     .setAction(ScreenRecorderService.ACTION_STOP)
             startService(stopIntent)
             finish()
+        }
+    }
+
+    private fun setUiTheme() {
+        when (mUiModeManager.nightMode) {
+            UiModeManager.MODE_NIGHT_AUTO -> {
+                setTheme(R.style.InvisibleActivity)
+                whiteHelper()
+            }
+            UiModeManager.MODE_NIGHT_YES -> setTheme(R.style.InvisibleActivity_Dark)
+            UiModeManager.MODE_NIGHT_NO -> whiteHelper()
+        }
+    }
+
+    private fun whiteHelper() {
+        // TODO: move to when or something easier to read
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val baseFlags = WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            // Marshmallow conditions
+            window.decorView.systemUiVisibility = baseFlags
+            // If it's higher than O we need to add something else
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                window.decorView.systemUiVisibility = baseFlags or
+                        View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+
+            }
         }
     }
 
