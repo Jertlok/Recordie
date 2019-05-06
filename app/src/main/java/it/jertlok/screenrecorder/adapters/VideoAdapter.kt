@@ -11,13 +11,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.Button
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toDrawable
 import androidx.recyclerview.widget.RecyclerView
@@ -36,7 +32,7 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
         var image: ImageView = view.findViewById(R.id.image)
         var title: TextView = view.findViewById(R.id.title)
         var deleteButton: MaterialButton = view.findViewById(R.id.delete)
-        var shareButton: MaterialButton = view.findViewById(R.id.share)
+        private var shareButton: MaterialButton = view.findViewById(R.id.share)
 
         fun bindView(eventInterface: EventInterface) {
             // TODO: move this thing into image
@@ -157,11 +153,11 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
             super.onPostExecute(result)
             // Get element
             val element = holderRef.get()
+            val transparent = ColorDrawable(ContextCompat.getColor(element?.itemView?.context!!,
+                    android.R.color.transparent))
             // Set out thumbnail to be center crop
             if (mThumbnail != null) {
                 // Compatible transparent color
-                val transparent = ColorDrawable(ContextCompat.getColor(element?.itemView?.context!!,
-                        android.R.color.transparent))
                 // Create transition
                 val td = TransitionDrawable(arrayOf(transparent,
                         mThumbnail?.toDrawable(element.itemView.resources!!)))
@@ -170,8 +166,10 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
                 holderRef.get()?.image?.scaleType = ImageView.ScaleType.CENTER_CROP
                 td.startTransition(IMAGE_FADE_MS)
             } else {
-                element?.image?.setImageDrawable(
-                        element.itemView.context.getDrawable(R.drawable.ic_movie))
+                val td = TransitionDrawable(arrayOf(transparent,
+                        element.itemView.context.getDrawable(R.drawable.ic_movie)))
+                element.image.setImageDrawable(td)
+                td.startTransition(IMAGE_FADE_MS)
             }
         }
     }
