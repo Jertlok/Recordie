@@ -232,6 +232,10 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
     override fun hearShake() = stopRecording()
 
     fun stopRecording() {
+        // If we are not recording there's no need to get into all these actions
+        if (!mIsRecording) {
+            return
+        }
         // Stopping the media recorder could lead to crash, let us be safe.
         mIsRecording = false
         mMediaRecorder?.apply {
@@ -247,6 +251,8 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         updateMedia(Uri.fromFile(mOutputFile))
         // Stop notification
         stopForeground(true)
+        // Stop shake service, we activate it after we start the recording for saving battery
+        mShakeDetector.stop()
         // Send broadcast for recording status
         recStatusBroadcast()
         // Create notification
