@@ -44,8 +44,8 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
             deleteButton.setOnClickListener {
                 val builder = MaterialAlertDialogBuilder(context)
                 // Set positive button
-                builder.setTitle("Delete screen record")
-                builder.setPositiveButton(android.R.string.yes) { _, _ ->
+                builder.setTitle("Delete screen record?")
+                builder.setPositiveButton(R.string.yes) { _, _ ->
                     deleteFile(videoData)
                     eventInterface.deleteEvent(videoData)
                 }
