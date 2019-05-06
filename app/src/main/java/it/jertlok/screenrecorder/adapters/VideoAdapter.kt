@@ -2,23 +2,22 @@ package it.jertlok.screenrecorder.adapters
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.TransitionDrawable
 import android.media.ThumbnailUtils
 import android.os.AsyncTask
 import android.provider.MediaStore
 import android.util.Log
+import android.util.LruCache
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toDrawable
+import androidx.core.app.DialogCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.dialog.MaterialDialogs
 import it.jertlok.screenrecorder.R
 import it.jertlok.screenrecorder.common.ScreenVideo
 import java.io.File
@@ -34,6 +33,12 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
         var deleteButton: MaterialButton = view.findViewById(R.id.delete)
         private var shareButton: MaterialButton = view.findViewById(R.id.share)
 
+        val mCache = object : LruCache<String, Bitmap>(CACHE_SIZE) {
+            override fun sizeOf(key: String?, value: Bitmap): Int {
+                return value.byteCount
+            }
+        }
+
         fun bindView(eventInterface: EventInterface) {
             // TODO: move this thing into image
             val videoData = deleteButton.getTag(R.id.fileUri).toString()
@@ -46,7 +51,7 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
                     eventInterface.deleteEvent(videoData)
                 }
                 // Set negative button
-                builder.setNeutralButton(android.R.string.cancel) { dialog, _ ->
+                builder.setNegativeButton(android.R.string.cancel) { dialog, _ ->
                     dialog.cancel()
                 }
                 // Show the dialog
@@ -140,41 +145,42 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
         private var mThumbnail: Bitmap? = null
 
         override fun doInBackground(vararg params: String?): Boolean {
+            val holder = holderRef.get() ?: return false
             if (params.size > 1) {
                 return false
             }
             val fileUri = params[0]
-            mThumbnail =
-                    ThumbnailUtils.createVideoThumbnail(fileUri, MediaStore.Video.Thumbnails.MINI_KIND)
+
+            synchronized (holder.mCache) {
+                if (holder.mCache.get(fileUri) == null) {
+                    mThumbnail = ThumbnailUtils.createVideoThumbnail(fileUri,
+                            MediaStore.Video.Thumbnails.MINI_KIND)
+                    if (mThumbnail != null) {
+                        holder.mCache.put(fileUri, mThumbnail)
+                    }
+                } else {
+                    mThumbnail = holder.mCache.get(fileUri)
+                }
+            }
             return true
         }
 
         override fun onPostExecute(result: Boolean) {
             super.onPostExecute(result)
             // Get element
-            val element = holderRef.get()
-            val transparent = ColorDrawable(ContextCompat.getColor(element?.itemView?.context!!,
-                    android.R.color.transparent))
+            val holder = holderRef.get() ?: return
             // Set out thumbnail to be center crop
             if (mThumbnail != null) {
-                // Compatible transparent color
-                // Create transition
-                val td = TransitionDrawable(arrayOf(transparent,
-                        mThumbnail?.toDrawable(element.itemView.resources!!)))
-                // Start transitioning
-                holderRef.get()?.image?.setImageDrawable(td)
+                holderRef.get()?.image?.setImageBitmap(mThumbnail)
                 holderRef.get()?.image?.scaleType = ImageView.ScaleType.CENTER_CROP
-                td.startTransition(IMAGE_FADE_MS)
             } else {
-                val td = TransitionDrawable(arrayOf(transparent,
-                        element.itemView.context.getDrawable(R.drawable.ic_movie)))
-                element.image.setImageDrawable(td)
-                td.startTransition(IMAGE_FADE_MS)
+                val placeholder = holder.itemView.context.getDrawable(R.drawable.ic_movie)
+                holder.image.setImageDrawable(placeholder)
             }
         }
     }
 
     companion object {
-        private const val IMAGE_FADE_MS = 350
+        private const val CACHE_SIZE = 4 * 1024 * 1024 // 4MiB
     }
 }

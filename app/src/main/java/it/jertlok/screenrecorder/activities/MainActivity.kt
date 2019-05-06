@@ -13,6 +13,7 @@ import android.os.*
 import androidx.appcompat.app.AppCompatActivity
 import android.preference.PreferenceManager
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.core.content.FileProvider
@@ -29,6 +30,7 @@ import it.jertlok.screenrecorder.services.ScreenRecorderService
 import it.jertlok.screenrecorder.common.ScreenVideo
 import java.io.File
 import java.lang.ref.WeakReference
+import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
 
@@ -46,6 +48,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mVideoAdapter: VideoAdapter
     private var mVideoArray = ArrayList<ScreenVideo>()
+    private var mVideoArrayUpdate = ArrayList<ScreenVideo>()
     private lateinit var mLayoutManager: LinearLayoutManager
     // Drawables
     private var fabStartDrawable: Drawable? = null
@@ -353,51 +356,55 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-        private class UpdateVideosTask(context: MainActivity): AsyncTask<Void, Void, Boolean>() {
-            private val activityRef: WeakReference<MainActivity> = WeakReference(context)
+    private class UpdateVideosTask(context: MainActivity): AsyncTask<Void, Void, Boolean>() {
+        private val activityRef: WeakReference<MainActivity> = WeakReference(context)
 
-            override fun doInBackground(vararg params: Void): Boolean {
-                val activity = activityRef.get()
-                if (activity == null || activity.isFinishing) {
-                    return false
-                }
-                val contentResolver = activity.contentResolver
-                // Clear array
-                activity.mVideoArray.clear()
-                val projection = arrayOf(
-                        MediaStore.Video.Media.DATA, // index: 0
-                        MediaStore.Video.Media.TITLE, // index: 1
-                        MediaStore.Video.Media.DURATION, // index: 2
-                        MediaStore.Video.Media.DATE_TAKEN)
-                // Set cursor
-                val cursor = contentResolver?.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-                        projection,
-                        MediaStore.Video.Media.DATA + " LIKE '%Screen Recorder/SCR%'",
-                        null,
-                        // Sort from newest to oldest
-                        MediaStore.Video.Media.DATE_TAKEN + " DESC")
-                // Go through list
-                cursor?.apply {
-                    while (moveToNext()) {
-                        activity.mVideoArray.add(ScreenVideo(
-                                getString(/* DATA */ 0),
-                                getString(/* TITLE */ 1),
-                                getString(/* DURATION */ 2)))
-                    }
-                }
-                // Close the cursor
-                cursor?.close()
-                return true
+        override fun doInBackground(vararg params: Void): Boolean {
+            val activity = activityRef.get()
+            if (activity == null || activity.isFinishing) {
+                return false
             }
+            val contentResolver = activity.contentResolver
+            // Clear array
+            activity.mVideoArrayUpdate.clear()
+            val projection = arrayOf(
+                    MediaStore.Video.Media.DATA, // index: 0
+                    MediaStore.Video.Media.TITLE, // index: 1
+                    MediaStore.Video.Media.DURATION, // index: 2
+                    MediaStore.Video.Media.DATE_TAKEN)
+            // Set cursor
+            val cursor = contentResolver?.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                    projection,
+                    MediaStore.Video.Media.DATA + " LIKE '%Screen Recorder/SCR%'",
+                    null,
+                    // Sort from newest to oldest
+                    MediaStore.Video.Media.DATE_TAKEN + " DESC")
+            // Go through list
+            cursor?.apply {
+                while (moveToNext()) {
+                    activity.mVideoArrayUpdate.add(ScreenVideo(
+                            getString(/* DATA */ 0),
+                            getString(/* TITLE */ 1),
+                            getString(/* DURATION */ 2)))
+                }
+            }
+            // Close the cursor
+            cursor?.close()
+            return true
+        }
 
-            override fun onPostExecute(result: Boolean?) {
+        override fun onPostExecute(result: Boolean?) {
             super.onPostExecute(result)
             val activity = activityRef.get()
             if (activity == null || activity.isFinishing) {
                 return
             }
             // Notify that the data has changed.
-            activity.mVideoAdapter.notifyDataSetChanged()
+            if (activity.mVideoArray.size != activity.mVideoArrayUpdate.size) {
+                Log.d("MainActivity", "The list differs.")
+                activity.mVideoArray.addAll(activity.mVideoArrayUpdate)
+                activity.mVideoAdapter.notifyDataSetChanged()
+            }
         }
     }
 
