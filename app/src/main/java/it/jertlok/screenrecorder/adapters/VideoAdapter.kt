@@ -2,6 +2,8 @@ package it.jertlok.screenrecorder.adapters
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.TransitionDrawable
 import android.media.ThumbnailUtils
 import android.os.AsyncTask
 import android.provider.MediaStore
@@ -9,11 +11,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toDrawable
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -86,7 +92,6 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Couldn't remove file: $videoData")
-                    return false
                 }
             }
             // We did not find the file
@@ -101,6 +106,10 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.video_list_row,
                 parent, false)
+        // Add a simple animation
+        val animation = AnimationUtils.loadAnimation(parent.context, android.R.anim.fade_in)
+        animation.duration = 500
+        itemView.animation = animation
         return VideoHolder(parent.context, itemView)
     }
 
@@ -111,6 +120,8 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
         holder.deleteButton.setTag(R.id.fileUri, video.data)
         // Let's create the thumbnail
         CreateThumbnailTask(holder).execute(video.data)
+        // Start animating
+        holder.itemView.animate()
         // So we can communicate from others activity
         holder.bindView(mInterface)
     }
@@ -144,11 +155,28 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
 
         override fun onPostExecute(result: Boolean) {
             super.onPostExecute(result)
+            // Get element
+            val element = holderRef.get()
             // Set out thumbnail to be center crop
             if (mThumbnail != null) {
-                holderRef.get()?.image?.setImageBitmap(mThumbnail)
+                // Compatible transparent color
+                val transparent = ColorDrawable(ContextCompat.getColor(element?.itemView?.context!!,
+                        android.R.color.transparent))
+                // Create transition
+                val td = TransitionDrawable(arrayOf(transparent,
+                        mThumbnail?.toDrawable(element.itemView.resources!!)))
+                // Start transitioning
+                holderRef.get()?.image?.setImageDrawable(td)
                 holderRef.get()?.image?.scaleType = ImageView.ScaleType.CENTER_CROP
+                td.startTransition(IMAGE_FADE_MS)
+            } else {
+                element?.image?.setImageDrawable(
+                        element.itemView.context.getDrawable(R.drawable.ic_movie))
             }
         }
+    }
+
+    companion object {
+        private const val IMAGE_FADE_MS = 350
     }
 }
