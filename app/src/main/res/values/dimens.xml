@@ -8,4 +8,7 @@
     <!-- Recycler View constraints -->
     <dimen name="recycler_view_top_margin">8dp</dimen>
     <dimen name="recycler_view_bottom_margin">64dp</dimen>
+
+    <!-- Temporary values / hacks -->
+    <dimen name="card_button_size">44dp</dimen>
 </resources>

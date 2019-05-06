@@ -23,6 +23,7 @@
                 android:layout_height="160dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_movie"
+                android:tint="@color/gray"
                 android:clickable="true"
                 android:focusable="true" />
 
@@ -47,30 +48,26 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="18dp"
-                android:layout_marginEnd="18dp"
+                android:layout_gravity="end"
+                android:layout_marginEnd="8dp"
                 android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/share"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="0dp"
+                    style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
+                    android:layout_width="@dimen/card_button_size"
+                    android:layout_marginEnd="8dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1.0"
-                    android:text="@string/share"
-                    android:textAllCaps="false"
-                    app:layout_constraintEnd_toStartOf="@+id/delete" />
+                    app:icon="@drawable/ic_share"
+                    app:iconTint="@color/gray" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/delete"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="0dp"
+                    style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
+                    android:layout_width="@dimen/card_button_size"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1.0"
-                    android:text="@string/delete"
-                    android:textAllCaps="false"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    tools:layout_editor_absoluteY="0dp" />
+                    app:icon="@drawable/ic_delete"
+                    app:iconTint="@color/gray" />
 
             </LinearLayout>
 
