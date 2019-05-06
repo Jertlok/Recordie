@@ -263,7 +263,12 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
 
     private fun recStatusBroadcast() {
         val fabBroadcast = Intent(MainActivity.ACTION_UPDATE_FAB)
-        sendBroadcast(fabBroadcast)
+        // Lord, forgive for what I am going to do here.
+        // The MainActivity onResume is slow at registering the BroadcastReceiver,
+        // let's set a small postDelayed call.
+        Handler().postDelayed({
+            sendBroadcast(fabBroadcast)
+        }, 250)
     }
 
     private fun stopScreenSharing() {
