@@ -131,9 +131,6 @@ class MainActivity : AppCompatActivity() {
         mRecyclerView.itemAnimator = DefaultItemAnimator()
         mRecyclerView.adapter = mVideoAdapter
 
-        // Update videos onCreate
-        updateVideos()
-
         // Drawables
         fabStartDrawable = getDrawable(R.drawable.ic_record)
         fabStopDrawable = getDrawable(R.drawable.ic_stop)
@@ -237,6 +234,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /** Function for retrieving all the video list */
     private fun updateVideos() {
         if (!mStoragePermissionGranted) {
             return
@@ -245,12 +243,13 @@ class MainActivity : AppCompatActivity() {
         UpdateVideosTask(this).execute()
     }
 
-    private fun updateVideo(uri: Uri?) {
+    /** Function for retrieving the last element from the content resolver */
+    private fun updateLastVideo() {
         if (!mStoragePermissionGranted) {
             return
         }
         // This task will update the video array in the background
-        UpdateSingleVideoTask(this).execute(uri)
+        UpdateSingleVideoTask(this).execute()
     }
 
     private fun stopRecording() {
@@ -292,40 +291,35 @@ class MainActivity : AppCompatActivity() {
         override fun onChange(selfChange: Boolean, uri: Uri?) {
             // On new file added
             if (mPattern.containsMatchIn(uri.toString())) {
-                updateVideo(uri)
+                updateLastVideo()
             }
         }
     }
 
-    private class UpdateSingleVideoTask(context: MainActivity): AsyncTask<Uri, Void, Boolean>() {
+    private class UpdateSingleVideoTask(context: MainActivity): AsyncTask<Void, Void, Boolean>() {
         private val activityRef: WeakReference<MainActivity> = WeakReference(context)
 
-        override fun doInBackground(vararg params: Uri): Boolean {
+        override fun doInBackground(vararg params: Void): Boolean {
             val activity = activityRef.get()
             if (activity == null || activity.isFinishing || params.size > 1) {
                 return false
             }
-            val fileUri = params[0]
             val contentResolver = activity.contentResolver
-            // Clear array
-            // activity.mVideoArray.clear()
+            // The columns we need to retrieve
             val projection = arrayOf(
                     MediaStore.Video.Media.DATA, // index: 0
                     MediaStore.Video.Media.TITLE, // index: 1
                     MediaStore.Video.Media.DURATION, // index: 2
                     MediaStore.Video.Media.DATE_TAKEN)
             // Let's try to do the query
-            var cursor: Cursor? = null
-            try {
-                cursor = contentResolver?.query(fileUri,
-                        projection, null, null, null)
-            } catch (e: Exception) {
-                Log.e(TAG, "Error while querying content with the following $fileUri, error: $e")
-            }
-
-            // Go through list
+            val cursor = contentResolver?.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                        projection,
+                        MediaStore.Video.Media.DATA + " LIKE '%Screen Recorder/SCR%'",
+                        null, null)
+            // Try to get the element
             cursor?.apply {
-                if (moveToFirst()) {
+                // Workaround: Marshmallow contentResolver doesn't distinguish between media URIs
+                if (moveToLast()) {
                     activity.mVideoArray.add(0, ScreenVideo(
                             getString(/* DATA */ 0),
                             getString(/* TITLE */ 1),
@@ -368,11 +362,11 @@ class MainActivity : AppCompatActivity() {
                         MediaStore.Video.Media.DATE_TAKEN)
                 // Set cursor
                 val cursor = contentResolver?.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-                        projection, MediaStore.Video.Media.DATA + " LIKE '%Screen Recorder/SCR%'",
+                        projection,
+                        MediaStore.Video.Media.DATA + " LIKE '%Screen Recorder/SCR%'",
                         null,
                         // Sort from newest to oldest
                         MediaStore.Video.Media.DATE_TAKEN + " DESC")
-
                 // Go through list
                 cursor?.apply {
                     while (moveToNext()) {
