@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.content.*
 import android.content.pm.PackageManager
 import android.database.ContentObserver
+import android.database.Cursor
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.media.projection.MediaProjectionManager
@@ -13,7 +14,7 @@ import android.os.*
 import androidx.appcompat.app.AppCompatActivity
 import android.preference.PreferenceManager
 import android.provider.MediaStore
-import android.view.KeyEvent
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.core.content.FileProvider
@@ -29,6 +30,7 @@ import it.jertlok.screenrecorder.adapters.VideoAdapter
 import it.jertlok.screenrecorder.services.ScreenRecorderService
 import it.jertlok.screenrecorder.common.ScreenVideo
 import java.io.File
+import java.lang.Exception
 import java.lang.ref.WeakReference
 
 class MainActivity : AppCompatActivity() {
@@ -53,6 +55,8 @@ class MainActivity : AppCompatActivity() {
     private var fabStopDrawable: Drawable? = null
     // Content Observer
     private lateinit var mVideoContentObserver: VideoContentObserver
+    // Regex for updating video files
+    private val mPattern = "content://media/external/video/media.*".toRegex()
     // Notification manager
     private lateinit var mNotificationManager: NotificationManager
     // Shared preference
@@ -120,13 +124,14 @@ class MainActivity : AppCompatActivity() {
 
         // Set adapter
         mVideoAdapter = VideoAdapter(mVideoArray, EventInterfaceImpl())
+
         mLayoutManager = GridLayoutManager(applicationContext, 2)
 
         mRecyclerView.layoutManager = mLayoutManager
         mRecyclerView.itemAnimator = DefaultItemAnimator()
         mRecyclerView.adapter = mVideoAdapter
 
-        // Update videos
+        // Update videos onCreate
         updateVideos()
 
         // Drawables
@@ -237,7 +242,15 @@ class MainActivity : AppCompatActivity() {
             return
         }
         // This task will update the video array in the background
-        UpdateVideoTask(this).execute()
+        UpdateVideosTask(this).execute()
+    }
+
+    private fun updateVideo(uri: Uri?) {
+        if (!mStoragePermissionGranted) {
+            return
+        }
+        // This task will update the video array in the background
+        UpdateSingleVideoTask(this).execute(uri)
     }
 
     private fun stopRecording() {
@@ -248,7 +261,9 @@ class MainActivity : AppCompatActivity() {
 
     private inner class EventInterfaceImpl : VideoAdapter.EventInterface {
         override fun deleteEvent(videoData: String) {
-            updateVideos()
+            val position = mVideoArray.indexOf(mVideoArray.find { s -> s.data == videoData})
+            mVideoArray.removeAt(position)
+            mVideoAdapter.notifyItemRemoved(position)
         }
 
         override fun playVideo(videoData: String) {
@@ -275,38 +290,43 @@ class MainActivity : AppCompatActivity() {
 
     private inner class VideoContentObserver(handler: Handler) : ContentObserver(handler) {
         override fun onChange(selfChange: Boolean, uri: Uri?) {
-            // TODO: optimise updates
-            updateVideos()
+            // On new file added
+            if (mPattern.containsMatchIn(uri.toString())) {
+                updateVideo(uri)
+            }
         }
     }
 
-    private class UpdateVideoTask(context: MainActivity): AsyncTask<String, Void, Boolean>() {
+    private class UpdateSingleVideoTask(context: MainActivity): AsyncTask<Uri, Void, Boolean>() {
         private val activityRef: WeakReference<MainActivity> = WeakReference(context)
 
-        override fun doInBackground(vararg params: String?): Boolean {
+        override fun doInBackground(vararg params: Uri): Boolean {
             val activity = activityRef.get()
-            if (activity == null || activity.isFinishing) {
+            if (activity == null || activity.isFinishing || params.size > 1) {
                 return false
             }
-
+            val fileUri = params[0]
             val contentResolver = activity.contentResolver
             // Clear array
-            activity.mVideoArray.clear()
+            // activity.mVideoArray.clear()
             val projection = arrayOf(
                     MediaStore.Video.Media.DATA, // index: 0
                     MediaStore.Video.Media.TITLE, // index: 1
                     MediaStore.Video.Media.DURATION, // index: 2
                     MediaStore.Video.Media.DATE_TAKEN)
-            // Set cursor
-            val cursor = contentResolver?.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-                    projection, MediaStore.Video.Media.DATA + " LIKE '%Screen Recorder/SCR%'",
-                    null,
-                    // Sort from newest to oldest
-                    MediaStore.Video.Media.DATE_TAKEN + " DESC")
+            // Let's try to do the query
+            var cursor: Cursor? = null
+            try {
+                cursor = contentResolver?.query(fileUri,
+                        projection, null, null, null)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error while querying content with the following $fileUri, error: $e")
+            }
+
             // Go through list
             cursor?.apply {
-                while (moveToNext()) {
-                    activity.mVideoArray.add(ScreenVideo(
+                if (moveToFirst()) {
+                    activity.mVideoArray.add(0, ScreenVideo(
                             getString(/* DATA */ 0),
                             getString(/* TITLE */ 1),
                             getString(/* DURATION */ 2)))
@@ -323,7 +343,57 @@ class MainActivity : AppCompatActivity() {
             if (activity == null || activity.isFinishing) {
                 return
             }
-            // Notify that the data has changed
+            // Notify that the data has changed.
+            activity.mVideoAdapter.notifyItemInserted(0)
+            // Do not scroll ffs.
+            activity.mRecyclerView.smoothScrollToPosition(0)
+        }
+    }
+
+        private class UpdateVideosTask(context: MainActivity): AsyncTask<Void, Void, Boolean>() {
+            private val activityRef: WeakReference<MainActivity> = WeakReference(context)
+
+            override fun doInBackground(vararg params: Void): Boolean {
+                val activity = activityRef.get()
+                if (activity == null || activity.isFinishing) {
+                    return false
+                }
+                val contentResolver = activity.contentResolver
+                // Clear array
+                activity.mVideoArray.clear()
+                val projection = arrayOf(
+                        MediaStore.Video.Media.DATA, // index: 0
+                        MediaStore.Video.Media.TITLE, // index: 1
+                        MediaStore.Video.Media.DURATION, // index: 2
+                        MediaStore.Video.Media.DATE_TAKEN)
+                // Set cursor
+                val cursor = contentResolver?.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                        projection, MediaStore.Video.Media.DATA + " LIKE '%Screen Recorder/SCR%'",
+                        null,
+                        // Sort from newest to oldest
+                        MediaStore.Video.Media.DATE_TAKEN + " DESC")
+
+                // Go through list
+                cursor?.apply {
+                    while (moveToNext()) {
+                        activity.mVideoArray.add(ScreenVideo(
+                                getString(/* DATA */ 0),
+                                getString(/* TITLE */ 1),
+                                getString(/* DURATION */ 2)))
+                    }
+                }
+                // Close the cursor
+                cursor?.close()
+                return true
+            }
+
+            override fun onPostExecute(result: Boolean?) {
+            super.onPostExecute(result)
+            val activity = activityRef.get()
+            if (activity == null || activity.isFinishing) {
+                return
+            }
+            // Notify that the data has changed.
             activity.mVideoAdapter.notifyDataSetChanged()
         }
     }
@@ -345,6 +415,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
+        private const val TAG = "MainActivity"
         // Permission request code
         private const val PERMISSION_REQUESTS = 0
         // Intent filter
