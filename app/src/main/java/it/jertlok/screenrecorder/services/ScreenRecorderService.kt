@@ -52,7 +52,8 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
     private var mBinder = LocalBinder()
     // Notification
     private lateinit var mNotificationManager: NotificationManager
-    private lateinit var mNotificationChannel: NotificationChannel
+    private lateinit var mRecNotificationChannel: NotificationChannel
+    private lateinit var mFinalNotificationChannel: NotificationChannel
     // Shake detector
     private lateinit var mSensorManager: SensorManager
     private lateinit var mShakeDetector: ShakeDetector
@@ -91,10 +92,16 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         // Create notification channel if needed
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            mNotificationChannel = NotificationChannel(NOTIFICATION_CHANNEL_ID,
+            // Notification channel for the recording progress
+            mRecNotificationChannel = NotificationChannel(NOTIFICATION_CHANNEL_REC_ID,
                     NOTIFICATION_CHANNEL_NAME,
                     NotificationManager.IMPORTANCE_LOW)
-            mNotificationManager.createNotificationChannel(mNotificationChannel)
+            mNotificationManager.createNotificationChannel(mRecNotificationChannel)
+            // Notification channel for completed screen records
+            mFinalNotificationChannel = NotificationChannel(NOTIFICATION_CHANNEL_FINAL_ID,
+                    NOTIFICATION_CHANNEL_NAME,
+                    NotificationManager.IMPORTANCE_HIGH)
+            mNotificationManager.createNotificationChannel(mRecNotificationChannel)
         }
         // Set shared preference listener
         mSharedPrefListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
@@ -258,7 +265,7 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         // Create notification
         createFinalNotification()
         // Send vibration
-        sendVibrationCompat()
+//        sendVibrationCompat()
     }
 
     private fun recStatusBroadcast() {
@@ -325,7 +332,7 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         val mainAction = PendingIntent.getActivity(this, 0, mainIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT)
         // Build notification
-        val builder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
+        val builder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_REC_ID)
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText(getString(R.string.notif_rec_progress))
@@ -362,7 +369,7 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         val mainAction = PendingIntent.getActivity(this, 0, mainIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT)
         // Build notification
-        val builder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
+        val builder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_FINAL_ID)
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle(getString(R.string.notif_rec_complete))
                 .setContentText("Video")
@@ -371,9 +378,12 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
                 .addAction(R.drawable.ic_share, "Share", shareAction)
                 .setContentIntent(mainAction)
                 .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setDefaults(NotificationCompat.DEFAULT_SOUND)
+                .setVibrate(LongArray(0))
                 .build()
         // Send notification
-        mNotificationManager.notify(NOTIFICATION_RECORD_ID, builder)
+        mNotificationManager.notify(NOTIFICATION_RECORD_FINAL_ID, builder)
     }
 
     /** Compatibility function for sending a vibration */
@@ -489,9 +499,13 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         const val REQUEST_CODE_SCREEN_RECORD = 1
         // Notification constants
         private const val NOTIFICATION_CHANNEL_NAME = "Screen Recorder"
-        private const val NOTIFICATION_CHANNEL_ID =
+        private const val NOTIFICATION_CHANNEL_REC_ID =
                 "it.jertlok.services.ScreenRecorderService.Recording"
         const val NOTIFICATION_RECORD_ID = 1
+        // Channel for notifications only
+        private const val NOTIFICATION_CHANNEL_FINAL_ID =
+                "it.jertlok.services.ScreenRecorderService.Recording"
+        const val NOTIFICATION_RECORD_FINAL_ID = 2
         // Intent actions
         const val ACTION_START = "it.jertlok.services.ScreenRecorderService.ACTION_START"
         const val ACTION_STOP = "it.jertlok.services.ScreenRecorderService.ACTION_STOP"
