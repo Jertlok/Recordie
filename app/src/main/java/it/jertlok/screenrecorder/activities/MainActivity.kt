@@ -179,9 +179,13 @@ class MainActivity : AppCompatActivity() {
         mBound = false
     }
 
-    override fun onPause() {
+    override fun onDestroy() {
+        super.onDestroy()
         // Unregister video content observer
         contentResolver.unregisterContentObserver(mVideoContentObserver)
+    }
+
+    override fun onPause() {
         // Unregister broadcast receiver
         unregisterReceiver(mBroadcastReceiver)
         super.onPause()
@@ -285,6 +289,10 @@ class MainActivity : AppCompatActivity() {
     private inner class EventInterfaceImpl : VideoAdapter.EventInterface {
         override fun deleteEvent(videoData: String) {
             updateDelete(videoData)
+            if (mBoundService.mOutputFile?.path == videoData) {
+                // It means we are deleting the last recorded video, hence we can remove its notif.
+                mNotificationManager.cancel(ScreenRecorderService.NOTIFICATION_RECORD_FINAL_ID)
+            }
         }
 
         override fun playVideo(videoData: String) {

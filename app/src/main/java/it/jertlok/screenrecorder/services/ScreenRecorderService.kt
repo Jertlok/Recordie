@@ -44,7 +44,8 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
     // Display metrics
     private lateinit var mDisplayMetrics: DisplayMetrics
     // Output file
-    private var mOutputFile: File? = null
+    var mOutputFile: File? = null
+        private set
     // Whether we are recording or not
     private var mIsRecording = false
     // SharedPreference
