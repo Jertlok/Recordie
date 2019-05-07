@@ -96,12 +96,12 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // Notification channel for the recording progress
             mRecNotificationChannel = NotificationChannel(NOTIFICATION_CHANNEL_REC_ID,
-                    NOTIFICATION_CHANNEL_NAME,
+                    NOTIFICATION_CHANNEL_PROGRESS_NAME,
                     NotificationManager.IMPORTANCE_LOW)
             mNotificationManager.createNotificationChannel(mRecNotificationChannel)
             // Notification channel for completed screen records
             mFinalNotificationChannel = NotificationChannel(NOTIFICATION_CHANNEL_FINAL_ID,
-                    NOTIFICATION_CHANNEL_NAME,
+                    NOTIFICATION_CHANNEL_NOTIF_NAME,
                     NotificationManager.IMPORTANCE_HIGH)
             // Default ringtone
             val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
@@ -233,7 +233,8 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         mRecScheduled = false
         // We are recording
         mIsRecording = true
-        // TODO: try to figure the warning on data
+        // Remove standard notifications
+        mNotificationManager.cancel(NOTIFICATION_RECORD_FINAL_ID)
         // Initialise MediaProjection
         mMediaProjection = mMediaProjectionManager.getMediaProjection(Activity.RESULT_OK, data)
         mMediaProjection?.registerCallback(mMediaProjectionCallback, null)
@@ -243,8 +244,26 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         mVirtualDisplay = createVirtualDisplay()
         // Start recording
         mMediaRecorder?.start()
-        // Send broadcast for recording status
+        // Send broadcasts for recording status
         recStatusBroadcast()
+        // Update QS Tile status
+        toggleQS(true)
+    }
+
+    private fun toggleQS(state: Boolean) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            // Construct broadcast
+            val broadcast = Intent()
+            if (state) {
+                broadcast.action = RecordQSTileService.ACTION_ENABLE_QS
+            } else {
+                broadcast.action = RecordQSTileService.ACTION_DISABLE_QS
+            }
+            // Send broadcast
+            Handler().postDelayed({
+                sendBroadcast(broadcast)
+            }, 250)
+        }
     }
 
     // Implement shake listener
@@ -276,8 +295,8 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         recStatusBroadcast()
         // Create notification
         createFinalNotification()
-        // Send vibration
-//        sendVibrationCompat()
+        // Toggle QS
+        toggleQS(false)
     }
 
     private fun recStatusBroadcast() {
@@ -501,7 +520,8 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         // Request code for starting a screen record
         const val REQUEST_CODE_SCREEN_RECORD = 1
         // Notification constants
-        private const val NOTIFICATION_CHANNEL_NAME = "Screen Recorder"
+        private const val NOTIFICATION_CHANNEL_PROGRESS_NAME = "Recording progress"
+        private const val NOTIFICATION_CHANNEL_NOTIF_NAME = "Recording notifications"
         private const val NOTIFICATION_CHANNEL_REC_ID =
                 "it.jertlok.services.ScreenRecorderService.Recording"
         const val NOTIFICATION_RECORD_ID = 1
