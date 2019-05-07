@@ -421,7 +421,9 @@ class MainActivity : AppCompatActivity() {
             }
             // Notify that the data has changed.
             if (activity.mVideoArray.size != activity.mVideoArrayUpdate.size) {
-                Log.d("MainActivity", "The list differs.")
+                // Clear the main array
+                activity.mVideoArray.clear()
+                // Add the elements from the update array
                 activity.mVideoArray.addAll(activity.mVideoArrayUpdate)
                 activity.mVideoAdapter.notifyDataSetChanged()
             }
