@@ -42,12 +42,11 @@ class SettingsActivity: AppCompatActivity() {
 
     private fun setUiTheme() {
         when (mUiModeManager.nightMode) {
-            UiModeManager.MODE_NIGHT_AUTO -> {
+            UiModeManager.MODE_NIGHT_AUTO or UiModeManager.MODE_NIGHT_NO -> {
                 setTheme(R.style.AppTheme_Settings)
                 whiteHelper()
             }
             UiModeManager.MODE_NIGHT_YES -> setTheme(R.style.AppTheme_Settings_Dark)
-            UiModeManager.MODE_NIGHT_NO -> whiteHelper()
         }
     }
 
@@ -59,7 +58,7 @@ class SettingsActivity: AppCompatActivity() {
             // Marshmallow conditions
             window.decorView.systemUiVisibility = baseFlags
             // If it's higher than O we need to add something else
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
                 window.decorView.systemUiVisibility = baseFlags or
                         View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
 

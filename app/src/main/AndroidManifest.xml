@@ -36,15 +36,15 @@
         </activity>
 
         <!-- QS Tile service -->
-<!--        <service-->
-<!--            android:name=".services.RecordQSTileService"-->
-<!--            android:label="@string/qs_record_title"-->
-<!--            android:icon="@drawable/ic_record"-->
-<!--            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.service.quicksettings.action.QS_TILE" />-->
-<!--            </intent-filter>-->
-<!--        </service>-->
+        <service
+            android:name=".services.RecordQSTileService"
+            android:label="@string/qs_record_title"
+            android:icon="@drawable/ic_record"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
 
         <service android:name=".services.ScreenRecorderService"/>
 

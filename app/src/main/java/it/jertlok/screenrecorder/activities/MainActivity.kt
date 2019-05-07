@@ -13,7 +13,6 @@ import android.os.*
 import androidx.appcompat.app.AppCompatActivity
 import android.preference.PreferenceManager
 import android.provider.MediaStore
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.core.content.FileProvider
@@ -66,7 +65,6 @@ class MainActivity : AppCompatActivity() {
     private val mIntentFilter = IntentFilter()
     // UiModeManager
     private lateinit var mUiModeManager: UiModeManager
-    private var mStockWindowFlags: Int = 16
     // ScreenRecorderService
     private var mBound = false
     private lateinit var mBoundService: ScreenRecorderService
@@ -175,15 +173,6 @@ class MainActivity : AppCompatActivity() {
         updateVideos()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        // Unregister video content observer
-        contentResolver.unregisterContentObserver(mVideoContentObserver)
-        // Stop ScreenRecorder service
-        val stopIntent = Intent(this, ScreenRecorderService::class.java)
-        stopService(stopIntent)
-    }
-
     override fun onStop() {
         super.onStop()
         unbindService(mConnection)
@@ -191,6 +180,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
+        // Unregister video content observer
+        contentResolver.unregisterContentObserver(mVideoContentObserver)
         // Unregister broadcast receiver
         unregisterReceiver(mBroadcastReceiver)
         super.onPause()
@@ -203,12 +194,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun setUiTheme() {
         when (mUiModeManager.nightMode) {
-            UiModeManager.MODE_NIGHT_AUTO -> {
+            UiModeManager.MODE_NIGHT_AUTO or UiModeManager.MODE_NIGHT_NO -> {
                 setTheme(R.style.AppTheme)
                 whiteHelper()
             }
             UiModeManager.MODE_NIGHT_YES -> setTheme(R.style.AppTheme_Dark)
-            UiModeManager.MODE_NIGHT_NO -> whiteHelper()
         }
     }
 
@@ -220,7 +210,7 @@ class MainActivity : AppCompatActivity() {
             // Marshmallow conditions
             window.decorView.systemUiVisibility = baseFlags
             // If it's higher than O we need to add something else
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
                 window.decorView.systemUiVisibility = baseFlags or
                         View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
 
@@ -454,7 +444,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "MainActivity"
         // Permission request code
-        private const val PERMISSION_REQUESTS = 0
+        const val PERMISSION_REQUESTS = 0
         // Intent filter
         const val ACTION_UPDATE_FAB = "it.jertlok.activities.MainActivity.ACTION_UPDATE_FAB"
         const val ACTION_DELETE_VIDEO = "it.jertlok.activities.MainActivity.ACTION_DELETE_VIDEO"
