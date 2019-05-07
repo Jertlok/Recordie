@@ -10,7 +10,7 @@ import it.jertlok.screenrecorder.activities.RecordingActivity
 
 @RequiresApi(Build.VERSION_CODES.N)
 open class RecordQSTileService: TileService() {
-    // Broadcast receiver for updating FAB button from service
+    // Broadcast receiver for updating QS button from service
     private val mBroadcastReceiver = LocalBroadcastReceiver()
     private val mIntentFilter = IntentFilter()
     // ScreenRecorderService
@@ -75,13 +75,6 @@ open class RecordQSTileService: TileService() {
     private fun setQsToggle(state: Boolean) {
         if (state) qsTile.state = Tile.STATE_ACTIVE else qsTile.state = Tile.STATE_INACTIVE
         qsTile.updateTile()
-    }
-
-
-    override fun onTileAdded() {
-        super.onTileAdded()
-        // Deactivate tile
-        setQsToggle(false)
     }
 
     private inner class LocalBroadcastReceiver : BroadcastReceiver() {
