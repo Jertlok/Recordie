@@ -24,6 +24,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var shakeStopPref: SwitchPreference
     private lateinit var screenStopPref: SwitchPreference
     private lateinit var recDelayPref: SeekBarPreference
+    private lateinit var darkModePref: SwitchPreference
 
     // Display resolution
     private lateinit var mDisplayRes: String
@@ -51,6 +52,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         shakeStopPref = findPreference("shake_stop_pref")!!
         screenStopPref = findPreference("screen_stop_pref")!!
         recDelayPref = findPreference("rec_delay_pref")!!
+        darkModePref = findPreference("dark_mode_pref")!!
 
         // We need to get the shared preferences and change the elements accordingly
         bitRatePref.setValueIndex(
@@ -63,13 +65,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 mSharedPreferences.getString("frame_rate", "30")
             )
         )
-        audioRecordingPref.isChecked =
-            mSharedPreferences.getBoolean("audio_recording", false)
-        shakeStopPref.isChecked =
-            mSharedPreferences.getBoolean("shake_stop", false)
-        screenStopPref.isChecked =
-            mSharedPreferences.getBoolean("screen_off_stop", false)
+        audioRecordingPref.isChecked = mSharedPreferences.getBoolean("audio_recording", false)
+        shakeStopPref.isChecked = mSharedPreferences.getBoolean("shake_stop", false)
+        screenStopPref.isChecked =  mSharedPreferences.getBoolean("screen_off_stop", false)
         recDelayPref.value = mSharedPreferences.getInt("rec_delay", 3)
+        darkModePref.isChecked = mSharedPreferences.getBoolean("dark_mode", false)
 
         // On preference change listeners
         bitRatePref.setOnPreferenceChangeListener { _, newValue ->
@@ -94,6 +94,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
         recDelayPref.setOnPreferenceChangeListener { _, newValue ->
             mSharedPreferences.edit().putInt("rec_delay", newValue as Int).apply()
+            true
+        }
+        darkModePref.setOnPreferenceChangeListener { _, newValue ->
+            mSharedPreferences.edit().putBoolean("dark_mode", newValue as Boolean).apply()
+            activity?.recreate()
             true
         }
 

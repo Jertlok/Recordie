@@ -35,6 +35,7 @@ import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
+    private var mDarkOverride = false
     private var mStoragePermissionGranted = false
     // MediaProjection API
     private lateinit var mMediaProjectionManager: MediaProjectionManager
@@ -99,6 +100,7 @@ class MainActivity : AppCompatActivity() {
 
         // Initialise shared preferences
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        mDarkOverride = mSharedPreferences.getBoolean("dark_mode", false)
 
         // User interface
         bottomBar = findViewById(R.id.bar)
@@ -107,7 +109,6 @@ class MainActivity : AppCompatActivity() {
 
         // Set adapter
         mVideoAdapter = VideoAdapter(mVideoArray, AdapterInterfaceImpl())
-
         mLayoutManager = GridLayoutManager(applicationContext, 2)
 
         mRecyclerView.layoutManager = mLayoutManager
@@ -152,6 +153,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        // Check for dark theme override and eventually set new mode
+        darkThemeCheck()
         // Register broadcast receiver
         registerReceiver(mBroadcastReceiver, mIntentFilter)
         // Remove all the app notifications
@@ -180,6 +183,16 @@ class MainActivity : AppCompatActivity() {
     // TODO: investigate on app being killed for some reasons.
     override fun onBackPressed() {
         moveTaskToBack(true)
+    }
+
+    /** Small function for recreating activity in case of dark mode toggle change */
+    private fun darkThemeCheck() {
+        // If dark theme override has changed we need to recreate
+        val currentDarkOverride = mSharedPreferences.getBoolean("dark_mode", false)
+        if (mDarkOverride != currentDarkOverride) {
+            mDarkOverride = currentDarkOverride
+            recreate()
+        }
     }
 
     private fun conditionalFabToggle() {
