@@ -3,6 +3,7 @@
 
     <PreferenceCategory
         android:title="@string/video_category"/>
+
     <ListPreference
         app:key="bit_rate_pref"
         app:title="@string/bit_rate_title"
@@ -17,6 +18,7 @@
 
     <PreferenceCategory
         android:title="@string/audio_category"/>
+
     <SwitchPreference
         app:key="audio_recording_pref"
         app:title="@string/audio_recording_title"
@@ -24,6 +26,7 @@
 
     <PreferenceCategory
         android:title="@string/misc_category"/>
+
     <SwitchPreference
         app:key="shake_stop_pref"
         app:title="@string/shake_stop_title"
@@ -43,4 +46,15 @@
         app:updatesContinuously="true"
         app:showSeekBarValue="true"
         app:adjustable="true" />
+
+    <PreferenceCategory
+        android:title="@string/theme_category" />
+
+    <SwitchPreference
+        app:key="dark_mode_pref"
+        app:title="@string/dark_mode_title"
+        app:summary="@string/dark_mode_desc"
+        app:defaultValue="false"/>
+
+
 </androidx.preference.PreferenceScreen>

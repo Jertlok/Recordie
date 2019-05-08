@@ -23,6 +23,11 @@
     <string name="shake_stop_title">Shake to stop</string>
     <string name="screen_stop_title">Turn off screen to stop</string>
     <string name="rec_delay_title">Recording delay (seconds)</string>
+    <!-- Theme configurations -->
+    <string name="theme_category">Theme</string>
+    <string name="dark_mode_title">Dark mode</string>
+    <string name="dark_mode_desc">Force dark mode, useful for older Android versions that do not have
+        UIModeManager support.</string>
 
     <!-- QS Tile -->
     <string name="qs_record_title">Record</string>

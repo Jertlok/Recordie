@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.UiModeManager
 import android.content.Context
 import android.os.Build
+import android.preference.PreferenceManager
 import android.view.View
 import android.view.WindowManager
 
@@ -22,6 +23,19 @@ class ThemeHelper {
             val activity = activityRef.get() ?: return
             // We get the UIModeManager
             val uiModeManager = activity.getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
+
+            // Implement dark override
+            val darkOverride = PreferenceManager.getDefaultSharedPreferences(activity.applicationContext)
+                .getBoolean("dark_mode", false)
+
+            if (darkOverride) {
+                activity.setTheme(darkTheme)
+                // Workaround for SystemUI visibility toggle
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                    activity.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+                }
+                return
+            }
 
             when (uiModeManager.nightMode) {
                 UiModeManager.MODE_NIGHT_AUTO or UiModeManager.MODE_NIGHT_NO -> {
