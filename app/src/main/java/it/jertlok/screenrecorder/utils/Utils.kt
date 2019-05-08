@@ -1,6 +1,9 @@
 package it.jertlok.screenrecorder.utils
 
+import android.content.ContentResolver
+import android.provider.MediaStore
 import android.util.DisplayMetrics
+import java.io.File
 
 open class Utils {
 
@@ -20,6 +23,39 @@ open class Utils {
             val height = realMetrics.heightPixels
             // Return the resolution in the [width]x[height] format
             return height.toString() + "x" + width.toString()
+        }
+
+        /**
+         * Deletes a file from the storage and the android database
+         *
+         * @param contentResolver
+         * @param videoData: It's basically the path resulting from a previous content
+         * resolver query. So this thing acts as the file path for doing all the work.
+         *
+         * @return boolean: true if it has deleted the file, false if not.
+         */
+        fun deleteFile(contentResolver: ContentResolver, videoData: String): Boolean {
+            // The file we need to remove
+            val where = "${MediaStore.Video.Media.DATA} = '$videoData'"
+            // The resulting rows, that in our case must be a single value
+            val rows = contentResolver.delete(
+                MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                where, null
+            )
+            // If we find the file inside our content resolver
+            if (rows != 0) {
+                // Let's try to remove the file
+                try {
+                    val file = File(videoData)
+                    if (file.delete()) {
+                        return true
+                    }
+                } catch (e: Exception) {
+                    // Do nothing for now
+                }
+            }
+            // We did not find the file
+            return false
         }
     }
 }

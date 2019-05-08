@@ -6,16 +6,14 @@ import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.preference.*
+import androidx.preference.ListPreference
+import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SeekBarPreference
+import androidx.preference.SwitchPreference
 import it.jertlok.screenrecorder.R
 import it.jertlok.screenrecorder.utils.Utils
 
-class SettingsFragment: PreferenceFragmentCompat() {
-    // TODO: Make the resolutions available according to the
-    // TODO: main display resolution.
-    companion object {
-        private const val TAG = "SettingsFragment"
-    }
+class SettingsFragment : PreferenceFragmentCompat() {
 
     private lateinit var mSharedPreferences: SharedPreferences
 
@@ -33,6 +31,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
 
+        // Get shared preferences
         mSharedPreferences = preferenceManager.sharedPreferences
 
         // Get display metrics
@@ -41,9 +40,11 @@ class SettingsFragment: PreferenceFragmentCompat() {
         mDisplayRes = Utils.getDisplayResolution(metrics)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        // TODO: we also need to set the descriptions.
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Get the various preferences
         bitRatePref = findPreference("bit_rate_pref")!!
         frameRateListPref = findPreference("frame_rate_pref")!!
         audioRecordingPref = findPreference("audio_recording_pref")!!
@@ -52,16 +53,22 @@ class SettingsFragment: PreferenceFragmentCompat() {
         recDelayPref = findPreference("rec_delay_pref")!!
 
         // We need to get the shared preferences and change the elements accordingly
-        bitRatePref.setValueIndex(bitRatePref.findIndexOfValue(
-                mSharedPreferences.getString("bit_rate", "16384000")))
-        frameRateListPref.setValueIndex(frameRateListPref.findIndexOfValue(
-                mSharedPreferences.getString("frame_rate", "30")))
+        bitRatePref.setValueIndex(
+            bitRatePref.findIndexOfValue(
+                mSharedPreferences.getString("bit_rate", "16384000")
+            )
+        )
+        frameRateListPref.setValueIndex(
+            frameRateListPref.findIndexOfValue(
+                mSharedPreferences.getString("frame_rate", "30")
+            )
+        )
         audioRecordingPref.isChecked =
-                mSharedPreferences.getBoolean("audio_recording", false)
+            mSharedPreferences.getBoolean("audio_recording", false)
         shakeStopPref.isChecked =
-                mSharedPreferences.getBoolean("shake_stop", false)
+            mSharedPreferences.getBoolean("shake_stop", false)
         screenStopPref.isChecked =
-                mSharedPreferences.getBoolean("screen_off_stop", false)
+            mSharedPreferences.getBoolean("screen_off_stop", false)
         recDelayPref.value = mSharedPreferences.getInt("rec_delay", 2)
 
         // On preference change listeners
