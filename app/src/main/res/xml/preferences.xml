@@ -37,7 +37,7 @@
     <SeekBarPreference
         app:key="rec_delay_pref"
         app:title="@string/rec_delay_title"
-        app:defaultValue="2"
+        app:defaultValue="3"
         app:min="0"
         android:max="10"
         app:updatesContinuously="true"

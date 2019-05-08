@@ -69,7 +69,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             mSharedPreferences.getBoolean("shake_stop", false)
         screenStopPref.isChecked =
             mSharedPreferences.getBoolean("screen_off_stop", false)
-        recDelayPref.value = mSharedPreferences.getInt("rec_delay", 2)
+        recDelayPref.value = mSharedPreferences.getInt("rec_delay", 3)
 
         // On preference change listeners
         bitRatePref.setOnPreferenceChangeListener { _, newValue ->
