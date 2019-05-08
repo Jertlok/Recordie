@@ -1,15 +1,13 @@
 package it.jertlok.screenrecorder.fragments
 
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.preference.ListPreference
-import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.SeekBarPreference
-import androidx.preference.SwitchPreference
+import androidx.preference.*
 import it.jertlok.screenrecorder.R
 import it.jertlok.screenrecorder.utils.Utils
 
@@ -25,7 +23,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var screenStopPref: SwitchPreference
     private lateinit var recDelayPref: SeekBarPreference
     private lateinit var darkModePref: SwitchPreference
-
+    private lateinit var themeCategory: PreferenceCategory
     // Display resolution
     private lateinit var mDisplayRes: String
 
@@ -53,6 +51,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
         screenStopPref = findPreference("screen_stop_pref")!!
         recDelayPref = findPreference("rec_delay_pref")!!
         darkModePref = findPreference("dark_mode_pref")!!
+        themeCategory = findPreference("theme_category")!!
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            darkModePref.isVisible = false
+            themeCategory.isVisible = false
+        }
 
         // We need to get the shared preferences and change the elements accordingly
         bitRatePref.setValueIndex(

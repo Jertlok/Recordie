@@ -28,12 +28,10 @@ class ThemeHelper {
             val darkOverride = PreferenceManager.getDefaultSharedPreferences(activity.applicationContext)
                 .getBoolean("dark_mode", false)
 
-            if (darkOverride) {
+            if (darkOverride && Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
                 activity.setTheme(darkTheme)
                 // Workaround for SystemUI visibility toggle
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-                    activity.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
-                }
+                activity.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
                 return
             }
 
