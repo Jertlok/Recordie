@@ -48,12 +48,12 @@
         app:adjustable="true" />
 
     <PreferenceCategory
+        app:key="theme_category"
         android:title="@string/theme_category" />
 
     <SwitchPreference
         app:key="dark_mode_pref"
         app:title="@string/dark_mode_title"
-        app:summary="@string/dark_mode_desc"
         app:defaultValue="false"/>
 
 
