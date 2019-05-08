@@ -9,29 +9,14 @@ import androidx.annotation.RequiresApi
 import it.jertlok.screenrecorder.activities.RecordingActivity
 
 @RequiresApi(Build.VERSION_CODES.N)
-open class RecordQSTileService: TileService() {
+open class RecordQSTileService : TileService() {
     // Broadcast receiver for updating QS button from service
     private val mBroadcastReceiver = LocalBroadcastReceiver()
     private val mIntentFilter = IntentFilter()
     // ScreenRecorderService
     private var mBound = false
     private lateinit var mBoundService: ScreenRecorderService
-    private val mConnection = object : ServiceConnection {
-        override fun onServiceConnected(name: ComponentName, service: IBinder) {
-            mBoundService = (service as ScreenRecorderService.LocalBinder).getService()
-            mBound = true
-            // Set toggle
-            if (mBoundService.isRecording()) {
-                setQsToggle(true)
-            } else {
-                setQsToggle(false)
-            }
-        }
-
-        override fun onServiceDisconnected(name: ComponentName) {
-            mBound = false
-        }
-    }
+    private val mConnection = LocalServiceConnection()
 
     override fun onCreate() {
         super.onCreate()
@@ -60,13 +45,13 @@ open class RecordQSTileService: TileService() {
         // Start Tiling recording activity
         if (mBound && !mBoundService.isRecording() && !mBoundService.mRecScheduled) {
             val startIntent = Intent(this, RecordingActivity::class.java)
-                    .setAction(RecordingActivity.ACTION_QS_START)
+                .setAction(RecordingActivity.ACTION_QS_START)
             startIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivityAndCollapse(startIntent)
         } else if (mBound && mBoundService.isRecording()) {
             // Stop service
             val stopIntent = Intent(this, ScreenRecorderService::class.java)
-                    .setAction(ScreenRecorderService.ACTION_STOP)
+                .setAction(ScreenRecorderService.ACTION_STOP)
             startService(stopIntent)
         }
     }
@@ -83,6 +68,23 @@ open class RecordQSTileService: TileService() {
                 ACTION_ENABLE_QS -> setQsToggle(true)
                 ACTION_DISABLE_QS -> setQsToggle(false)
             }
+        }
+    }
+
+    private inner class LocalServiceConnection : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName, service: IBinder) {
+            mBoundService = (service as ScreenRecorderService.LocalBinder).getService()
+            mBound = true
+            // Set toggle
+            if (mBoundService.isRecording()) {
+                setQsToggle(true)
+            } else {
+                setQsToggle(false)
+            }
+        }
+
+        override fun onServiceDisconnected(name: ComponentName) {
+            mBound = false
         }
     }
 

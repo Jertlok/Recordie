@@ -1,27 +1,20 @@
 package it.jertlok.screenrecorder.activities
 
-import android.app.UiModeManager
-import android.content.Context
 import android.content.Intent
-import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
-import android.view.View
-import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import it.jertlok.screenrecorder.R
 import it.jertlok.screenrecorder.fragments.SettingsFragment
+import it.jertlok.screenrecorder.utils.ThemeHelper
 
-class SettingsActivity: AppCompatActivity() {
-    private lateinit var mUiModeManager: UiModeManager
+class SettingsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // Set theme
-        mUiModeManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
-        setUiTheme()
+        ThemeHelper.setTheme(this, R.style.AppTheme_Settings, R.style.AppTheme_Settings_Dark)
 
         // Set contents
         setContentView(R.layout.settings_base)
@@ -34,36 +27,10 @@ class SettingsActivity: AppCompatActivity() {
 
         // Let's inflate the settings fragment
         supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.settings_content, SettingsFragment())
-                .addToBackStack(TAG)
-                .commit()
-    }
-
-    private fun setUiTheme() {
-        when (mUiModeManager.nightMode) {
-            UiModeManager.MODE_NIGHT_AUTO or UiModeManager.MODE_NIGHT_NO -> {
-                setTheme(R.style.AppTheme_Settings)
-                whiteHelper()
-            }
-            UiModeManager.MODE_NIGHT_YES -> setTheme(R.style.AppTheme_Settings_Dark)
-        }
-    }
-
-    private fun whiteHelper() {
-        // TODO: move to when or something easier to read
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val baseFlags = WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or
-                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-            // Marshmallow conditions
-            window.decorView.systemUiVisibility = baseFlags
-            // If it's higher than O we need to add something else
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-                window.decorView.systemUiVisibility = baseFlags or
-                        View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-
-            }
-        }
+            .beginTransaction()
+            .replace(R.id.settings_content, SettingsFragment())
+            .addToBackStack("Settings")
+            .commit()
     }
 
     override fun onBackPressed() {
@@ -79,9 +46,5 @@ class SettingsActivity: AppCompatActivity() {
             android.R.id.home -> onBackPressed()
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    companion object {
-        private const val TAG = "SettingsActivity"
     }
 }
