@@ -20,8 +20,7 @@ class UpdateVideosTask(context: MainActivity) : AsyncTask<Void, Void, Boolean>()
         val projection = arrayOf(
             MediaStore.Video.Media.DATA, // index: 0
             MediaStore.Video.Media.TITLE, // index: 1
-            MediaStore.Video.Media.DURATION, // index: 2
-            MediaStore.Video.Media.DATE_TAKEN
+            MediaStore.Video.Media.DURATION // index: 2
         )
         // Set cursor
         val cursor = contentResolver?.query(
@@ -35,13 +34,12 @@ class UpdateVideosTask(context: MainActivity) : AsyncTask<Void, Void, Boolean>()
         // Go through list
         cursor?.apply {
             while (moveToNext()) {
-                activity.mVideoArrayUpdate.add(
-                    ScreenVideo(
-                        getString(/* DATA */ 0),
-                        getString(/* TITLE */ 1)/*,
-                        getString(/* DURATION */ 2)*/
-                    )
-                )
+                // Build ScreenVideo element
+                val screenVideo = ScreenVideo(
+                    getString(/* DATA */ 0),
+                    getString(/* TITLE */ 1),
+                    getString(/* DURATION */ 2))
+                activity.mVideoArrayUpdate.add(screenVideo)
             }
         }
         // Close the cursor

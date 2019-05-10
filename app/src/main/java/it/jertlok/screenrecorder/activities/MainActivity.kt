@@ -4,16 +4,12 @@ import android.Manifest
 import android.app.NotificationManager
 import android.content.*
 import android.content.pm.PackageManager
-import android.database.ContentObserver
 import android.graphics.drawable.Drawable
 import android.media.projection.MediaProjectionManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.os.IBinder
 import android.preference.PreferenceManager
-import android.provider.MediaStore
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -31,6 +27,7 @@ import it.jertlok.screenrecorder.services.ScreenRecorderService
 import it.jertlok.screenrecorder.tasks.UpdateSingleVideoTask
 import it.jertlok.screenrecorder.tasks.UpdateVideosTask
 import it.jertlok.screenrecorder.utils.ThemeHelper
+import it.jertlok.screenrecorder.utils.Utils
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -51,8 +48,6 @@ class MainActivity : AppCompatActivity() {
     // Drawables
     private var fabStartDrawable: Drawable? = null
     private var fabStopDrawable: Drawable? = null
-    // Content Observer
-    private lateinit var mVideoContentObserver: VideoContentObserver
     // Notification manager
     private lateinit var mNotificationManager: NotificationManager
     // Shared preference
@@ -88,13 +83,6 @@ class MainActivity : AppCompatActivity() {
         mMediaProjectionManager = getSystemService(
             Context.MEDIA_PROJECTION_SERVICE
         ) as MediaProjectionManager
-
-        // Register video content observer
-        mVideoContentObserver = VideoContentObserver(Handler())
-        contentResolver.registerContentObserver(
-            MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-            true, mVideoContentObserver
-        )
 
         // Initialise shared preferences
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
@@ -139,6 +127,28 @@ class MainActivity : AppCompatActivity() {
             // Start Settings activity
             startActivity(Intent(this, SettingsActivity::class.java))
         }
+
+        bottomBar.setOnMenuItemClickListener { i ->
+            when (i.itemId) {
+                R.id.delete -> {
+                    Utils.deleteFiles(contentResolver, mVideoAdapter.selectedItems)
+                    updateMultiDelete()
+                    // We gotta clear the selected array
+                    mVideoAdapter.selectedItems.clear()
+                    // Update menu
+                    updateMenuItems()
+                    true
+                }
+                R.id.share -> {
+                    updateMenuItems()
+                    shareVideoFromSelection()
+                    // Update menu
+                    updateMenuItems()
+                    true
+                }
+                else -> { false }
+            }
+        }
     }
 
     override fun onStart() {
@@ -166,12 +176,6 @@ class MainActivity : AppCompatActivity() {
         unbindService(mConnection)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        // Unregister video content observer
-        contentResolver.unregisterContentObserver(mVideoContentObserver)
-    }
-
     override fun onPause() {
         // Unregister broadcast receiver
         unregisterReceiver(mBroadcastReceiver)
@@ -180,7 +184,14 @@ class MainActivity : AppCompatActivity() {
 
     // TODO: investigate on app being killed for some reasons.
     override fun onBackPressed() {
-        moveTaskToBack(true)
+        if (mVideoAdapter.selectedItems.size > 0) {
+            // TODO: Not sure if this is the best way...
+            mVideoAdapter.selectedItems.clear()
+            mVideoAdapter.notifyDataSetChanged()
+            updateMenuItems()
+        } else {
+            moveTaskToBack(true)
+        }
     }
 
     /** Small function for recreating activity in case of dark mode toggle change */
@@ -219,10 +230,42 @@ class MainActivity : AppCompatActivity() {
         UpdateSingleVideoTask(this).execute(mBoundService.mOutputFile?.path)
     }
 
+    private fun updateMultiDelete() {
+        for (video: ScreenVideo in mVideoAdapter.selectedItems) {
+            val position = mVideoArray.indexOf(mVideoArray.find { s -> s.data == video.data})
+            println("position: $position")
+            mVideoArray.removeAt(position)
+            mVideoAdapter.notifyItemRemoved(position)
+            removeNotificationIfNeeded(video.data)
+        }
+    }
+
     private fun updateDelete(videoData: String) {
         val position = mVideoArray.indexOf(mVideoArray.find { s -> s.data == videoData })
         mVideoArray.removeAt(position)
         mVideoAdapter.notifyItemRemoved(position)
+        removeNotificationIfNeeded(videoData)
+
+    }
+
+    private fun removeNotificationIfNeeded(videoData: String) {
+        if (mBoundService.mOutputFile?.path == videoData) {
+            // It means we are deleting the last recorded video, hence we can remove its notif.
+            mNotificationManager.cancel(ScreenRecorderService.NOTIFICATION_RECORD_FINAL_ID)
+        }
+    }
+
+    private fun shareVideoFromSelection() {
+        val videoFile = File(mVideoAdapter.selectedItems[0].data)
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        shareIntent.type = "video/*"
+        shareIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        val fileToShare = FileProvider.getUriForFile(
+            this@MainActivity,
+            BuildConfig.APPLICATION_ID + ".provider", videoFile
+        )
+        shareIntent.putExtra(Intent.EXTRA_STREAM, fileToShare)
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.share_title)))
     }
 
     private fun stopRecording() {
@@ -307,19 +350,27 @@ class MainActivity : AppCompatActivity() {
             shareIntent.putExtra(Intent.EXTRA_STREAM, fileToShare)
             startActivity(Intent.createChooser(shareIntent, getString(R.string.share_title)))
         }
+
+        override fun updateCardCheck() {
+            updateMenuItems()
+        }
     }
 
-    private inner class VideoContentObserver(handler: Handler) : ContentObserver(handler) {
-        override fun onChange(selfChange: Boolean, uri: Uri?) {
-            // Update last video, if it's a deleted one it will be ignored.
-            updateLastVideo()
-        }
+    fun updateMenuItems() {
+        val deleteAction =  bottomBar.menu.getItem(0)
+        val shareAction = bottomBar.menu.getItem(1)
+
+        deleteAction.isVisible = mVideoAdapter.selectedItems.size >= 1
+        shareAction.isVisible = mVideoAdapter.selectedItems.size == 1
     }
 
     private inner class LocalBroadcastReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
-                ACTION_UPDATE_FAB -> conditionalFabToggle()
+                ACTION_UPDATE_FAB -> {
+                    conditionalFabToggle()
+                    updateLastVideo()
+                }
                 ACTION_DELETE_VIDEO -> {
                     // Let's get the fileUri from the intent
                     val videoData = intent.getStringExtra(ScreenRecorderService.SCREEN_RECORD_URI)

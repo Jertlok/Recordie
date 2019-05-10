@@ -9,4 +9,7 @@ interface AdapterInterface {
 
     // Called when we click on share button
     fun shareVideo(videoData: String)
+
+    // Called when we long click the card view
+    fun updateCardCheck()
 }

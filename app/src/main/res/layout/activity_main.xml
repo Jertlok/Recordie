@@ -22,7 +22,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             app:fabAlignmentMode="center"
-            app:navigationIcon="@drawable/ic_settings" />
+            app:navigationIcon="@drawable/ic_settings"
+            app:menu="@menu/actions"
+            android:animateLayoutChanges="true" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"

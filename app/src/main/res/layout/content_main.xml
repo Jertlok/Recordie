@@ -21,7 +21,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_video_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="fill_parent"
                 android:layout_marginTop="@dimen/recycler_view_top_margin"
                 android:layout_marginBottom="@dimen/recycler_view_bottom_margin"
                 android:scrollbars="vertical" />
