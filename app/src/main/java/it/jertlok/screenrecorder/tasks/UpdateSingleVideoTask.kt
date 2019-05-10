@@ -6,14 +6,18 @@ import it.jertlok.screenrecorder.activities.MainActivity
 import it.jertlok.screenrecorder.common.ScreenVideo
 import java.lang.ref.WeakReference
 
-class UpdateSingleVideoTask(context: MainActivity) : AsyncTask<Void, Void, Boolean>() {
+class UpdateSingleVideoTask(context: MainActivity) : AsyncTask<String, Void, Boolean>() {
     private val activityRef: WeakReference<MainActivity> = WeakReference(context)
+    private var mDeleteAction = false
 
-    override fun doInBackground(vararg params: Void): Boolean {
+    override fun doInBackground(vararg params: String): Boolean {
         val activity = activityRef.get()
         if (activity == null || activity.isFinishing || params.size > 1) {
             return false
         }
+        // Get fileUri
+        val fileUri = params[0]
+        // Get content resolver
         val contentResolver = activity.contentResolver
         // The columns we need to retrieve
         val projection = arrayOf(
@@ -26,13 +30,13 @@ class UpdateSingleVideoTask(context: MainActivity) : AsyncTask<Void, Void, Boole
         val cursor = contentResolver?.query(
             MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
             projection,
-            MediaStore.Video.Media.DATA + " LIKE '%Screen Recorder/SCR%'",
+            MediaStore.Video.Media.DATA + " = '$fileUri'",
             null, null
         )
         // Try to get the element
         cursor?.apply {
             // Workaround: Marshmallow contentResolver doesn't distinguish between media URIs
-            if (moveToLast()) {
+            if (moveToFirst()) {
                 activity.mVideoArray.add(
                     0, ScreenVideo(
                         getString(/* DATA */ 0),
@@ -40,6 +44,8 @@ class UpdateSingleVideoTask(context: MainActivity) : AsyncTask<Void, Void, Boole
                     getString(/* DURATION */ 2)*/
                     )
                 )
+            } else {
+                mDeleteAction = true
             }
         }
         // Close the cursor
@@ -50,7 +56,7 @@ class UpdateSingleVideoTask(context: MainActivity) : AsyncTask<Void, Void, Boole
     override fun onPostExecute(result: Boolean?) {
         super.onPostExecute(result)
         val activity = activityRef.get()
-        if (activity == null || activity.isFinishing) {
+        if (activity == null || activity.isFinishing || mDeleteAction) {
             return
         }
         // Notify that the data has changed.
