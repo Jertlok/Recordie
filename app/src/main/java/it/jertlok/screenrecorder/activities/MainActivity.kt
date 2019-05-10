@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomappbar.BottomAppBar
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import it.jertlok.screenrecorder.BuildConfig
 import it.jertlok.screenrecorder.R
@@ -131,12 +132,23 @@ class MainActivity : AppCompatActivity() {
         bottomBar.setOnMenuItemClickListener { i ->
             when (i.itemId) {
                 R.id.delete -> {
-                    Utils.deleteFiles(contentResolver, mVideoAdapter.selectedItems)
-                    updateMultiDelete()
-                    // We gotta clear the selected array
-                    mVideoAdapter.selectedItems.clear()
-                    // Update menu
-                    updateMenuItems()
+                    val builder = MaterialAlertDialogBuilder(this@MainActivity)
+                    // Set positive button
+                    builder.setTitle(R.string.delete_dialog_title)
+                    builder.setPositiveButton(R.string.delete) { _, _ ->
+                        Utils.deleteFiles(contentResolver, mVideoAdapter.selectedItems)
+                        updateMultiDelete()
+                        // We gotta clear the selected array
+                        mVideoAdapter.selectedItems.clear()
+                        // Update menu
+                        updateMenuItems()
+                    }
+                    // Set negative button
+                    builder.setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                        dialog.cancel()
+                    }
+                    // Show the dialog
+                    builder.show()
                     true
                 }
                 R.id.share -> {
