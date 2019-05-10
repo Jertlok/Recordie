@@ -23,8 +23,7 @@ class UpdateSingleVideoTask(context: MainActivity) : AsyncTask<String, Void, Boo
         val projection = arrayOf(
             MediaStore.Video.Media.DATA, // index: 0
             MediaStore.Video.Media.TITLE, // index: 1
-            MediaStore.Video.Media.DURATION, // index: 2
-            MediaStore.Video.Media.DATE_TAKEN
+            MediaStore.Video.Media.DURATION // index: 2
         )
         // Let's try to do the query
         val cursor = contentResolver?.query(
@@ -37,13 +36,12 @@ class UpdateSingleVideoTask(context: MainActivity) : AsyncTask<String, Void, Boo
         cursor?.apply {
             // Workaround: Marshmallow contentResolver doesn't distinguish between media URIs
             if (moveToFirst()) {
-                activity.mVideoArray.add(
-                    0, ScreenVideo(
-                        getString(/* DATA */ 0),
-                        getString(/* TITLE */ 1)/*,
-                    getString(/* DURATION */ 2)*/
-                    )
-                )
+                // Build ScreenVideo element
+                val screenVideo = ScreenVideo(
+                    getString(/* DATA */ 0),
+                    getString(/* TITLE */ 1),
+                    getString(/* DURATION */ 2))
+                activity.mVideoArray.add(0, screenVideo)
             } else {
                 mDeleteAction = true
             }
