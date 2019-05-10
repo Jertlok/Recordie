@@ -41,4 +41,7 @@
     <!-- Material card -->
     <string name="share">Share</string>
     <string name="delete">Delete</string>
+
+    <!-- Alert dialog for delete action -->
+    <string name="delete_dialog_title">Do you want to delete?</string>
 </resources>
