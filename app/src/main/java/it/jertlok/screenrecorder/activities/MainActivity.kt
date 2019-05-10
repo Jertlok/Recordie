@@ -53,8 +53,6 @@ class MainActivity : AppCompatActivity() {
     private var fabStopDrawable: Drawable? = null
     // Content Observer
     private lateinit var mVideoContentObserver: VideoContentObserver
-    // Regex for updating video files
-    private val mPattern = "content://media/external/video/media.*".toRegex()
     // Notification manager
     private lateinit var mNotificationManager: NotificationManager
     // Shared preference
@@ -218,7 +216,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         // This task will update the video array in the background
-        UpdateSingleVideoTask(this).execute()
+        UpdateSingleVideoTask(this).execute(mBoundService.mOutputFile?.path)
     }
 
     private fun updateDelete(videoData: String) {
@@ -313,10 +311,8 @@ class MainActivity : AppCompatActivity() {
 
     private inner class VideoContentObserver(handler: Handler) : ContentObserver(handler) {
         override fun onChange(selfChange: Boolean, uri: Uri?) {
-            // On new file added
-            if (mPattern.containsMatchIn(uri.toString())) {
-                updateLastVideo()
-            }
+            // Update last video, if it's a deleted one it will be ignored.
+            updateLastVideo()
         }
     }
 
