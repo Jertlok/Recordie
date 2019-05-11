@@ -59,16 +59,23 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         // We need to get the shared preferences and change the elements accordingly
+        // Bit rate
         bitRatePref.setValueIndex(
             bitRatePref.findIndexOfValue(
                 mSharedPreferences.getString("bit_rate", "16384000")
             )
         )
+        // Set summary
+        bitRatePref.summary = bitRatePref.entry
+        // Frame rate
         frameRateListPref.setValueIndex(
             frameRateListPref.findIndexOfValue(
                 mSharedPreferences.getString("frame_rate", "30")
             )
         )
+        // Set summary
+        frameRateListPref.summary =  frameRateListPref.entry
+        // Other prefs
         audioRecordingPref.isChecked = mSharedPreferences.getBoolean("audio_recording", false)
         shakeStopPref.isChecked = mSharedPreferences.getBoolean("shake_stop", false)
         screenStopPref.isChecked =  mSharedPreferences.getBoolean("screen_off_stop", false)
@@ -78,10 +85,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
         // On preference change listeners
         bitRatePref.setOnPreferenceChangeListener { _, newValue ->
             mSharedPreferences.edit().putString("bit_rate", newValue as String).apply()
+            bitRatePref.summary = bitRatePref.entries[bitRatePref.findIndexOfValue(newValue)]
             true
         }
         frameRateListPref.setOnPreferenceChangeListener { _, newValue ->
             mSharedPreferences.edit().putString("frame_rate", newValue as String).apply()
+            frameRateListPref.summary = frameRateListPref.entries[frameRateListPref.findIndexOfValue(newValue)]
             true
         }
         audioRecordingPref.setOnPreferenceChangeListener { _, newValue ->
