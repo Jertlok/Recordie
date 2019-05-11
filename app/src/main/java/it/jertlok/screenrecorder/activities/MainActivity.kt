@@ -81,9 +81,7 @@ class MainActivity : AppCompatActivity() {
 
         // Get various system services
         mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        mMediaProjectionManager = getSystemService(
-            Context.MEDIA_PROJECTION_SERVICE
-        ) as MediaProjectionManager
+        mMediaProjectionManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
 
         // Initialise shared preferences
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)

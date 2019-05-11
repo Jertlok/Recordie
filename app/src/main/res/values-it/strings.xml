@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Activity names -->
+    <string name="app_name">Screen Recorder</string>
+    <string name="settings_activity_name">Impostazioni</string>
+
+    <!-- Menu strings -->
+
+    <!-- Toast message for casting permission denied -->
+    <string name="permission_cast_denied">Permesso cast non garantito</string>
+
+    <!-- Settings -->
+
+    <!-- Video configurations -->
+    <string name="video_category">Video</string>
+    <string name="bit_rate_title">Bit rate</string>
+    <string name="video_resolution_title">Risoluzione video</string>
+    <string name="frame_rate_title">Frame rate</string>
+    <!-- Audio configurations -->
+    <string name="audio_category">Audio</string>
+    <string name="audio_recording_title">Registrazione audio</string>
+    <!-- Misc configurations -->
+    <string name="misc_category">Generali</string>
+    <string name="shake_stop_title">Scuoti per fermare</string>
+    <string name="screen_stop_title">Spegni schermo per fermare</string>
+    <string name="rec_delay_title">Ritardo registrazione (in secondi)</string>
+    <!-- Theme configurations -->
+    <string name="theme_category">Tema</string>
+    <string name="dark_mode_title">Modalità scura</string>
+
+    <!-- QS Tile -->
+    <string name="qs_record_title">Registra</string>
+
+    <!-- Notification -->
+    <string name="notif_rec_progress">Registrazione in corso</string>
+    <string name="notif_rec_complete">Registrazione completa</string>
+    <string name="notif_rec_stop">Ferma</string>
+
+    <!-- Share intent -->
+    <string name="share_title">Condividi video</string>
+
+    <!-- Material card -->
+    <string name="share">Condividi</string>
+    <string name="delete">Cancella</string>
+
+    <!-- Alert dialog for delete action -->
+    <string name="delete_dialog_title">Vuoi cancellare?</string>
+</resources>
