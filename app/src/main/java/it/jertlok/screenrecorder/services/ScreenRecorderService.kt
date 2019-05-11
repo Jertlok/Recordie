@@ -137,6 +137,8 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         // Initialise shake detector
         mIsShakeActive = mSharedPreferences.getBoolean("shake_stop", false)
         mShakeDetector = ShakeDetector(this)
+        // Set sensitivity to medium
+        mShakeDetector.setSensitivity(ShakeDetector.SENSITIVITY_MEDIUM)
         // Initialisation for screen off feature
         mIsScreenStopActive = mSharedPreferences.getBoolean("screen_off_stop", false)
         // Broadcast receiver
@@ -411,12 +413,13 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
             this, 0,
             deleteIntent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_CANCEL_CURRENT
         )
-        // Open MainActivity action
-        val mainIntent = Intent(this, MainActivity::class.java)
-            .setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+        // Play video as main activity
+        val mainIntent = Intent(Intent.ACTION_VIEW)
+            .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            .setDataAndType(fileUri, "video/*")
         val mainAction = PendingIntent.getActivity(
             this, 0, mainIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_CANCEL_CURRENT
         )
         // Build notification
         val builder = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_FINAL_ID)
