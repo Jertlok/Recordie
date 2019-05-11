@@ -71,8 +71,6 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
         }
     }
 
-
-
     private fun cardBehaviour(holder: VideoHolder, video: ScreenVideo) {
         if (!holder.card.isChecked) {
             holder.card.isChecked = true

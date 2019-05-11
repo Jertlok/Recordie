@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Translated by Ante0 @xda (@antezero) -->
+    <string name="app_name">Screen Recorder</string>
+    <string name="settings_activity_name">Inställningar</string>
+
+    <!-- Menu strings -->
+
+    <!-- Toast message for casting permission denied -->
+    <string name="permission_cast_denied">Cast-tillstånd ej beviljat</string>
+
+    <!-- Settings -->
+
+    <!-- Video configurations -->
+    <string name="video_category">Video</string>
+    <string name="bit_rate_title">Bithastighet</string>
+    <string name="video_resolution_title">Videoupplösning</string>
+    <string name="frame_rate_title">Bildhastighet</string>
+    <!-- Audio configurations -->
+    <string name="audio_category">Ljud</string>
+    <string name="audio_recording_title">Ljudinspelning</string>
+    <!-- Misc configurations -->
+    <string name="misc_category">Övrigt</string>
+    <string name="shake_stop_title">Skaka för att stoppa</string>
+    <string name="screen_stop_title">Stäng av skärm för att stoppa</string>
+    <string name="rec_delay_title">Inspelningsfördröjning (sekunder)</string>
+    <!-- Theme configurations -->
+    <string name="theme_category">Tema</string>
+    <string name="dark_mode_title">Mörkt läge (Dark mode)</string>
+
+    <!-- QS Tile -->
+    <string name="qs_record_title">Inspelning</string>
+
+    <!-- Notification -->
+    <string name="notif_rec_progress">Inspelning pågår</string>
+    <string name="notif_rec_complete">Inspelning klar</string>
+    <string name="notif_rec_stop">Stopp</string>
+
+    <!-- Share intent -->
+    <string name="share_title">Dela video</string>
+
+    <!-- Material card -->
+    <string name="share">Dela</string>
+    <string name="delete">Radera</string>
+
+    <!-- Alert dialog for delete action -->
+    <string name="delete_dialog_title">Vill du radera?</string>
+</resources>
