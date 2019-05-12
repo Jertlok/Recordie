@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<about>
+    <me.jfenn.attribouter.wedges.AppWedge>
+        <!-- TODO add shit -->
+    </me.jfenn.attribouter.wedges.AppWedge>
+
+    <me.jfenn.attribouter.wedges.ContributorsWedge
+        showDefaults="false">
+        <me.jfenn.attribouter.wedges.ContributorWedge
+            name="Giuseppe Maggio"
+            avatar="https://avatars0.githubusercontent.com/u/6817879"
+            position="1"
+            task="Owner">
+            <me.jfenn.attribouter.wedges.link.LinkWedge
+                name="Twitter"
+                icon="https://twitter.com/favicon.ico"
+                url="https://twitter.com/jertlok" />
+        </me.jfenn.attribouter.wedges.ContributorWedge>
+    </me.jfenn.attribouter.wedges.ContributorsWedge>
+
+    <me.jfenn.attribouter.wedges.TranslatorsWedge overflow="5">
+        <me.jfenn.attribouter.wedges.TranslatorWedge
+            login="Ante0"
+            name="Ante0"
+            locales="sv" />
+    </me.jfenn.attribouter.wedges.TranslatorsWedge>
+
+<!--    <me.jfenn.attribouter.wedges.LicensesWedge-->
+<!--        overflow="1"-->
+<!--        showDefaults="false">-->
+<!--    </me.jfenn.attribouter.wedges.LicensesWedge>-->
+</about>
