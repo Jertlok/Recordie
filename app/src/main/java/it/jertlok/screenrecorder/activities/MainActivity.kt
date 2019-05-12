@@ -10,14 +10,19 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.preference.PreferenceManager
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomappbar.BottomAppBar
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.navigation.NavigationView
 import it.jertlok.screenrecorder.BuildConfig
 import it.jertlok.screenrecorder.R
 import it.jertlok.screenrecorder.adapters.VideoAdapter
@@ -40,6 +45,10 @@ class MainActivity : AppCompatActivity() {
     // User interface
     private lateinit var bottomBar: BottomAppBar
     private lateinit var fabButton: FloatingActionButton
+    private lateinit var mCoordinatorLayout: CoordinatorLayout
+    private lateinit var mNavigationView: NavigationView
+    private lateinit var bottomDrawer: View
+    private lateinit var bottomBehaviour: BottomSheetBehavior<View>
     // Video list
     lateinit var mRecyclerView: VideoRecyclerView
     lateinit var mVideoAdapter: VideoAdapter
@@ -71,13 +80,21 @@ class MainActivity : AppCompatActivity() {
         // Set contents
         setContentView(R.layout.activity_main)
 
+        // User interface
+        mCoordinatorLayout = findViewById(R.id.coordinator_layout)
+        bottomBar = findViewById(R.id.bar)
+        fabButton = findViewById(R.id.fab)
+        mRecyclerView = findViewById(R.id.recycler_video_view)
+        mNavigationView = findViewById(R.id.navigation_view)
+
+        // Drawables
+        fabStartDrawable = getDrawable(R.drawable.ic_record)
+        fabStopDrawable = getDrawable(R.drawable.ic_stop)
+
+        setUpBottomDrawer()
+
         // Grant permissions if needed
         checkPermissions()
-
-        // TODO: move to android manifest asap
-        // Set the various intent filters
-        mIntentFilter.addAction(ACTION_DELETE_VIDEO)
-        mIntentFilter.addAction(ACTION_UPDATE_FAB)
 
         // Get various system services
         mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -87,12 +104,7 @@ class MainActivity : AppCompatActivity() {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         mDarkOverride = mSharedPreferences.getBoolean("dark_mode", false)
 
-        // User interface
-        bottomBar = findViewById(R.id.bar)
-        fabButton = findViewById(R.id.fab)
-        mRecyclerView = findViewById(R.id.recycler_video_view)
-
-        // Set adapter
+        // Setup RecyclerView
         mVideoAdapter = VideoAdapter(mVideoArray, AdapterInterfaceImpl())
         mLayoutManager = GridLayoutManager(applicationContext, 2)
         mRecyclerView.layoutManager = mLayoutManager
@@ -100,33 +112,39 @@ class MainActivity : AppCompatActivity() {
         mRecyclerView.adapter = mVideoAdapter
         mRecyclerView.mEmptyView = findViewById(R.id.empty)
 
-        // Drawables
-        fabStartDrawable = getDrawable(R.drawable.ic_record)
-        fabStopDrawable = getDrawable(R.drawable.ic_stop)
+        // TODO: move to android manifest asap
+        // Set the various intent filters
+        mIntentFilter.addAction(ACTION_DELETE_VIDEO)
+        mIntentFilter.addAction(ACTION_UPDATE_FAB)
+    }
 
-        // Set actions for the FAB
-        fabButton.setOnClickListener {
-            // Here we need to understand whether we are recording or not.
-            // If we are not recording we can send the intent for recording
-            // otherwise we will try to stop the recording.
-            if (!mBoundService.isRecording() && !mBoundService.mRecScheduled) {
-                // Start invisible activity
-                val startIntent = Intent(this, RecordingActivity::class.java)
-                    .setAction(RecordingActivity.ACTION_START)
-                startActivity(startIntent)
-            } else if (mBoundService.isRecording()) {
-                stopRecording()
+    /** Function for setting up all the bottom area */
+    private fun setUpBottomDrawer() {
+        bottomDrawer = mCoordinatorLayout.findViewById(R.id.bottom_drawer)
+        bottomBehaviour = BottomSheetBehavior.from(bottomDrawer)
+        bottomBehaviour.state = BottomSheetBehavior.STATE_HIDDEN
+
+        // When clicking on the menu bottom
+        bottomBar.setNavigationOnClickListener {
+            bottomBehaviour.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+        }
+
+        // Bottom sheet
+        mNavigationView.setNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.settings -> {
+                    startActivity(Intent(this, SettingsActivity::class.java))
+                    true
+                }
+                R.id.about -> {
+                    Toast.makeText(this, "To be implemented.", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                else -> false
             }
         }
 
-        // TODO: this is indeed temporary, just for development purposes
-        // TODO: and also because I am being lazy in regards of the UI for now.
-        // Set something for menu
-        bottomBar.setNavigationOnClickListener {
-            // Start Settings activity
-            startActivity(Intent(this, SettingsActivity::class.java))
-        }
-
+        // Extra actions on the right for interacting with cards
         bottomBar.setOnMenuItemClickListener { i ->
             when (i.itemId) {
                 R.id.delete -> {
@@ -161,6 +179,21 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        // Set FAB button behaviour
+        fabButton.setOnClickListener {
+            // Here we need to understand whether we are recording or not.
+            // If we are not recording we can send the intent for recording
+            // otherwise we will try to stop the recording.
+            if (!mBoundService.isRecording() && !mBoundService.mRecScheduled) {
+                // Start invisible activity
+                val startIntent = Intent(this, RecordingActivity::class.java)
+                    .setAction(RecordingActivity.ACTION_START)
+                startActivity(startIntent)
+            } else if (mBoundService.isRecording()) {
+                stopRecording()
+            }
+        }
     }
 
     override fun onStart() {
@@ -173,6 +206,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        // Restore bottom behaviour
+        bottomBehaviour.state = BottomSheetBehavior.STATE_HIDDEN
         // Check for dark theme override and eventually set new mode
         darkThemeCheck()
         // Register broadcast receiver
@@ -196,6 +231,12 @@ class MainActivity : AppCompatActivity() {
 
     // TODO: investigate on app being killed for some reasons.
     override fun onBackPressed() {
+        // Handle bottom sheet behaviour on back press
+        if (bottomBehaviour.state != BottomSheetBehavior.STATE_HIDDEN) {
+            bottomBehaviour.state = BottomSheetBehavior.STATE_HIDDEN
+            return
+        }
+        // Handle selected cards on back press
         if (mVideoAdapter.selectedItems.size > 0) {
             // TODO: Not sure if this is the best way...
             mVideoAdapter.selectedItems.clear()

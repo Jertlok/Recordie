@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/main_activity"
+    android:id="@+id/coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.MainActivity" >
@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             app:fabAlignmentMode="center"
-            app:navigationIcon="@drawable/ic_settings"
+            app:navigationIcon="@drawable/ic_menu"
             app:menu="@menu/actions"
             android:animateLayoutChanges="true" />
 
@@ -36,5 +36,20 @@
             app:tint="@color/white"
             app:srcCompat="@drawable/ic_record"
             app:layout_anchor="@id/bar" />
+
+        <FrameLayout
+            android:id="@+id/bottom_drawer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="16dp"
+            app:behavior_hideable="true"
+            app:layout_behavior="@string/bottom_sheet_behavior">
+
+            <com.google.android.material.navigation.NavigationView
+                android:id="@+id/navigation_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:menu="@menu/primary"/>
+        </FrameLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

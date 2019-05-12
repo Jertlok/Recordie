@@ -44,4 +44,5 @@
     <!-- Alert dialog for delete action -->
     <string name="delete_dialog_title">Do you want to delete?</string>
     <string name="empty_list">No videos yet :(</string>
+    <string name="about_activity_name">About</string>
 </resources>

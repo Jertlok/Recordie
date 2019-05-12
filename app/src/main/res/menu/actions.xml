@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/delete"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
         app:iconTint="@color/gray"
         android:title="@string/delete"
         android:visible="false"
