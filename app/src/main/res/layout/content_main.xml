@@ -18,13 +18,46 @@
             tools:showIn="@layout/activity_main"
             tools:context=".activities.MainActivity">
 
-            <androidx.recyclerview.widget.RecyclerView
+            <it.jertlok.screenrecorder.common.VideoRecyclerView
                 android:id="@+id/recycler_video_view"
                 android:layout_width="match_parent"
                 android:layout_height="fill_parent"
                 android:layout_marginTop="@dimen/recycler_view_top_margin"
                 android:layout_marginBottom="@dimen/recycler_view_bottom_margin"
                 android:scrollbars="vertical" />
+
+            <RelativeLayout
+                android:id="@+id/empty"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:alpha="0.4"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/empty_placeholder"
+                    android:tint="@color/gray"
+                    android:src="@drawable/ic_no_movie"
+                    android:scaleType="fitCenter"
+                    android:layout_width="match_parent"
+                    android:layout_height="128dp"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:contentDescription="@string/empty_list" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/empty_placeholder"
+                    android:typeface="monospace"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="@string/empty_list"
+                    android:textAlignment="center"
+                    android:textColor="@color/gray"
+                    android:textSize="15sp" />
+
+            </RelativeLayout>
         </RelativeLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
