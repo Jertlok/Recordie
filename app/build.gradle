@@ -49,5 +49,5 @@ dependencies {
     // Shake detector
     implementation 'com.squareup:seismic:1.0.2'
     // Attribouter
-    implementation 'me.jfenn:Attribouter:0.1.5'
+    implementation 'com.github.Jertlok:attribouter:master-SNAPSHOT'
 }
