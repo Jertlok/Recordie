@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <about>
-    <me.jfenn.attribouter.wedges.AppWedge>
-        <!-- TODO add shit -->
+    <me.jfenn.attribouter.wedges.AppWedge
+        description="Minimal Screen Recorder written in Kotlin.">
+        <me.jfenn.attribouter.wedges.link.LinkWedge
+            hidden="true"
+            id="playStore" />
     </me.jfenn.attribouter.wedges.AppWedge>
 
     <me.jfenn.attribouter.wedges.ContributorsWedge
         showDefaults="false">
         <me.jfenn.attribouter.wedges.ContributorWedge
+            login="Jertlok"
             name="Giuseppe Maggio"
+            bio="^I nitpick on things."
             avatar="https://avatars0.githubusercontent.com/u/6817879"
             position="1"
             task="Owner">
+            <me.jfenn.attribouter.wedges.link.LinkWedge
+                hidden="true"
+                id="website" />
             <me.jfenn.attribouter.wedges.link.LinkWedge
                 name="Twitter"
                 icon="https://twitter.com/favicon.ico"
