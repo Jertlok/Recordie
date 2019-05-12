@@ -23,6 +23,7 @@ import it.jertlok.screenrecorder.BuildConfig
 import it.jertlok.screenrecorder.R
 import it.jertlok.screenrecorder.adapters.VideoAdapter
 import it.jertlok.screenrecorder.common.ScreenVideo
+import it.jertlok.screenrecorder.common.VideoRecyclerView
 import it.jertlok.screenrecorder.interfaces.AdapterInterface
 import it.jertlok.screenrecorder.services.ScreenRecorderService
 import it.jertlok.screenrecorder.tasks.UpdateSingleVideoTask
@@ -41,7 +42,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottomBar: BottomAppBar
     private lateinit var fabButton: FloatingActionButton
     // Video list
-    lateinit var mRecyclerView: RecyclerView
+    lateinit var mRecyclerView: VideoRecyclerView
     lateinit var mVideoAdapter: VideoAdapter
     var mVideoArray = ArrayList<ScreenVideo>()
     var mVideoArrayUpdate = ArrayList<ScreenVideo>()
@@ -95,11 +96,11 @@ class MainActivity : AppCompatActivity() {
         // Set adapter
         mVideoAdapter = VideoAdapter(mVideoArray, AdapterInterfaceImpl())
         mLayoutManager = GridLayoutManager(applicationContext, 2)
-
         mRecyclerView.layoutManager = mLayoutManager
         mRecyclerView.itemAnimator = DefaultItemAnimator()
         mRecyclerView.adapter = mVideoAdapter
-
+        mRecyclerView.mEmptyView = findViewById(R.id.empty)
+        println("L' ten'? ${mVideoAdapter.hasObservers()}")
         // Drawables
         fabStartDrawable = getDrawable(R.drawable.ic_record)
         fabStopDrawable = getDrawable(R.drawable.ic_stop)
