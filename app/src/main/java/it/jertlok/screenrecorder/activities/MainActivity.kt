@@ -34,6 +34,7 @@ import it.jertlok.screenrecorder.tasks.UpdateSingleVideoTask
 import it.jertlok.screenrecorder.tasks.UpdateVideosTask
 import it.jertlok.screenrecorder.utils.ThemeHelper
 import it.jertlok.screenrecorder.utils.Utils
+import me.jfenn.attribouter.Attribouter
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -137,7 +138,7 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.about -> {
-                    Toast.makeText(this, "To be implemented.", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this, AboutActivity::class.java))
                     true
                 }
                 else -> false

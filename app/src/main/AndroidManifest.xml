@@ -29,6 +29,8 @@
         <activity android:name=".activities.SettingsActivity"
             android:theme="@style/AppTheme.Settings" />
 
+        <activity android:name=".activities.AboutActivity" />
+
         <!-- Activity for starting the recording from a QS Tile -->
         <activity android:name=".activities.RecordingActivity"
             android:theme="@style/InvisibleActivity"
