@@ -40,7 +40,8 @@ class UpdateSingleVideoTask(context: MainActivity) : AsyncTask<String, Void, Boo
                 val screenVideo = ScreenVideo(
                     getString(/* DATA */ 0),
                     getString(/* TITLE */ 1),
-                    getString(/* DURATION */ 2))
+                    getString(/* DURATION */ 2)
+                )
                 activity.mVideoArray.add(0, screenVideo)
             } else {
                 mDeleteAction = true

@@ -15,7 +15,6 @@ import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -100,7 +99,7 @@ class MainActivity : AppCompatActivity() {
         mRecyclerView.itemAnimator = DefaultItemAnimator()
         mRecyclerView.adapter = mVideoAdapter
         mRecyclerView.mEmptyView = findViewById(R.id.empty)
-        println("L' ten'? ${mVideoAdapter.hasObservers()}")
+
         // Drawables
         fabStartDrawable = getDrawable(R.drawable.ic_record)
         fabStopDrawable = getDrawable(R.drawable.ic_stop)
@@ -157,7 +156,9 @@ class MainActivity : AppCompatActivity() {
                     updateMenuItems()
                     true
                 }
-                else -> { false }
+                else -> {
+                    false
+                }
             }
         }
     }
@@ -243,7 +244,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateMultiDelete() {
         for (video: ScreenVideo in mVideoAdapter.selectedItems) {
-            val position = mVideoArray.indexOf(mVideoArray.find { s -> s.data == video.data})
+            val position = mVideoArray.indexOf(mVideoArray.find { s -> s.data == video.data })
             println("position: $position")
             mVideoArray.removeAt(position)
             mVideoAdapter.notifyItemRemoved(position)
@@ -368,7 +369,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun updateMenuItems() {
-        val deleteAction =  bottomBar.menu.getItem(0)
+        val deleteAction = bottomBar.menu.getItem(0)
         val shareAction = bottomBar.menu.getItem(1)
 
         deleteAction.isVisible = mVideoAdapter.selectedItems.size >= 1

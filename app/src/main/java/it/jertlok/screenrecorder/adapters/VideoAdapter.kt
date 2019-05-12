@@ -29,7 +29,6 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
         var duration: TextView = view.findViewById(R.id.duration)
         // Instantiate cache - referenced by the external CreateThumbnailTask.
         val mCache = ThumbnailCache()
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoHolder {
@@ -58,7 +57,7 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
         // Initialise card
         holder.card.isChecked = false
         // Set long click listener
-        holder.card.setOnLongClickListener{
+        holder.card.setOnLongClickListener {
             cardBehaviour(holder, video)
             true
         }
