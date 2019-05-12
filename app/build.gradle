@@ -44,10 +44,8 @@ dependencies {
     testImplementation 'junit:junit:4.13-beta-2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1-beta01'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-beta01'
-
     // Material design
     implementation 'com.google.android.material:material:1.1.0-alpha06'
-
     // Shake detector
     implementation 'com.squareup:seismic:1.0.2'
 }
