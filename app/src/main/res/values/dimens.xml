@@ -10,5 +10,4 @@
     <dimen name="recycler_view_bottom_margin">64dp</dimen>
 
     <!-- Temporary values / hacks -->
-    <dimen name="card_button_size">42dp</dimen>
 </resources>

@@ -97,10 +97,12 @@ open class Utils {
         fun formatDuration(duration: String): String {
             val longDuration = duration.toLong()
 
-            return String.format("%dm:%ds",
+            return String.format(
+                "%dm:%ds",
                 TimeUnit.MILLISECONDS.toMinutes(longDuration),
                 TimeUnit.MILLISECONDS.toSeconds(longDuration) -
-                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(longDuration)))
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(longDuration))
+            )
         }
     }
 }

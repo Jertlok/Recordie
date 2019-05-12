@@ -14,7 +14,6 @@
     <!-- Video configurations -->
     <string name="video_category">Video</string>
     <string name="bit_rate_title">Bit rate</string>
-    <string name="video_resolution_title">Risoluzione video</string>
     <string name="frame_rate_title">Frame rate</string>
     <!-- Audio configurations -->
     <string name="audio_category">Audio</string>

@@ -38,7 +38,8 @@ class UpdateVideosTask(context: MainActivity) : AsyncTask<Void, Void, Boolean>()
                 val screenVideo = ScreenVideo(
                     getString(/* DATA */ 0),
                     getString(/* TITLE */ 1),
-                    getString(/* DURATION */ 2))
+                    getString(/* DURATION */ 2)
+                )
                 activity.mVideoArrayUpdate.add(screenVideo)
             }
         }

@@ -9,6 +9,7 @@ import android.view.View
 import android.view.WindowManager
 
 import java.lang.ref.WeakReference
+import java.util.*
 
 class ThemeHelper {
 
@@ -36,25 +37,37 @@ class ThemeHelper {
             }
 
             when (uiModeManager.nightMode) {
-                UiModeManager.MODE_NIGHT_AUTO or UiModeManager.MODE_NIGHT_NO -> {
-                    // Set light theme
-                    activity.setTheme(lightTheme)
-                    // TODO: move to when or something easier to read
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        val baseFlags = WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or
-                                View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-                        // Marshmallow conditions
-                        activity.window.decorView.systemUiVisibility = baseFlags
-                        // If it's higher than O we need to add something else
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-                            activity.window.decorView.systemUiVisibility = baseFlags or
-                                    View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-
-                        }
-                    }
+                UiModeManager.MODE_NIGHT_AUTO -> {
+                    val calendar = Calendar.getInstance()
+                    val timeOfDay = calendar.get(Calendar.HOUR_OF_DAY)
+                    // Set theme according to time
+                    if (timeOfDay in 0..18)
+                        setLightTheme(activity, lightTheme)
+                    else
+                        activity.setTheme(darkTheme)
                 }
+                // Set light theme
+                UiModeManager.MODE_NIGHT_NO -> setLightTheme(activity, lightTheme)
                 // Set dark theme
                 UiModeManager.MODE_NIGHT_YES -> activity.setTheme(darkTheme)
+            }
+        }
+
+        private fun setLightTheme(activity: Activity, theme: Int) {
+            // Set light theme
+            activity.setTheme(theme)
+            // TODO: move to when or something easier to read
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val baseFlags = WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or
+                        View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                // Marshmallow conditions
+                activity.window.decorView.systemUiVisibility = baseFlags
+                // If it's higher than O we need to add something else
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                    activity.window.decorView.systemUiVisibility = baseFlags or
+                            View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+
+                }
             }
         }
     }

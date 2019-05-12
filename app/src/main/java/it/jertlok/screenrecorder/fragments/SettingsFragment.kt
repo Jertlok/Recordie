@@ -74,11 +74,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
             )
         )
         // Set summary
-        frameRateListPref.summary =  frameRateListPref.entry
+        frameRateListPref.summary = frameRateListPref.entry
         // Other prefs
         audioRecordingPref.isChecked = mSharedPreferences.getBoolean("audio_recording", false)
         shakeStopPref.isChecked = mSharedPreferences.getBoolean("shake_stop", false)
-        screenStopPref.isChecked =  mSharedPreferences.getBoolean("screen_off_stop", false)
+        screenStopPref.isChecked = mSharedPreferences.getBoolean("screen_off_stop", false)
         recDelayPref.value = mSharedPreferences.getInt("rec_delay", 3)
         darkModePref.isChecked = mSharedPreferences.getBoolean("dark_mode", false)
 
