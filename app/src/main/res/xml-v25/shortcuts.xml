@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="record"
+        android:enabled="true"
+        android:icon="@drawable/ic_record"
+        android:shortcutShortLabel="@string/qs_record_title" >
+        <intent
+            android:action="it.jertlok.activities.RecordingActivity.ACTION_QS_START"
+            android:targetPackage="it.jertlok.screenrecorder"
+            android:targetClass="it.jertlok.screenrecorder.activities.RecordingActivity" />
+
+        <categories android:name="android.shortcut.record" />
+    </shortcut>
+</shortcuts>
+
