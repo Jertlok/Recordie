@@ -30,13 +30,13 @@
                 android:id="@+id/empty"
                 android:layout_width="fill_parent"
                 android:layout_height="match_parent"
-                android:alpha="0.4"
+                android:alpha="0.3"
                 android:gravity="center"
                 android:orientation="vertical">
 
                 <ImageView
                     android:id="@+id/empty_placeholder"
-                    android:tint="@color/gray"
+                    android:tint="@color/grey_500"
                     android:src="@drawable/ic_no_movie"
                     android:scaleType="fitCenter"
                     android:layout_width="match_parent"
@@ -54,7 +54,7 @@
                     android:gravity="center"
                     android:text="@string/empty_list"
                     android:textAlignment="center"
-                    android:textColor="@color/gray"
+                    android:textColor="@color/grey_500"
                     android:textSize="15sp" />
 
             </RelativeLayout>

@@ -17,7 +17,6 @@
 
         <com.google.android.material.bottomappbar.BottomAppBar
             android:id="@+id/bar"
-            style="@style/Widget.MaterialComponents.BottomAppBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
@@ -50,6 +49,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_sheet"
+                app:itemIconTint="?attr/bottom_bar_ic_tint"
                 app:menu="@menu/primary"/>
         </FrameLayout>
 

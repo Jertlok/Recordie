@@ -7,6 +7,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <!-- Material alert dialog -->
         <item name="materialAlertDialogTheme">@style/AppTheme.AlertDialog</item>
+        <item name="bottom_bar_ic_tint">@color/grey_500</item>
     </style>
 
     <style name="AppTheme.Settings" parent="Theme.MaterialComponents.Light.DarkActionBar">
@@ -52,6 +53,10 @@
         <item name="colorAccent">@color/colorAccent</item>
         <!-- Material alert dialog -->
         <item name="materialAlertDialogTheme">@style/AppTheme.AlertDialog</item>
+
+        <item name="bottomAppBarStyle">@style/AppTheme.BottomAppBar.Dark</item>
+        <item name="materialCardViewStyle">@style/AppTheme.MaterialCardView.Dark</item>
+        <item name="bottom_bar_ic_tint">@color/grey_200</item>
     </style>
 
     <style name="AppTheme.Settings.Dark" parent="Theme.MaterialComponents">
@@ -70,5 +75,13 @@
 
     <style name="AppTheme.Settings.Dark.ActionBar" parent="Theme.MaterialComponents">
         <item name="android:background">#141414</item>
+    </style>
+
+    <style name="AppTheme.BottomAppBar.Dark" parent="Widget.MaterialComponents.BottomAppBar">
+        <item name="android:backgroundTint">@color/grey_800</item>
+    </style>
+
+    <style name="AppTheme.MaterialCardView.Dark" parent="Widget.MaterialComponents.CardView">
+        <item name="android:backgroundTint">@color/grey_800</item>
     </style>
 </resources>

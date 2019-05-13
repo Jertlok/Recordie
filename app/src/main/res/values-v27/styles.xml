@@ -12,12 +12,12 @@
         <item name="colorAccent">@color/colorAccent</item>
         <!-- Material alert dialog -->
         <item name="materialAlertDialogTheme">@style/AppTheme.AlertDialog</item>
+        <item name="bottom_bar_ic_tint">@color/grey_500</item>
     </style>
 
     <style name="AppTheme.Settings" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <item name="backgroundColor">@android:color/white</item>
         <item name="android:navigationBarColor">@android:color/white</item>
-        <item name="android:windowLightNavigationBar">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="actionBarTheme">@style/AppTheme.Settings.ActionBar</item>
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -61,25 +61,31 @@
 
     <!-- Dark theme -->
     <style name="AppTheme.Dark" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="android:windowBackground">@color/grey_900</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar">false</item>
-        <item name="android:statusBarColor">#121212</item>
-        <item name="android:navigationBarColor">#2D2D2D</item>
+        <item name="android:statusBarColor">@color/grey_900</item>
+        <item name="android:navigationBarColor">@color/grey_800</item>
+        <item name="android:navigationBarDividerColor">@color/grey_800</item>
         <!-- Material alert dialog -->
         <item name="materialAlertDialogTheme">@style/AppTheme.AlertDialog</item>
+
+        <item name="bottomAppBarStyle">@style/AppTheme.BottomAppBar.Dark</item>
+        <item name="materialCardViewStyle">@style/AppTheme.MaterialCardView.Dark</item>
+        <item name="bottom_bar_ic_tint">@color/grey_200</item>
     </style>
 
     <style name="AppTheme.Settings.Dark" parent="Theme.MaterialComponents">
-        <item name="backgroundColor">#141414</item>
+        <item name="backgroundColor">@color/grey_900</item>
         <item name="actionBarTheme">@style/AppTheme.Settings.Dark.ActionBar</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:statusBarColor">#141414</item>
-        <item name="android:navigationBarColor">#141414</item>
+        <item name="android:statusBarColor">@color/grey_900</item>
+        <item name="android:navigationBarColor">@color/grey_900</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar">false</item>
         <!-- Material alert dialog -->
@@ -89,6 +95,15 @@
     </style>
 
     <style name="AppTheme.Settings.Dark.ActionBar" parent="Theme.MaterialComponents">
-        <item name="android:background">#141414</item>
+        <item name="android:background">@color/grey_900</item>
     </style>
+
+    <style name="AppTheme.BottomAppBar.Dark" parent="Widget.MaterialComponents.BottomAppBar">
+        <item name="android:backgroundTint">@color/grey_800</item>
+    </style>
+
+    <style name="AppTheme.MaterialCardView.Dark" parent="Widget.MaterialComponents.CardView">
+        <item name="android:backgroundTint">@color/grey_800</item>
+    </style>
+
 </resources>
