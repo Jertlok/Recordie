@@ -454,7 +454,6 @@ class MainActivity : AppCompatActivity() {
         val shareAction = bottomBar.menu.getItem(1)
         deleteAction.isVisible = mVideoAdapter.selectedItems.size >= 1
         shareAction.isVisible = mVideoAdapter.selectedItems.size >= 1
-        println(deleteAction.actionView)
     }
 
     private inner class LocalBroadcastReceiver : BroadcastReceiver() {
