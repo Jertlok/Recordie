@@ -69,6 +69,10 @@ open class RecordingActivity : AppCompatActivity() {
             ACTION_QS_START -> {
                 if (!mBoundService.isRecording() && !mBoundService.mRecScheduled) {
                     checkPermissionsAndStart()
+                } else {
+                    // Finish immediately, it allows us to reuse some code for the launcher shortcut.
+                    // TODO: make the launcher shortcut dynamic...
+                    finish()
                 }
             }
             else -> {
