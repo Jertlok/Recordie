@@ -69,7 +69,6 @@
         <item name="android:windowLightNavigationBar">false</item>
         <item name="android:statusBarColor">@color/grey_900</item>
         <item name="android:navigationBarColor">@color/grey_800</item>
-        <item name="android:navigationBarDividerColor">@color/grey_800</item>
         <!-- Material alert dialog -->
         <item name="materialAlertDialogTheme">@style/AppTheme.AlertDialog</item>
 
