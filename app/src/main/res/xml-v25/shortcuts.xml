@@ -3,7 +3,7 @@
     <shortcut
         android:shortcutId="record"
         android:enabled="true"
-        android:icon="@drawable/ic_record"
+        android:icon="@drawable/shortcut_record"
         android:shortcutShortLabel="@string/qs_record_title" >
         <intent
             android:action="it.jertlok.activities.RecordingActivity.ACTION_QS_START"
