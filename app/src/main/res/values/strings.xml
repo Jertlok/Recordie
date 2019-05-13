@@ -40,6 +40,7 @@
 
     <!-- Share intent -->
     <string name="share_title">Share video</string>
+    <string name="multiple_share_title">Share videos</string>
 
     <!-- Material card -->
     <string name="share">Share</string>
