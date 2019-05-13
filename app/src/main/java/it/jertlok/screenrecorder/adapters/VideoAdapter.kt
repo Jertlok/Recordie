@@ -21,14 +21,13 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
     RecyclerView.Adapter<VideoAdapter.VideoHolder>() {
 
     var selectedItems = ArrayList<ScreenVideo>()
+    val mCache = ThumbnailCache()
 
     class VideoHolder(private val context: Context, view: View) : RecyclerView.ViewHolder(view) {
         var card: MaterialCardView = view.findViewById(R.id.card)
         var image: ImageView = view.findViewById(R.id.image)
         var title: TextView = view.findViewById(R.id.title)
         var duration: TextView = view.findViewById(R.id.duration)
-        // Instantiate cache - referenced by the external CreateThumbnailTask.
-        val mCache = ThumbnailCache()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoHolder {
@@ -40,6 +39,7 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
         val animation = AnimationUtils.loadAnimation(parent.context, android.R.anim.fade_in)
         animation.duration = 500
         itemView.animation = animation
+        println("Create video holder...")
         return VideoHolder(parent.context, itemView)
     }
 
@@ -51,7 +51,7 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
         holder.duration.text = Utils.formatDuration(video.duration)
         holder.card.setTag(R.id.fileUri, video.data)
         // Let's create the thumbnail
-        CreateThumbnailTask(holder).execute(video.data)
+        CreateThumbnailTask(this@VideoAdapter, holder).execute(video.data)
         // Start animating
         holder.itemView.animate()
         // Initialise card

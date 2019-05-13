@@ -9,29 +9,31 @@ import it.jertlok.screenrecorder.R
 import it.jertlok.screenrecorder.adapters.VideoAdapter
 import java.lang.ref.WeakReference
 
-class CreateThumbnailTask(context: VideoAdapter.VideoHolder) : AsyncTask<String, Void, Boolean>() {
+class CreateThumbnailTask(adapter: VideoAdapter, holder: VideoAdapter.VideoHolder) : AsyncTask<String, Void, Boolean>() {
     // We need to do operations on the caller, so we create a weak reference.
-    private val holderRef: WeakReference<VideoAdapter.VideoHolder> = WeakReference(context)
+    private val adapterRef: WeakReference<VideoAdapter> = WeakReference(adapter)
+    private val holderRef: WeakReference<VideoAdapter.VideoHolder> = WeakReference(holder)
+
     private var mThumbnail: Bitmap? = null
 
     override fun doInBackground(vararg params: String?): Boolean {
-        val holder = holderRef.get() ?: return false
+        val adapter = adapterRef.get() ?: return false
         if (params.size > 1) {
             return false
         }
         val fileUri = params[0]
 
-        synchronized(holder.mCache) {
-            if (holder.mCache.get(fileUri) == null) {
+        synchronized(adapter.mCache) {
+            if (adapter.mCache.get(fileUri) == null) {
                 mThumbnail = ThumbnailUtils.createVideoThumbnail(
                     fileUri,
                     MediaStore.Video.Thumbnails.MINI_KIND
                 )
                 if (mThumbnail != null) {
-                    holder.mCache.put(fileUri, mThumbnail)
+                    adapter.mCache.put(fileUri, mThumbnail)
                 }
             } else {
-                mThumbnail = holder.mCache.get(fileUri)
+                mThumbnail = adapter.mCache.get(fileUri)
             }
         }
         return true
