@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.view.get
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
 import it.jertlok.screenrecorder.R
@@ -21,6 +22,7 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
     RecyclerView.Adapter<VideoAdapter.VideoHolder>() {
 
     var selectedItems = ArrayList<ScreenVideo>()
+    var selectedHolder = ArrayList<VideoHolder>()
     val mCache = ThumbnailCache()
 
     class VideoHolder(private val context: Context, view: View) : RecyclerView.ViewHolder(view) {
@@ -39,7 +41,6 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
         val animation = AnimationUtils.loadAnimation(parent.context, android.R.anim.fade_in)
         animation.duration = 500
         itemView.animation = animation
-        println("Create video holder...")
         return VideoHolder(parent.context, itemView)
     }
 
@@ -52,10 +53,10 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
         holder.card.setTag(R.id.fileUri, video.data)
         // Let's create the thumbnail
         CreateThumbnailTask(this@VideoAdapter, holder).execute(video.data)
-        // Start animating
-        holder.itemView.animate()
         // Initialise card
         holder.card.isChecked = false
+        // Start animating
+        holder.itemView.animate()
         // Set long click listener
         holder.card.setOnLongClickListener {
             cardBehaviour(holder, video)
@@ -74,6 +75,7 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
         if (!holder.card.isChecked) {
             holder.card.isChecked = true
             selectedItems.add(video)
+            selectedHolder.add(holder)
             mInterface.updateCardCheck()
         } else {
             holder.card.isChecked = false

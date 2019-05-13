@@ -262,12 +262,20 @@ class MainActivity : AppCompatActivity() {
         }
         // Handle selected cards on back press
         if (mVideoAdapter.selectedItems.size > 0) {
-            // TODO: Not sure if this is the best way...
-            mVideoAdapter.selectedItems.clear()
-            mVideoAdapter.notifyDataSetChanged()
+            // Remove all the selected items
+            cleanUpSelection()
+            // Disable the menu items on the bottom right
             updateMenuItems()
         } else {
             moveTaskToBack(true)
+        }
+    }
+
+    private fun cleanUpSelection() {
+        // TODO: Not sure if this is the best way...
+        mVideoAdapter.selectedItems.clear()
+        mVideoAdapter.selectedHolder.forEach { h ->
+            h.card.isChecked = false
         }
     }
 
@@ -316,7 +324,6 @@ class MainActivity : AppCompatActivity() {
     private fun updateMultiDelete() {
         for (video: ScreenVideo in mVideoAdapter.selectedItems) {
             val position = mVideoArray.indexOf(mVideoArray.find { s -> s.data == video.data })
-            println("position: $position")
             mVideoArray.removeAt(position)
             mVideoAdapter.notifyItemRemoved(position)
             removeNotificationIfNeeded(video.data)
