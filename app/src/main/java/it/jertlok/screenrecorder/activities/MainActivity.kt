@@ -34,7 +34,6 @@ import it.jertlok.screenrecorder.tasks.UpdateSingleVideoTask
 import it.jertlok.screenrecorder.tasks.UpdateVideosTask
 import it.jertlok.screenrecorder.utils.ThemeHelper
 import it.jertlok.screenrecorder.utils.Utils
-import me.jfenn.attribouter.Attribouter
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -207,6 +206,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        // Is storage permission granted on the meantime?
+        ensureStoragePermission()
         // Restore bottom behaviour
         bottomBehaviour.state = BottomSheetBehavior.STATE_HIDDEN
         // Check for dark theme override and eventually set new mode
@@ -246,6 +247,12 @@ class MainActivity : AppCompatActivity() {
         } else {
             moveTaskToBack(true)
         }
+    }
+
+    private fun ensureStoragePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            mStoragePermissionGranted =
+                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
     }
 
     /** Small function for recreating activity in case of dark mode toggle change */
@@ -336,23 +343,13 @@ class MainActivity : AppCompatActivity() {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) == PackageManager.PERMISSION_GRANTED
             // Check permissions
-            if (!mStoragePermissionGranted || checkSelfPermission(Manifest.permission.RECORD_AUDIO)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                // Permission is not granted
-                if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    || shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)
-                ) {
-                    // Show the explanation
-                } else {
-                    requestPermissions(
-                        arrayOf(
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                            Manifest.permission.RECORD_AUDIO
-                        ),
-                        PERMISSION_REQUESTS
-                    )
-                }
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(
+                    arrayOf(
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    ),
+                    PERMISSION_REQUESTS
+                )
             }
         }
     }
@@ -368,6 +365,9 @@ class MainActivity : AppCompatActivity() {
             // Let's set the global variable
             mStoragePermissionGranted = true
             updateVideos()
+        } else {
+            // TODO create a friendly SnackBar giving the user another chance to request the permissions.
+            Toast.makeText(this, getString(R.string.permission_storage_denied), Toast.LENGTH_SHORT).show()
         }
     }
 

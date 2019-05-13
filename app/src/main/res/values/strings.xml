@@ -7,6 +7,10 @@
 
     <!-- Toast message for casting permission denied -->
     <string name="permission_cast_denied">Cast permission not granted</string>
+    <!-- Toast message for generic permission denied -->
+    <string name="permission_usages_denied">The app cannot work without the required user permissions</string>
+    <!-- Toast message for notifying the user that he won't get the video list - lol -->
+    <string name="permission_storage_denied">You will not be able to see the recorded videos without this permission</string>
 
     <!-- Settings -->
 
