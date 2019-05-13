@@ -21,14 +21,14 @@ open class RecordingActivity : AppCompatActivity() {
     private lateinit var mNotificationManager: NotificationManager
     private lateinit var mMediaProjectionManager: MediaProjectionManager
     private lateinit var mSharedPreferences: SharedPreferences
-    // Permissions
-    private var mStoragePermissionGranted = false
     // Workaround
     private var mAction: String? = null
     // ScreenRecorderService
     private var mBound = false
     private lateinit var mBoundService: ScreenRecorderService
     private val mConnection = LocalServiceConnection()
+    // Make permission checker smarter
+    private var mIncludesAudio = false
 
     override fun onStart() {
         super.onStart()
@@ -52,6 +52,8 @@ open class RecordingActivity : AppCompatActivity() {
         // Initialise shared preferences
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
 
+        mIncludesAudio = mSharedPreferences.getBoolean("audio_recording", false)
+
         mMediaProjectionManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE)
                 as MediaProjectionManager
         mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -63,21 +65,10 @@ open class RecordingActivity : AppCompatActivity() {
 
     private fun startRecording() {
         when (intent.action) {
-            ACTION_START -> {
-                startActivityForResult(
-                    mMediaProjectionManager.createScreenCaptureIntent(),
-                    ScreenRecorderService.REQUEST_CODE_SCREEN_RECORD
-                )
-            }
+            ACTION_START -> checkPermissionsAndStart()
             ACTION_QS_START -> {
-                checkPermissions()
-                if (!mStoragePermissionGranted) {
-                    // Get the f... out.
-                } else if (!mBoundService.isRecording() && !mBoundService.mRecScheduled) {
-                    startActivityForResult(
-                        mMediaProjectionManager.createScreenCaptureIntent(),
-                        ScreenRecorderService.REQUEST_CODE_SCREEN_RECORD
-                    )
+                if (!mBoundService.isRecording() && !mBoundService.mRecScheduled) {
+                    checkPermissionsAndStart()
                 }
             }
             else -> {
@@ -90,33 +81,27 @@ open class RecordingActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkPermissions() {
+    private fun checkPermissionsAndStart() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            // We need to know if at least the storage permission got granted, it will be useful
-            // for allowing to update videos asynchronously.
-            mStoragePermissionGranted = checkSelfPermission(
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED
             // Check permissions
-            if (!mStoragePermissionGranted || checkSelfPermission(Manifest.permission.RECORD_AUDIO)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                // Permission is not granted
-                if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    || shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)
-                ) {
-                    // Show the explanation
-                } else {
-                    requestPermissions(
-                        arrayOf(
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                            Manifest.permission.RECORD_AUDIO
-                        ),
-                        MainActivity.PERMISSION_REQUESTS
-                    )
-                }
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                || checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                // Set basic permission
+                val permissions = arrayListOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                // Add audio only if needed
+                if (mIncludesAudio) permissions.add(Manifest.permission.RECORD_AUDIO)
+                // Request permissions
+                requestPermissions(permissions.toTypedArray(), MainActivity.PERMISSION_REQUESTS)
+            } else {
+                createScreenCapturePermission()
             }
         }
+    }
+
+    private fun createScreenCapturePermission() {
+        startActivityForResult(
+            mMediaProjectionManager.createScreenCaptureIntent(),
+            ScreenRecorderService.REQUEST_CODE_SCREEN_RECORD)
     }
 
     override fun onRequestPermissionsResult(
@@ -126,13 +111,14 @@ open class RecordingActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         // If we got the the WRITE_EXTERNAL_STORAGE permission granted
-        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            // Let's set the global variable
-            mStoragePermissionGranted = true
-            startActivityForResult(
-                mMediaProjectionManager.createScreenCaptureIntent(),
-                ScreenRecorderService.REQUEST_CODE_SCREEN_RECORD
-            )
+        if (grantResults[0] == PackageManager.PERMISSION_GRANTED && !mIncludesAudio) {
+            createScreenCapturePermission()
+        } else if (mIncludesAudio && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+            createScreenCapturePermission()
+        } else {
+            Toast.makeText(this, getString(R.string.permission_usages_denied), Toast.LENGTH_SHORT).show()
+            finish()
         }
     }
 
