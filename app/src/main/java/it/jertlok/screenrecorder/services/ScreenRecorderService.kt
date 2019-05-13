@@ -230,7 +230,6 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
     }
 
     private fun startRecording(data: Intent) {
-        // TODO: Improve user experience
         if (mIsRecording) {
             return
         }

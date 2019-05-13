@@ -1,10 +1,14 @@
 package it.jertlok.screenrecorder.tasks
 
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.TransitionDrawable
 import android.media.ThumbnailUtils
 import android.os.AsyncTask
 import android.provider.MediaStore
 import android.widget.ImageView
+import androidx.core.graphics.drawable.toDrawable
 import it.jertlok.screenrecorder.R
 import it.jertlok.screenrecorder.adapters.VideoAdapter
 import java.lang.ref.WeakReference
@@ -45,12 +49,18 @@ class CreateThumbnailTask(adapter: VideoAdapter, holder: VideoAdapter.VideoHolde
         val holder = holderRef.get() ?: return
         // Set out thumbnail to be center crop
         if (mThumbnail != null) {
-            holderRef.get()?.image?.setImageBitmap(mThumbnail)
+            // TODO temporary use some fade to make glitch appear less
+            val transition = TransitionDrawable(arrayOf(ColorDrawable(Color.TRANSPARENT),
+                mThumbnail?.toDrawable(holder.itemView.resources)))
+            holderRef.get()?.image?.setImageDrawable(transition)
             holderRef.get()?.image?.scaleType = ImageView.ScaleType.CENTER_CROP
+            transition.startTransition(500)
         } else {
+            val transition = TransitionDrawable(arrayOf(ColorDrawable(Color.TRANSPARENT),
+                holder.itemView.context.getDrawable(R.drawable.ic_movie)))
             // We couldn't create / load a thumbnail, so we set the placeholder.
-            val placeholder = holder.itemView.context.getDrawable(R.drawable.ic_movie)
-            holder.image.setImageDrawable(placeholder)
+            holder.image.setImageDrawable(transition)
+            transition.startTransition(500)
         }
     }
 }
