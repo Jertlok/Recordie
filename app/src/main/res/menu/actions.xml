@@ -4,7 +4,7 @@
     <item
         android:id="@+id/delete"
         app:showAsAction="ifRoom"
-        app:iconTint="@color/gray"
+        app:iconTint="?attr/bottom_bar_ic_tint"
         android:title="@string/delete"
         android:visible="false"
         android:icon="@drawable/ic_delete" />
@@ -12,7 +12,7 @@
     <item
         android:id="@+id/share"
         app:showAsAction="ifRoom"
-        app:iconTint="@color/gray"
+        app:iconTint="?attr/bottom_bar_ic_tint"
         android:text="@string/share"
         android:visible="false"
         android:icon="@drawable/ic_share" />
