@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.NotificationManager
 import android.content.*
 import android.content.pm.PackageManager
+import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
@@ -11,6 +12,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.preference.PreferenceManager
+import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -117,6 +119,22 @@ class MainActivity : AppCompatActivity() {
         // Set the various intent filters
         mIntentFilter.addAction(ACTION_DELETE_VIDEO)
         mIntentFilter.addAction(ACTION_UPDATE_FAB)
+    }
+
+    /** Dismiss the BottomSheet when clicking outside of its boundaries */
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (ev?.action == MotionEvent.ACTION_DOWN) {
+            // If our bottom sheet is expanded
+            if (bottomBehaviour.state == BottomSheetBehavior.STATE_EXPANDED) {
+                // Get its layout
+                val outRect = Rect()
+                mNavigationView.getGlobalVisibleRect(outRect)
+                // If we are touching outside of the rect, dismiss it
+                if(!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt()))
+                    bottomBehaviour.state = BottomSheetBehavior.STATE_HIDDEN
+            }
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
     /** Function for setting up all the bottom area */
@@ -434,9 +452,9 @@ class MainActivity : AppCompatActivity() {
     fun updateMenuItems() {
         val deleteAction = bottomBar.menu.getItem(0)
         val shareAction = bottomBar.menu.getItem(1)
-
         deleteAction.isVisible = mVideoAdapter.selectedItems.size >= 1
         shareAction.isVisible = mVideoAdapter.selectedItems.size >= 1
+        println(deleteAction.actionView)
     }
 
     private inner class LocalBroadcastReceiver : BroadcastReceiver() {

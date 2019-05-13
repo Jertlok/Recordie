@@ -1,0 +1,46 @@
+<resources>
+    <!-- Activity names -->
+    <string name="app_name">Screen Recorder</string>
+    <string name="settings_activity_name">सेटिंग</string>
+
+    <!-- Menu strings -->
+
+    <!-- Toast message for casting permission denied -->
+    <string name="permission_cast_denied">कास्ट अनुमति नहीं दी गई</string>
+
+    <!-- Settings -->
+
+    <!-- Video configurations -->
+    <string name="video_category">वीडियो</string>
+    <string name="bit_rate_title">बिट दर</string>
+    <string name="frame_rate_title">फ्रेम रेट</string>
+    <!-- Audio configurations -->
+    <string name="audio_category">ऑडियो</string>
+    <string name="audio_recording_title">ऑडियो रिकॉर्डिंग</string>
+    <!-- Misc configurations -->
+    <string name="misc_category">विविध</string>
+    <string name="shake_stop_title">रोकने के लिए हिलाएँ</string>
+    <string name="screen_stop_title">बंद करने के लिए स्क्रीन बंद करें</string>
+    <string name="rec_delay_title">रिकॉर्डिंग में देरी (सेकंड)</string>
+    <!-- Theme configurations -->
+    <string name="theme_category">थीम</string>
+    <string name="dark_mode_title">डार्क मॉड</string>
+
+    <!-- QS Tile -->
+    <string name="qs_record_title">रिकॉर्ड</string>
+
+    <!-- Notification -->
+    <string name="notif_rec_progress">प्रोग्रेस में रिकॉर्डिंग</string>
+    <string name="notif_rec_complete">रिकॉर्डिंग पूर्ण</string>
+    <string name="notif_rec_stop">रुकें</string>
+
+    <!-- Share intent -->
+    <string name="share_title">वीडियो शेयर करें</string>
+
+    <!-- Material card -->
+    <string name="share">शेयर</string>
+    <string name="delete">मिटाना</string>
+
+    <!-- Alert dialog for delete action -->
+    <string name="delete_dialog_title">क्या आप मिटाना चाहते हैं</string>
+</resources>
