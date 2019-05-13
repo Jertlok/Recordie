@@ -1,0 +1,52 @@
+<resources>
+    <!-- Activity names -->
+    <string name="app_name">Screen Recorder</string>
+    <string name="settings_activity_name">Настройки</string>
+
+    <!-- Menu strings -->
+
+    <!-- Toast message for casting permission denied -->
+    <string name="permission_cast_denied">Разрешение на запись не предоставлено</string>
+    <!-- Toast message for generic permission denied -->
+    <string name="permission_usages_denied">Приложение не может работать без нужных пользовательских разрешений</string>
+    <!-- Toast message for notifying the user that he won't get the video list - lol -->
+    <string name="permission_storage_denied">Вы не сможете видеть записанные видео без этого разрешения</string>
+
+    <!-- Settings -->
+
+    <!-- Video configurations -->
+    <string name="video_category">Видео</string>
+    <string name="bit_rate_title">Битрейт</string>
+    <string name="frame_rate_title">Частота кадров</string>
+    <!-- Audio configurations -->
+    <string name="audio_category">Аудио</string>
+    <string name="audio_recording_title">Запись аудио</string>
+    <!-- Misc configurations -->
+    <string name="misc_category">Другое</string>
+    <string name="shake_stop_title">Остановить запись встряхиванием</string>
+    <string name="screen_stop_title">Остановить запись после выключения экрана</string>
+    <string name="rec_delay_title">Задержка записи (секунды)</string>
+    <!-- Theme configurations -->
+    <string name="theme_category">Тема</string>
+    <string name="dark_mode_title">Темный режим</string>
+
+    <!-- QS Tile -->
+    <string name="qs_record_title">Запись</string>
+
+    <!-- Notification -->
+    <string name="notif_rec_progress">Идет процесс записи</string>
+    <string name="notif_rec_complete">Запись завершена</string>
+    <string name="notif_rec_stop">Стоп</string>
+
+    <!-- Share intent -->
+    <string name="share_title">Поделиться видео</string>
+
+    <!-- Material card -->
+    <string name="share">Поделиться</string>
+    <string name="delete">Удалить</string>
+
+    <!-- Alert dialog for delete action -->
+    <string name="delete_dialog_title">Вы хотите удалить?</string>
+    <string name="empty_list">Нет видео :(</string>
+    <string name="about_activity_name">О программе</string>
+</resources>

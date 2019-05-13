@@ -27,10 +27,21 @@
     </me.jfenn.attribouter.wedges.ContributorsWedge>
 
     <me.jfenn.attribouter.wedges.TranslatorsWedge overflow="5">
+        <!-- Swedish -->
         <me.jfenn.attribouter.wedges.TranslatorWedge
             login="Ante0"
             name="Ante0"
             locales="sv" />
+        <!-- Hindi -->
+        <me.jfenn.attribouter.wedges.TranslatorWedge
+            login="VatsalVala"
+            name="Vatsal Vala"
+            locales="hi" />
+        <!-- Russian -->
+        <me.jfenn.attribouter.wedges.TranslatorWedge
+            login="Roker2"
+            name="Dmitry Minko"
+            locales="ru" />
     </me.jfenn.attribouter.wedges.TranslatorsWedge>
 
 <!--    <me.jfenn.attribouter.wedges.LicensesWedge-->
