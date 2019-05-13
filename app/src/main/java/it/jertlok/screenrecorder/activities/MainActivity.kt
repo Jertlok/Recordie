@@ -365,7 +365,7 @@ class MainActivity : AppCompatActivity() {
         }
         // Send files!
         shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files)
-        startActivity(shareIntent)
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.multiple_share_title)))
     }
 
     private fun stopRecording() {
