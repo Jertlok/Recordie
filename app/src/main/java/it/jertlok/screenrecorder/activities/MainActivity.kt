@@ -6,6 +6,7 @@ import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.media.projection.MediaProjectionManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
@@ -169,7 +170,10 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.share -> {
                     updateMenuItems()
-                    shareVideoFromSelection()
+                    if (mVideoAdapter.selectedItems.size == 1)
+                        shareVideoFromSelection()
+                    else
+                        shareVideosFromSelection()
                     // Update menu
                     updateMenuItems()
                     true
@@ -329,6 +333,23 @@ class MainActivity : AppCompatActivity() {
         startActivity(Intent.createChooser(shareIntent, getString(R.string.share_title)))
     }
 
+    private fun shareVideosFromSelection() {
+        val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE)
+        shareIntent.type = "video/*"
+        shareIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        // Build array list of URIs
+        val files = ArrayList<Uri>()
+        for (video in mVideoAdapter.selectedItems) {
+            files.add(FileProvider.getUriForFile(
+                this@MainActivity,
+                BuildConfig.APPLICATION_ID + ".provider", File(video.data))
+            )
+        }
+        // Send files!
+        shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files)
+        startActivity(shareIntent)
+    }
+
     private fun stopRecording() {
         mBoundService.stopRecording()
         // Let's reset the FAB icon to start
@@ -415,7 +436,7 @@ class MainActivity : AppCompatActivity() {
         val shareAction = bottomBar.menu.getItem(1)
 
         deleteAction.isVisible = mVideoAdapter.selectedItems.size >= 1
-        shareAction.isVisible = mVideoAdapter.selectedItems.size == 1
+        shareAction.isVisible = mVideoAdapter.selectedItems.size >= 1
     }
 
     private inner class LocalBroadcastReceiver : BroadcastReceiver() {

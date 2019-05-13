@@ -44,4 +44,7 @@
 
     <!-- Alert dialog for delete action -->
     <string name="delete_dialog_title">Vuoi cancellare?</string>
+    <string name="permission_storage_denied">Senza questo permesso non potrai vedere i video registrati</string>
+    <string name="permission_usages_denied">L\'applicazione non può funzionare senza i permessi utente richiesti</string>
+    <string name="empty_list">Nessun video presente :(</string>
 </resources>
