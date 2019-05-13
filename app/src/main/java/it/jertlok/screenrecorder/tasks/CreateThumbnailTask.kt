@@ -54,13 +54,13 @@ class CreateThumbnailTask(adapter: VideoAdapter, holder: VideoAdapter.VideoHolde
                 mThumbnail?.toDrawable(holder.itemView.resources)))
             holderRef.get()?.image?.setImageDrawable(transition)
             holderRef.get()?.image?.scaleType = ImageView.ScaleType.CENTER_CROP
-            transition.startTransition(500)
+            transition.startTransition(350)
         } else {
             val transition = TransitionDrawable(arrayOf(ColorDrawable(Color.TRANSPARENT),
                 holder.itemView.context.getDrawable(R.drawable.ic_movie)))
             // We couldn't create / load a thumbnail, so we set the placeholder.
             holder.image.setImageDrawable(transition)
-            transition.startTransition(500)
+            transition.startTransition(350)
         }
     }
 }
