@@ -168,13 +168,9 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
             }
             ACTION_STOP -> {
                 stopRecording()
-                // Stop shake detector
-                mShakeDetector.stop()
             }
-            ACTION_STOP_DELAYED -> {
-                // Block everything
-                mHandler.removeCallbacksAndMessages(null)
-                mRecScheduled = false
+            ACTION_CANCEL -> {
+                cancelRecording()
             }
         }
         return super.onStartCommand(intent, flags, startId)
@@ -274,12 +270,34 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
     override fun hearShake() = stopRecording()
 
     fun stopRecording() {
+        // Stop the recording
+        baseStopRecording()
+        // Notify new media file
+        updateMedia(Uri.fromFile(mOutputFile))
+        // Create notification
+        createFinalNotification()
+        // Toggle QS
+        toggleQS(false)
+    }
+
+    private fun cancelRecording() {
+        // Stop the recording, note that we did not notify the ContentResolver ;)
+        baseStopRecording()
+        // Then delete the file
+        mOutputFile?.delete()
+    }
+
+    private fun baseStopRecording() {
         // If we are not recording there's no need to get into all these actions
         if (!mIsRecording) {
             return
         }
         // Stopping the media recorder could lead to crash, let us be safe.
         mIsRecording = false
+        // Remove all callbacks for the delayed recording
+        mHandler.removeCallbacksAndMessages(null)
+        mRecScheduled = false
+        // Stop Media Recorder
         mMediaRecorder?.apply {
             stop()
             release()
@@ -289,18 +307,12 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         stopScreenSharing()
         // Destroy media projection session
         destroyMediaProjection()
-        // Notify new media file
-        updateMedia(Uri.fromFile(mOutputFile))
         // Stop notification
         stopForeground(true)
         // Stop shake service, we activate it after we start the recording for saving battery
         mShakeDetector.stop()
         // Send broadcast for recording status
         recStatusBroadcast()
-        // Create notification
-        createFinalNotification()
-        // Toggle QS
-        toggleQS(false)
     }
 
     private fun recStatusBroadcast() {
@@ -365,6 +377,13 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
             this, 0, intent,
             PendingIntent.FLAG_UPDATE_CURRENT
         )
+        // Action for dismissing recording
+        val dismissIntent = Intent(this, ScreenRecorderService::class.java)
+            .setAction(ACTION_CANCEL)
+        val cancelPending = PendingIntent.getService(
+            this, 0, dismissIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
         // Open MainActivity action
         val mainIntent = Intent(this, MainActivity::class.java)
             .setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
@@ -379,6 +398,10 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
             .setContentText(getString(R.string.notif_rec_progress))
             .setWhen(System.currentTimeMillis())
             .setUsesChronometer(true)
+            .addAction(
+                R.drawable.ic_close, getString(R.string.notif_rec_dimiss),
+                cancelPending
+            )
             .addAction(
                 R.drawable.ic_stop, getString(R.string.notif_rec_stop),
                 stopPendingIntent
@@ -516,8 +539,7 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         // Intent actions
         const val ACTION_START = "it.jertlok.services.ScreenRecorderService.ACTION_START"
         const val ACTION_STOP = "it.jertlok.services.ScreenRecorderService.ACTION_STOP"
-        const val ACTION_STOP_DELAYED =
-            "it.jertlok.services.ScreenRecorderService.ACTION_STOP_DELAYED"
+        const val ACTION_CANCEL = "it.jertlok.services.ScreenRecorderService.ACTION_CANCEL"
         const val ACTION_DELETE = "it.jertlok.services.ScreenRecorderService.ACTION_DELETE"
         const val SCREEN_RECORD_URI = "screen_record_file_uri"
     }
