@@ -324,18 +324,17 @@ class MainActivity : AppCompatActivity() {
     private fun updateMultiDelete() {
         for (video: ScreenVideo in mVideoAdapter.selectedItems) {
             val position = mVideoArray.indexOf(mVideoArray.find { s -> s.data == video.data })
-            mVideoArray.removeAt(position)
             mVideoAdapter.notifyItemRemoved(position)
+            mVideoArray.removeAt(position)
             removeNotificationIfNeeded(video.data)
         }
     }
 
     private fun updateDelete(videoData: String) {
         val position = mVideoArray.indexOf(mVideoArray.find { s -> s.data == videoData })
-        mVideoArray.removeAt(position)
         mVideoAdapter.notifyItemRemoved(position)
+        mVideoArray.removeAt(position)
         removeNotificationIfNeeded(videoData)
-
     }
 
     private fun removeNotificationIfNeeded(videoData: String) {
