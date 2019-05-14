@@ -173,8 +173,8 @@ class MainActivity : AppCompatActivity() {
                     builder.setPositiveButton(R.string.delete) { _, _ ->
                         Utils.deleteFiles(contentResolver, mVideoAdapter.selectedItems)
                         updateMultiDelete()
-                        // We gotta clear the selected array
-                        mVideoAdapter.selectedItems.clear()
+                        // Clean up selected items
+                        cleanUpSelection()
                         // Update menu
                         updateMenuItems()
                     }
@@ -322,24 +322,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateMultiDelete() {
-        for (video: ScreenVideo in mVideoAdapter.selectedItems) {
-            val position = mVideoArray.indexOf(mVideoArray.find { s -> s.data == video.data })
-            mVideoAdapter.notifyItemRemoved(position)
-            mVideoArray.removeAt(position)
-            removeNotificationIfNeeded(video.data)
+        mVideoAdapter.selectedItems.forEach { v ->
+            mVideoArray.remove(v)
+            removeNotificationIfNeeded(v.data)
         }
+        mVideoAdapter.notifyDataSetChanged()
     }
 
     private fun updateDelete(videoData: String) {
-        val position = mVideoArray.indexOf(mVideoArray.find { s -> s.data == videoData })
-        mVideoAdapter.notifyItemRemoved(position)
-        mVideoArray.removeAt(position)
+        // Get the index for the video to be removed according to the criteria
+        val i = mVideoArray.indexOf(mVideoArray.find { s -> s.data == videoData })
+        // Remove element
+        mVideoArray.removeAt(i)
+        mVideoAdapter.notifyItemRemoved(i)
         removeNotificationIfNeeded(videoData)
     }
 
     private fun removeNotificationIfNeeded(videoData: String) {
         if (mBoundService.mOutputFile?.path == videoData) {
-            // It means we are deleting the last recorded video, hence we can remove its notif.
+            // It means we are deleting the last recorded video, hence we can remove its notification.
             mNotificationManager.cancel(ScreenRecorderService.NOTIFICATION_RECORD_FINAL_ID)
         }
     }
