@@ -62,7 +62,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         // Bit rate
         bitRatePref.setValueIndex(
             bitRatePref.findIndexOfValue(
-                mSharedPreferences.getString("bit_rate", "16384000")
+                mSharedPreferences.getString("bit_rate", "8192000")
             )
         )
         // Set summary
