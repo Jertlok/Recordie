@@ -21,7 +21,7 @@
                 id="website" />
             <me.jfenn.attribouter.wedges.link.LinkWedge
                 name="Twitter"
-                icon="https://twitter.com/favicon.ico"
+                icon="@drawable/ic_twitter"
                 url="https://twitter.com/jertlok" />
         </me.jfenn.attribouter.wedges.ContributorWedge>
     </me.jfenn.attribouter.wedges.ContributorsWedge>
@@ -44,8 +44,20 @@
             locales="ru" />
     </me.jfenn.attribouter.wedges.TranslatorsWedge>
 
-<!--    <me.jfenn.attribouter.wedges.LicensesWedge-->
-<!--        overflow="1"-->
-<!--        showDefaults="false">-->
-<!--    </me.jfenn.attribouter.wedges.LicensesWedge>-->
+    <me.jfenn.attribouter.wedges.LicensesWedge
+        showDefaults="false">
+
+        <!-- Seismic -->
+        <me.jfenn.attribouter.wedges.LicenseWedge
+            title="Seismic"
+            repo="square/seismic"
+            license="apache" />
+
+        <!-- Attribouter -->
+        <me.jfenn.attribouter.wedges.LicenseWedge
+            title="Attribouter"
+            repo="fennifith/Attribouter"
+            license="apache" />
+
+    </me.jfenn.attribouter.wedges.LicensesWedge>
 </about>
