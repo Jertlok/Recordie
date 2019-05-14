@@ -45,7 +45,7 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
     }
 
     override fun onBindViewHolder(holder: VideoHolder, position: Int) {
-        // We need to set the values, for now I am going to put something hardcoded.
+        // Get the video
         val video = videos[position]
         // Set item properties
         holder.title.text = video.title
