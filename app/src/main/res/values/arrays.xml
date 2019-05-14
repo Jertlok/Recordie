@@ -2,14 +2,14 @@
 <resources>
     <!-- Video bit rates -->
     <string-array name="bit_rate_aliases">
+        <item>4 Mb/s</item>
         <item>8 Mb/s</item>
         <item>16 Mb/s</item>
-        <item>32 Mb/s</item>
     </string-array>
     <string-array name="bit_rate_values">
+        <item>4096000</item>
         <item>8192000</item>
         <item>16384000</item>
-        <item>32768000</item>
     </string-array>
     <!-- Frame rate parameters -->
     <string-array name="frame_rate_aliases">

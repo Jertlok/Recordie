@@ -211,7 +211,7 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         // Set video size
         mMediaRecorder?.setVideoSize(mDisplayMetrics.widthPixels, mDisplayMetrics.heightPixels)
         mMediaRecorder?.setVideoEncoder(MediaRecorder.VideoEncoder.H264)
-        val bitRate = mSharedPreferences.getString("bit_rate", "16384000")!!.toInt()
+        val bitRate = mSharedPreferences.getString("bit_rate", "8192000")!!.toInt()
         mMediaRecorder?.setVideoEncodingBitRate(bitRate)
         if (isAudioRecEnabled) {
             mMediaRecorder?.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
