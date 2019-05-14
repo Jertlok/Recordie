@@ -37,6 +37,7 @@
     <string name="notif_rec_progress">Recording in progress</string>
     <string name="notif_rec_complete">Recording complete</string>
     <string name="notif_rec_stop">Stop</string>
+    <string name="notif_rec_dimiss">Dismiss</string>
 
     <!-- Share intent -->
     <string name="share_title">Share video</string>
