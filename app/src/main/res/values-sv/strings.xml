@@ -1,13 +1,16 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Translated by Ante0 @xda (@antezero) -->
+    <!-- Activity names -->
     <string name="app_name">Screen Recorder</string>
     <string name="settings_activity_name">Inställningar</string>
 
     <!-- Menu strings -->
 
     <!-- Toast message for casting permission denied -->
-    <string name="permission_cast_denied">Cast-tillstånd ej beviljat</string>
+    <string name="permission_cast_denied">Cast-behörighet ej beviljad</string>
+    <!-- Toast message for generic permission denied -->
+    <string name="permission_usages_denied">Appen fungerar inte utan nödvändiga användar-behörigheter</string>
+    <!-- Toast message for notifying the user that he won't get the video list - lol -->
+    <string name="permission_storage_denied">Du kommer inte att kunna se inspelade videor utan denna behörighet</string>
 
     <!-- Settings -->
 
@@ -44,4 +47,6 @@
 
     <!-- Alert dialog for delete action -->
     <string name="delete_dialog_title">Vill du radera?</string>
+    <string name="empty_list">Inga videor än :(</string>
+    <string name="about_activity_name">Om</string>
 </resources>

@@ -1,0 +1,52 @@
+<resources>
+    <!-- Activity names -->
+    <string name="app_name">Gravador de Tela</string>
+    <string name="settings_activity_name">Configurações</string>
+
+    <!-- Menu strings -->
+
+    <!-- Toast message for casting permission denied -->
+    <string name="permission_cast_denied">Permissão cast não permitida</string>
+    <!-- Toast message for generic permission denied -->
+    <string name="permission_usages_denied">A aplicação não funciona sem as permissões do utilizador necessárias</string>
+    <!-- Toast message for notifying the user that he won't get the video list - lol -->
+    <string name="permission_storage_denied">Não irá conseguir ver os vídeos gravados sem esta permissão</string>
+
+    <!-- Settings -->
+
+    <!-- Video configurations -->
+    <string name="video_category">Vídeo</string>
+    <string name="bit_rate_title">Taxa de bits</string>
+    <string name="frame_rate_title">Taxa de frames</string>
+    <!-- Audio configurations -->
+    <string name="audio_category">Áudio</string>
+    <string name="audio_recording_title">Gravação de áudio</string>
+    <!-- Misc configurations -->
+    <string name="misc_category">Diversos</string>
+    <string name="shake_stop_title">Agitar para parar</string>
+    <string name="screen_stop_title">Desligar o ecrã para parar</string>
+    <string name="rec_delay_title">Atraso de gravação (segundos)</string>
+    <!-- Theme configurations -->
+    <string name="theme_category">Tema</string>
+    <string name="dark_mode_title">Modo escuro</string>
+
+    <!-- QS Tile -->
+    <string name="qs_record_title">Record</string>
+
+    <!-- Notification -->
+    <string name="notif_rec_progress">Gravação em progresso</string>
+    <string name="notif_rec_complete">Gravação completa</string>
+    <string name="notif_rec_stop">Parar</string>
+
+    <!-- Share intent -->
+    <string name="share_title">Compartilhar vídeo</string>
+
+    <!-- Material card -->
+    <string name="share">Compartilhar</string>
+    <string name="delete">Eliminar</string>
+
+    <!-- Alert dialog for delete action -->
+    <string name="delete_dialog_title">Deseja eliminar?</string>
+    <string name="empty_list">Nenhum vídeo :(</string>
+    <string name="about_activity_name">Sobre</string>
+</resources>
