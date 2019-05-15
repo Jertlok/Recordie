@@ -4,6 +4,7 @@
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="backgroundColor">@android:color/white</item>
         <item name="android:navigationBarColor">@android:color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowLightNavigationBar">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/white</item>
@@ -18,6 +19,8 @@
     <style name="AppTheme.Settings" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <item name="backgroundColor">@android:color/white</item>
         <item name="android:navigationBarColor">@android:color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="actionBarTheme">@style/AppTheme.Settings.ActionBar</item>
         <item name="colorPrimary">@color/colorPrimary</item>
