@@ -285,6 +285,8 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         baseStopRecording()
         // Then delete the file
         mOutputFile?.delete()
+        // Toggle QS
+        toggleQS(false)
     }
 
     private fun baseStopRecording() {
