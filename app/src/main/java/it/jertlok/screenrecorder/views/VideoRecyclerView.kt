@@ -1,4 +1,4 @@
-package it.jertlok.screenrecorder.common
+package it.jertlok.screenrecorder.views
 
 import android.content.Context
 import android.util.AttributeSet

@@ -30,7 +30,7 @@ import it.jertlok.screenrecorder.BuildConfig
 import it.jertlok.screenrecorder.R
 import it.jertlok.screenrecorder.adapters.VideoAdapter
 import it.jertlok.screenrecorder.common.ScreenVideo
-import it.jertlok.screenrecorder.common.VideoRecyclerView
+import it.jertlok.screenrecorder.views.VideoRecyclerView
 import it.jertlok.screenrecorder.interfaces.AdapterInterface
 import it.jertlok.screenrecorder.services.ScreenRecorderService
 import it.jertlok.screenrecorder.tasks.UpdateSingleVideoTask
