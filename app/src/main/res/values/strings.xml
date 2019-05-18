@@ -60,4 +60,5 @@
     <string name="overlay_permission_title">Overlay permission optional</string>
     <string name="overlay_permission_desc">The application needs permission to draw overlays for showing the countdown
         counter over other apps</string>
+    <string name="grant">Grant</string>
 </resources>

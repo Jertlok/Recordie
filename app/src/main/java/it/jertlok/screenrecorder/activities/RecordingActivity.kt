@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.content.*
 import android.content.pm.PackageManager
 import android.media.projection.MediaProjectionManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
@@ -13,6 +14,7 @@ import android.preference.PreferenceManager
 import android.provider.Settings
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import it.jertlok.screenrecorder.R
 import it.jertlok.screenrecorder.common.SdkHelper
 import it.jertlok.screenrecorder.services.ScreenRecorderService
@@ -105,7 +107,7 @@ open class RecordingActivity : AppCompatActivity() {
                 // Request permissions
                 requestPermissions(permissions.toTypedArray(), MainActivity.PERMISSION_REQUESTS)
             } else {
-                createScreenCapturePermission()
+                checkOverlayAndStart { createScreenCapturePermission() }
             }
         }
     }
@@ -117,6 +119,30 @@ open class RecordingActivity : AppCompatActivity() {
         )
     }
 
+    private fun checkOverlayAndStart(finished: () -> Unit) {
+        if (SdkHelper.atleastM() && !Settings.canDrawOverlays(applicationContext)) {
+            MaterialAlertDialogBuilder(this).apply {
+                // Set positive button
+                setTitle(R.string.overlay_permission_title)
+                setMessage(R.string.overlay_permission_desc)
+                setFinishOnTouchOutside(false)
+                setPositiveButton(R.string.grant) { _, _ ->
+                    val intent = Intent(
+                        Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:$packageName")
+                    )
+                    startActivityForResult(intent, MainActivity.PERMISSION_REQUESTS)
+                }
+                setNegativeButton(android.R.string.cancel) { d, _ ->
+                    d.dismiss()
+                    finished()
+                }
+            }.show()
+        } else {
+            finished()
+        }
+    }
+
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<out String>,
         grantResults: IntArray
@@ -125,11 +151,11 @@ open class RecordingActivity : AppCompatActivity() {
 
         // If we got the the WRITE_EXTERNAL_STORAGE permission granted
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED && !mIncludesAudio) {
-            createScreenCapturePermission()
+            checkOverlayAndStart { createScreenCapturePermission() }
         } else if (mIncludesAudio && grantResults[0] == PackageManager.PERMISSION_GRANTED
             && grantResults[1] == PackageManager.PERMISSION_GRANTED
         ) {
-            createScreenCapturePermission()
+            checkOverlayAndStart { createScreenCapturePermission() }
         } else {
             Toast.makeText(this, getString(R.string.permission_usages_denied), Toast.LENGTH_SHORT).show()
             finish()
