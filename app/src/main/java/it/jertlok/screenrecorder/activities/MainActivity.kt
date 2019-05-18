@@ -434,6 +434,8 @@ class MainActivity : AppCompatActivity() {
                     finished()
                 }
             }.show()
+        } else {
+            finished()
         }
     }
 
