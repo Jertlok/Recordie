@@ -60,6 +60,11 @@
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowAnimationStyle">@android:style/Animation</item>
+        <!-- Material alert dialog -->
+        <item name="materialAlertDialogTheme">@style/AppTheme.AlertDialog</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
     </style>
 
     <style name ="InvisibleActivity.Dark" parent="InvisibleActivity">

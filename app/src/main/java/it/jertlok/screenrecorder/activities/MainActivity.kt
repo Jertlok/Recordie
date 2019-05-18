@@ -209,9 +209,7 @@ class MainActivity : AppCompatActivity() {
             // If we are not recording we can send the intent for recording
             // otherwise we will try to stop the recording.
             if (!mBoundService.isRecording() && !mBoundService.mRecScheduled) {
-                checkOverlayAndStart {
-                    startRecording()
-                }
+                startRecording()
             } else if (mBoundService.isRecording()) {
                 stopRecording()
             }
@@ -412,30 +410,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 }.show()
             }
-        }
-    }
-
-    private fun checkOverlayAndStart(finished: () -> Unit) {
-        if (SdkHelper.atleastM() && !Settings.canDrawOverlays(applicationContext)) {
-            MaterialAlertDialogBuilder(this).apply {
-                // Set positive button
-                setTitle(R.string.overlay_permission_title)
-                setMessage(R.string.overlay_permission_desc)
-                setFinishOnTouchOutside(false)
-                setPositiveButton(android.R.string.ok) { _, _ ->
-                    val intent = Intent(
-                        Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                        Uri.parse("package:$packageName")
-                    )
-                    startActivityForResult(intent, PERMISSION_REQUESTS)
-                }
-                setNegativeButton(android.R.string.cancel) { d, _ ->
-                    d.dismiss()
-                    finished()
-                }
-            }.show()
-        } else {
-            finished()
         }
     }
 
