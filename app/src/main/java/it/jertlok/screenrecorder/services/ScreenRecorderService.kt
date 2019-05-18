@@ -282,7 +282,12 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
     }
 
     // Implement shake listener
-    override fun hearShake() = stopRecording()
+    override fun hearShake() {
+        // Create a small vibration, useful for shake to stop.
+        sendVibrationCompat(175)
+        // Stop the recording
+        stopRecording()
+    }
 
     fun stopRecording() {
         if (!mIsRecording) {
@@ -314,8 +319,6 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         }
         // Stopping the media recorder could lead to crash, let us be safe.
         mIsRecording = false
-        // Create a small vibration, useful for shake to stop.
-        sendVibrationCompat(175)
         // Remove all callbacks for the delayed recording
         mHandler.removeCallbacksAndMessages(null)
         mRecScheduled = false
