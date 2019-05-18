@@ -13,8 +13,10 @@ import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import android.os.*
 import android.preference.PreferenceManager
+import android.provider.Settings
 import android.util.DisplayMetrics
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.WindowManager
 import androidx.annotation.Nullable
 import androidx.core.app.NotificationCompat
@@ -23,6 +25,8 @@ import com.squareup.seismic.ShakeDetector
 import it.jertlok.screenrecorder.BuildConfig
 import it.jertlok.screenrecorder.R
 import it.jertlok.screenrecorder.activities.MainActivity
+import it.jertlok.screenrecorder.common.RealOverlayManager
+import it.jertlok.screenrecorder.common.SdkHelper
 import it.jertlok.screenrecorder.tasks.DeleteVideoTask
 import java.io.File
 import java.io.IOException
@@ -64,12 +68,14 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
     // Screen off stop
     private var mIsScreenStopActive = false
     // Some way to handle a scheduled recording
-    private var mRecDelay = 2
+    private var mRecDelay = 3
     var mRecScheduled = false
         private set
     private var mHandler = Handler()
     // Vibration
     private lateinit var mVibrator: Vibrator
+    // Window manager
+    private lateinit var mWindowManager: WindowManager
 
     override fun onCreate() {
         super.onCreate()
@@ -81,11 +87,11 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
             Context.MEDIA_PROJECTION_SERVICE
         ) as MediaProjectionManager
         // Get windowManager
-        val windowManager = mContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        mWindowManager = mContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         // Get display metrics
         mDisplayMetrics = DisplayMetrics()
-        windowManager.defaultDisplay.getRealMetrics(mDisplayMetrics)
+        mWindowManager.defaultDisplay.getRealMetrics(mDisplayMetrics)
         // Instantiate media projection callbacks
         mMediaProjectionCallback = MediaProjectionCallback()
         // Get SharedPreference
@@ -129,7 +135,7 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
                     if (mIsShakeActive) mShakeDetector.start(mSensorManager) else mShakeDetector.stop()
                 }
                 "screen_off_stop" -> mIsScreenStopActive = mSharedPreferences.getBoolean("screen_off_stop", false)
-                "rec_delay" -> mRecDelay = mSharedPreferences.getInt("rec_delay", 2)
+                "rec_delay" -> mRecDelay = mSharedPreferences.getInt("rec_delay", 3)
             }
         }
         // Register shared preference listener
@@ -147,7 +153,7 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         intentFilter.addAction(ACTION_DELETE)
         registerReceiver(mBroadcastReceiver, intentFilter)
         // Delay for recording
-        mRecDelay = mSharedPreferences.getInt("rec_delay", 2)
+        mRecDelay = mSharedPreferences.getInt("rec_delay", 3)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -159,11 +165,20 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
                 val mediaPermission = intent.getParcelableExtra<Intent>(Intent.EXTRA_INTENT)
                 // Start ShakeDetector if active
                 if (mIsShakeActive) mShakeDetector.start(mSensorManager)
-                // Start recording after user preference
-                mHandler.postDelayed({
-                    startRecording(mediaPermission)
-                    createNotification()
-                }, (mRecDelay * 1000).toLong())
+                if (SdkHelper.atleastM() && Settings.canDrawOverlays(mContext)) {
+                    // This is a pseudo handler post delayed
+                    val om = RealOverlayManager(mWindowManager, LayoutInflater.from(mContext))
+                    om.countdown({
+                        createNotification()
+                        startRecording(mediaPermission)
+                    }, mRecDelay)
+                } else {
+                    // Start recording after user preference
+                    mHandler.postDelayed({
+                        createNotification()
+                        startRecording(mediaPermission)
+                    }, (mRecDelay * 1000).toLong())
+                }
                 return START_STICKY
             }
             ACTION_STOP -> {
@@ -251,7 +266,7 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
     }
 
     private fun toggleQS(state: Boolean) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (SdkHelper.atleastN()) {
             // Construct broadcast
             val broadcast = Intent()
             if (state) {
@@ -270,6 +285,9 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
     override fun hearShake() = stopRecording()
 
     fun stopRecording() {
+        if (!mIsRecording) {
+            return
+        }
         // Stop the recording
         baseStopRecording()
         // Notify new media file
@@ -296,6 +314,8 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         }
         // Stopping the media recorder could lead to crash, let us be safe.
         mIsRecording = false
+        // Create a small vibration, useful for shake to stop.
+        sendVibrationCompat(175)
         // Remove all callbacks for the delayed recording
         mHandler.removeCallbacksAndMessages(null)
         mRecScheduled = false
@@ -351,6 +371,17 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
             DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
             mMediaRecorder?.surface, null, null
         )
+    }
+
+    /** Compatibility function for sending a vibration */
+    @Suppress("DEPRECATION")
+    private fun sendVibrationCompat(duration: Long) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            mVibrator.vibrate(VibrationEffect.createOneShot(duration,
+                VibrationEffect.DEFAULT_AMPLITUDE))
+        } else {
+            mVibrator.vibrate(duration)
+        }
     }
 
     private inner class MediaProjectionCallback : MediaProjection.Callback() {
@@ -523,6 +554,8 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
             }
         }
     }
+
+
 
     companion object {
         private const val TAG = "ScreenRecorderService"

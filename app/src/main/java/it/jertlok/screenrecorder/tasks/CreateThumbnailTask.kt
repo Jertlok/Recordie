@@ -13,7 +13,8 @@ import it.jertlok.screenrecorder.R
 import it.jertlok.screenrecorder.adapters.VideoAdapter
 import java.lang.ref.WeakReference
 
-class CreateThumbnailTask(adapter: VideoAdapter, holder: VideoAdapter.VideoHolder) : AsyncTask<String, Void, Boolean>() {
+class CreateThumbnailTask(adapter: VideoAdapter, holder: VideoAdapter.VideoHolder) :
+    AsyncTask<String, Void, Boolean>() {
     // We need to do operations on the caller, so we create a weak reference.
     private val adapterRef: WeakReference<VideoAdapter> = WeakReference(adapter)
     private val holderRef: WeakReference<VideoAdapter.VideoHolder> = WeakReference(holder)
@@ -50,14 +51,22 @@ class CreateThumbnailTask(adapter: VideoAdapter, holder: VideoAdapter.VideoHolde
         // Set out thumbnail to be center crop
         if (mThumbnail != null) {
             // TODO temporary use some fade to make glitch appear less
-            val transition = TransitionDrawable(arrayOf(ColorDrawable(Color.TRANSPARENT),
-                mThumbnail?.toDrawable(holder.itemView.resources)))
+            val transition = TransitionDrawable(
+                arrayOf(
+                    ColorDrawable(Color.TRANSPARENT),
+                    mThumbnail?.toDrawable(holder.itemView.resources)
+                )
+            )
             holderRef.get()?.image?.setImageDrawable(transition)
             holderRef.get()?.image?.scaleType = ImageView.ScaleType.CENTER_CROP
             transition.startTransition(350)
         } else {
-            val transition = TransitionDrawable(arrayOf(ColorDrawable(Color.TRANSPARENT),
-                holder.itemView.context.getDrawable(R.drawable.ic_movie)))
+            val transition = TransitionDrawable(
+                arrayOf(
+                    ColorDrawable(Color.TRANSPARENT),
+                    holder.itemView.context.getDrawable(R.drawable.ic_movie)
+                )
+            )
             // We couldn't create / load a thumbnail, so we set the placeholder.
             holder.image.setImageDrawable(transition)
             transition.startTransition(350)

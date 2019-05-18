@@ -1,7 +1,6 @@
 package it.jertlok.screenrecorder.fragments
 
 import android.content.SharedPreferences
-import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.LayoutInflater
@@ -9,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.preference.*
 import it.jertlok.screenrecorder.R
+import it.jertlok.screenrecorder.common.SdkHelper
 import it.jertlok.screenrecorder.utils.Utils
 
 class SettingsFragment : PreferenceFragmentCompat() {
@@ -53,7 +53,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         darkModePref = findPreference("dark_mode_pref")!!
         themeCategory = findPreference("theme_category")!!
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        if (SdkHelper.atleastP()) {
             darkModePref.isVisible = false
             themeCategory.isVisible = false
         }

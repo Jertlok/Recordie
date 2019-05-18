@@ -10,9 +10,11 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.preference.PreferenceManager
+import android.provider.Settings
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import it.jertlok.screenrecorder.R
+import it.jertlok.screenrecorder.common.SdkHelper
 import it.jertlok.screenrecorder.services.ScreenRecorderService
 import it.jertlok.screenrecorder.utils.ThemeHelper
 
@@ -29,6 +31,7 @@ open class RecordingActivity : AppCompatActivity() {
     private val mConnection = LocalServiceConnection()
     // Make permission checker smarter
     private var mIncludesAudio = false
+    private var mDrawOverlay = false
 
     override fun onStart() {
         super.onStart()
@@ -53,6 +56,10 @@ open class RecordingActivity : AppCompatActivity() {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
 
         mIncludesAudio = mSharedPreferences.getBoolean("audio_recording", false)
+        // Check if we can overlay
+        if (SdkHelper.atleastM())
+            mDrawOverlay = (mSharedPreferences.getInt("rec_schedule", 3) > 0)
+                .and(Settings.canDrawOverlays(applicationContext))
 
         mMediaProjectionManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE)
                 as MediaProjectionManager
@@ -89,7 +96,8 @@ open class RecordingActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // Check permissions
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-                || checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                || checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED
+            ) {
                 // Set basic permission
                 val permissions = arrayListOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 // Add audio only if needed
@@ -105,7 +113,8 @@ open class RecordingActivity : AppCompatActivity() {
     private fun createScreenCapturePermission() {
         startActivityForResult(
             mMediaProjectionManager.createScreenCaptureIntent(),
-            ScreenRecorderService.REQUEST_CODE_SCREEN_RECORD)
+            ScreenRecorderService.REQUEST_CODE_SCREEN_RECORD
+        )
     }
 
     override fun onRequestPermissionsResult(
@@ -118,7 +127,8 @@ open class RecordingActivity : AppCompatActivity() {
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED && !mIncludesAudio) {
             createScreenCapturePermission()
         } else if (mIncludesAudio && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+            && grantResults[1] == PackageManager.PERMISSION_GRANTED
+        ) {
             createScreenCapturePermission()
         } else {
             Toast.makeText(this, getString(R.string.permission_usages_denied), Toast.LENGTH_SHORT).show()
@@ -145,9 +155,10 @@ open class RecordingActivity : AppCompatActivity() {
             }
             // Start screen recorder after the user preference
             // Encapsulate media permission
-            val startIntent = Intent(this, ScreenRecorderService::class.java)
-                .setAction(ScreenRecorderService.ACTION_START)
-            startIntent.putExtra(Intent.EXTRA_INTENT, data)
+            val startIntent = Intent(this, ScreenRecorderService::class.java).apply {
+                action = ScreenRecorderService.ACTION_START
+                putExtra(Intent.EXTRA_INTENT, data)
+            }
             startService(startIntent)
             // Terminate activity
             finish()
