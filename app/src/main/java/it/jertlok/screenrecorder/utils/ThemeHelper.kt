@@ -5,9 +5,6 @@ import android.app.UiModeManager
 import android.content.Context
 import android.os.Build
 import android.preference.PreferenceManager
-import android.view.View
-import android.view.WindowManager
-
 import java.lang.ref.WeakReference
 import java.util.*
 

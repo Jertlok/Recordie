@@ -8,10 +8,10 @@ import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.preference.PreferenceManager
+import android.provider.Settings
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
@@ -30,13 +30,14 @@ import it.jertlok.screenrecorder.BuildConfig
 import it.jertlok.screenrecorder.R
 import it.jertlok.screenrecorder.adapters.VideoAdapter
 import it.jertlok.screenrecorder.common.ScreenVideo
-import it.jertlok.screenrecorder.views.VideoRecyclerView
+import it.jertlok.screenrecorder.common.SdkHelper
 import it.jertlok.screenrecorder.interfaces.AdapterInterface
 import it.jertlok.screenrecorder.services.ScreenRecorderService
 import it.jertlok.screenrecorder.tasks.UpdateSingleVideoTask
 import it.jertlok.screenrecorder.tasks.UpdateVideosTask
 import it.jertlok.screenrecorder.utils.ThemeHelper
 import it.jertlok.screenrecorder.utils.Utils
+import it.jertlok.screenrecorder.views.VideoRecyclerView
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -130,7 +131,7 @@ class MainActivity : AppCompatActivity() {
                 val outRect = Rect()
                 mNavigationView.getGlobalVisibleRect(outRect)
                 // If we are touching outside of the rect, dismiss it
-                if(!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt()))
+                if (!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt()))
                     bottomBehaviour.state = BottomSheetBehavior.STATE_HIDDEN
             }
         }
@@ -208,10 +209,9 @@ class MainActivity : AppCompatActivity() {
             // If we are not recording we can send the intent for recording
             // otherwise we will try to stop the recording.
             if (!mBoundService.isRecording() && !mBoundService.mRecScheduled) {
-                // Start invisible activity
-                val startIntent = Intent(this, RecordingActivity::class.java)
-                    .setAction(RecordingActivity.ACTION_START)
-                startActivity(startIntent)
+                checkOverlayAndStart {
+                    startRecording()
+                }
             } else if (mBoundService.isRecording()) {
                 stopRecording()
             }
@@ -279,8 +279,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun startRecording() {
+        val startIntent = Intent(this, RecordingActivity::class.java)
+            .setAction(RecordingActivity.ACTION_START)
+        startActivity(startIntent)
+    }
+
     private fun ensureStoragePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+        if (SdkHelper.atleastM())
             mStoragePermissionGranted =
                 checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
     }
@@ -365,9 +371,11 @@ class MainActivity : AppCompatActivity() {
         // Build array list of URIs
         val files = ArrayList<Uri>()
         for (video in mVideoAdapter.selectedItems) {
-            files.add(FileProvider.getUriForFile(
-                this@MainActivity,
-                BuildConfig.APPLICATION_ID + ".provider", File(video.data))
+            files.add(
+                FileProvider.getUriForFile(
+                    this@MainActivity,
+                    BuildConfig.APPLICATION_ID + ".provider", File(video.data)
+                )
             )
         }
         // Send files!
@@ -382,21 +390,50 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            // We need to know if at least the storage permission got granted, it will be useful
-            // for allowing to update videos asynchronously.
+        if (SdkHelper.atleastM()) {
+            // Check storage permission
             mStoragePermissionGranted = checkSelfPermission(
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) == PackageManager.PERMISSION_GRANTED
-            // Check permissions
-            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(
-                    arrayOf(
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                    ),
-                    PERMISSION_REQUESTS
-                )
+            if (!mStoragePermissionGranted) {
+                MaterialAlertDialogBuilder(this).apply {
+                    setTitle(R.string.storage_permission_title)
+                    setMessage(R.string.storage_permission_desc)
+                    setFinishOnTouchOutside(false)
+                    setCancelable(false)
+                    setPositiveButton(android.R.string.ok) { dialog, _ ->
+                        dialog.dismiss()
+                        requestPermissions(
+                            arrayOf(
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                            ),
+                            PERMISSION_REQUESTS
+                        )
+                    }
+                }.show()
             }
+        }
+    }
+
+    private fun checkOverlayAndStart(finished: () -> Unit) {
+        if (SdkHelper.atleastM() && !Settings.canDrawOverlays(applicationContext)) {
+            MaterialAlertDialogBuilder(this).apply {
+                // Set positive button
+                setTitle(R.string.overlay_permission_title)
+                setMessage(R.string.overlay_permission_desc)
+                setFinishOnTouchOutside(false)
+                setPositiveButton(android.R.string.ok) { _, _ ->
+                    val intent = Intent(
+                        Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:$packageName")
+                    )
+                    startActivityForResult(intent, PERMISSION_REQUESTS)
+                }
+                setNegativeButton(android.R.string.cancel) { d, _ ->
+                    d.dismiss()
+                    finished()
+                }
+            }.show()
         }
     }
 
