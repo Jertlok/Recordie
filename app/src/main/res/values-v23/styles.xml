@@ -3,9 +3,7 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="backgroundColor">@android:color/white</item>
-        <item name="android:navigationBarColor">@android:color/white</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowLightNavigationBar">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/white</item>
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -19,9 +17,7 @@
 
     <style name="AppTheme.Settings" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <item name="backgroundColor">@android:color/white</item>
-        <item name="android:navigationBarColor">@android:color/white</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowLightNavigationBar">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="actionBarTheme">@style/AppTheme.Settings.ActionBar</item>
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -53,7 +49,6 @@
     <style name ="InvisibleActivity" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowLightNavigationBar">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
@@ -69,7 +64,6 @@
     <style name ="InvisibleActivity.Dark" parent="Theme.MaterialComponents.NoActionBar">
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar">false</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
@@ -89,9 +83,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar">false</item>
         <item name="android:statusBarColor">@color/grey_900</item>
-        <item name="android:navigationBarColor">@color/grey_800</item>
         <!-- Material alert dialog -->
         <item name="materialAlertDialogTheme">@style/AppTheme.AlertDialog</item>
 
@@ -108,9 +100,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:statusBarColor">@color/grey_900</item>
-        <item name="android:navigationBarColor">@color/grey_900</item>
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar">false</item>
         <!-- Material alert dialog -->
         <item name="materialAlertDialogTheme">@style/AppTheme.AlertDialog</item>
         <!-- Button style for preferences etc. -->

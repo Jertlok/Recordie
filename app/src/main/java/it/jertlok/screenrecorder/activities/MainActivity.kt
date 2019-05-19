@@ -337,8 +337,12 @@ class MainActivity : AppCompatActivity() {
         // Get the index for the video to be removed according to the criteria
         val i = mVideoArray.indexOf(mVideoArray.find { s -> s.data == videoData })
         // Remove element
-        mVideoArray.removeAt(i)
-        mVideoAdapter.notifyItemRemoved(i)
+        try {
+            mVideoArray.removeAt(i)
+            mVideoAdapter.notifyItemRemoved(i)
+        } catch (e: ArrayIndexOutOfBoundsException) {
+            // Do nothing
+        }
         removeNotificationIfNeeded(videoData)
     }
 
