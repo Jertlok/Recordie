@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.preference.PreferenceManager
 import android.provider.Settings
+import android.view.KeyEvent
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -120,13 +121,14 @@ open class RecordingActivity : AppCompatActivity() {
     }
 
     private fun checkOverlayAndStart(finished: () -> Unit) {
-        if (SdkHelper.atleastM() && !Settings.canDrawOverlays(applicationContext)) {
+        if (SdkHelper.atleastM() && !Settings.canDrawOverlays(applicationContext)
+            && mSharedPreferences.getInt("rec_delay", 3) > 0) {
             MaterialAlertDialogBuilder(this).apply {
                 // Set positive button
                 setTitle(R.string.overlay_permission_title)
                 setMessage(R.string.overlay_permission_desc)
                 setFinishOnTouchOutside(false)
-                setPositiveButton(R.string.grant) { _, _ ->
+                setPositiveButton(R.string.grant) { d, _ ->
                     val intent = Intent(
                         Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                         Uri.parse("package:$packageName")
@@ -137,6 +139,13 @@ open class RecordingActivity : AppCompatActivity() {
                     d.dismiss()
                     finished()
                 }
+            }.setOnKeyListener {d, keyEvent, _ ->
+                if (keyEvent == KeyEvent.KEYCODE_BACK) {
+                    d.dismiss()
+                    // On dialog, press back to start recording.
+                    finished()
+                }
+                true
             }.show()
         } else {
             finished()

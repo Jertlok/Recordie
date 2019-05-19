@@ -56,7 +56,7 @@
     <!-- Permission dialogs -->
     <string name="storage_permission_title">Storage permission required</string>
     <string name="storage_permission_desc">The application needs to access the phone storage to save and list the
-        various recordings.</string>
+        various recordings</string>
     <string name="overlay_permission_title">Overlay permission optional</string>
     <string name="overlay_permission_desc">The application needs permission to draw overlays for showing the countdown
         counter over other apps</string>
