@@ -22,8 +22,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var shakeStopPref: SwitchPreference
     private lateinit var screenStopPref: SwitchPreference
     private lateinit var recDelayPref: SeekBarPreference
-    private lateinit var darkModePref: SwitchPreference
-    private lateinit var themeCategory: PreferenceCategory
+    private lateinit var themePref: ListPreference
     // Display resolution
     private lateinit var mDisplayRes: String
 
@@ -50,12 +49,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
         shakeStopPref = findPreference("shake_stop_pref")!!
         screenStopPref = findPreference("screen_stop_pref")!!
         recDelayPref = findPreference("rec_delay_pref")!!
-        darkModePref = findPreference("dark_mode_pref")!!
-        themeCategory = findPreference("theme_category")!!
+        themePref = findPreference("theme_mode_pref")!!
 
-        if (SdkHelper.atleastP()) {
-            darkModePref.isVisible = false
-            themeCategory.isVisible = false
+        // If the android version is not at least P, we need to hide the system theme.
+        if (!SdkHelper.atleastP()) {
+            themePref.entries = arrayOf(getString(R.string.light_theme), getString(R.string.dark_theme))
+            themePref.entryValues = arrayOf("LIGHT_THEME", "DARK_THEME")
         }
 
         // We need to get the shared preferences and change the elements accordingly
@@ -80,7 +79,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
         shakeStopPref.isChecked = mSharedPreferences.getBoolean("shake_stop", false)
         screenStopPref.isChecked = mSharedPreferences.getBoolean("screen_off_stop", false)
         recDelayPref.value = mSharedPreferences.getInt("rec_delay", 3)
-        darkModePref.isChecked = mSharedPreferences.getBoolean("dark_mode", false)
+        // Theme preference
+        themePref.setValueIndex(themePref.findIndexOfValue(
+            mSharedPreferences.getString("theme_mode", "LIGHT_THEME")
+            )
+        )
+        // Set summary
+        themePref.summary = themePref.entry
 
         // On preference change listeners
         bitRatePref.setOnPreferenceChangeListener { _, newValue ->
@@ -109,8 +114,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
             mSharedPreferences.edit().putInt("rec_delay", newValue as Int).apply()
             true
         }
-        darkModePref.setOnPreferenceChangeListener { _, newValue ->
-            mSharedPreferences.edit().putBoolean("dark_mode", newValue as Boolean).apply()
+        themePref.setOnPreferenceChangeListener { _, newValue ->
+            mSharedPreferences.edit().putString("theme_mode", newValue as String).apply()
             activity?.recreate()
             true
         }

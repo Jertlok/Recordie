@@ -22,4 +22,15 @@
         <item>30</item>
         <item>60</item>
     </string-array>
+    <!-- App theme parameters -->
+    <string-array name="theme_mode_aliases">
+        <item>@string/system_theme</item>
+        <item>@string/light_theme</item>
+        <item>@string/dark_theme</item>
+    </string-array>
+    <string-array name="theme_mode_values">
+        <item>SYSTEM_THEME</item>
+        <item>LIGHT_THEME</item>
+        <item>DARK_THEME</item>
+    </string-array>
 </resources>

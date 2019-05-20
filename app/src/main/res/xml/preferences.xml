@@ -51,10 +51,10 @@
         app:key="theme_category"
         android:title="@string/theme_category" />
 
-    <SwitchPreference
-        app:key="dark_mode_pref"
+    <ListPreference
+        app:key="theme_mode_pref"
         app:title="@string/dark_mode_title"
-        app:defaultValue="false"/>
-
+        app:entries="@array/theme_mode_aliases"
+        app:entryValues="@array/theme_mode_values" />
 
 </androidx.preference.PreferenceScreen>
