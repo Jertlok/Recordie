@@ -25,6 +25,8 @@
         <item name="colorAccent">@color/colorAccent</item>
         <!-- Material alert dialog -->
         <item name="materialAlertDialogTheme">@style/AppTheme.AlertDialog</item>
+        <!-- Button style for preferences etc. -->
+        <item name="materialButtonStyle">@style/AppTheme.Button</item>
     </style>
 
     <style name="AppTheme.Settings.ActionBar" parent="Theme.MaterialComponents.Light.DarkActionBar">

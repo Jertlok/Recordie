@@ -29,7 +29,10 @@
     <string name="rec_delay_title">Recording delay (seconds)</string>
     <!-- Theme configurations -->
     <string name="theme_category">Theme</string>
-    <string name="dark_mode_title">Dark mode</string>
+    <string name="dark_mode_title">App theme</string>
+    <string name="system_theme">Follow system</string>
+    <string name="light_theme">Light</string>
+    <string name="dark_theme">Dark</string>
 
     <!-- QS Tile -->
     <string name="qs_record_title">Record</string>

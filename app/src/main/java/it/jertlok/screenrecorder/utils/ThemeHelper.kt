@@ -22,31 +22,29 @@ class ThemeHelper {
             // We get the UIModeManager
             val uiModeManager = activity.getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
 
-            // Implement dark override
-            val darkOverride = PreferenceManager.getDefaultSharedPreferences(activity.applicationContext)
-                .getBoolean("dark_mode", false)
-
-            if (darkOverride && Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-                activity.setTheme(darkTheme)
-                return
-            }
-
-            when (uiModeManager.nightMode) {
-                UiModeManager.MODE_NIGHT_AUTO -> {
-                    val calendar = Calendar.getInstance()
-                    val timeOfDay = calendar.get(Calendar.HOUR_OF_DAY)
-                    // Set theme according to time
-                    // From 6am to 6pm use light theme
-                    // TODO: remove these hardcoded values
-                    if (timeOfDay in 6..18)
-                        activity.setTheme(lightTheme)
-                    else
-                        activity.setTheme(darkTheme)
+            when (PreferenceManager.getDefaultSharedPreferences(activity.applicationContext)
+                .getString("theme_mode", "LIGHT_THEME")) {
+                "SYSTEM_THEME" -> {
+                    when (uiModeManager.nightMode) {
+                        UiModeManager.MODE_NIGHT_AUTO -> {
+                            val calendar = Calendar.getInstance()
+                            val timeOfDay = calendar.get(Calendar.HOUR_OF_DAY)
+                            // Set theme according to time
+                            // From 6am to 6pm use light theme
+                            // TODO: remove these hardcoded values
+                            if (timeOfDay in 6..18)
+                                activity.setTheme(lightTheme)
+                            else
+                                activity.setTheme(darkTheme)
+                        }
+                        // Set light theme
+                        UiModeManager.MODE_NIGHT_NO -> activity.setTheme(lightTheme)
+                        // Set dark theme
+                        UiModeManager.MODE_NIGHT_YES -> activity.setTheme(darkTheme)
+                    }
                 }
-                // Set light theme
-                UiModeManager.MODE_NIGHT_NO -> activity.setTheme(lightTheme)
-                // Set dark theme
-                UiModeManager.MODE_NIGHT_YES -> activity.setTheme(darkTheme)
+                "LIGHT_THEME" -> activity.setTheme(lightTheme)
+                "DARK_THEME" -> activity.setTheme(darkTheme)
             }
         }
     }
