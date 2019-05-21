@@ -139,7 +139,7 @@ open class RecordingActivity : AppCompatActivity() {
 
     private fun checkOverlayAndStart(finished: () -> Unit) {
         if (SdkHelper.atleastM() && !Settings.canDrawOverlays(applicationContext)
-            && mSharedPreferences.getInt("rec_delay", 3) > 0) {
+            && mSharedPreferences.getInt("rec_delay", 0) > 0) {
             MaterialAlertDialogBuilder(this).apply {
                 // Set positive button
                 setTitle(R.string.overlay_permission_title)

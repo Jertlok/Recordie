@@ -152,7 +152,7 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
                     if (mIsShakeActive) mShakeDetector.start(mSensorManager) else mShakeDetector.stop()
                 }
                 "screen_off_stop" -> mIsScreenStopActive = mSharedPreferences.getBoolean("screen_off_stop", false)
-                "rec_delay" -> mRecDelay = mSharedPreferences.getInt("rec_delay", 3)
+                "rec_delay" -> mRecDelay = mSharedPreferences.getInt("rec_delay", 0)
             }
         }
         // Register shared preference listener
@@ -170,7 +170,7 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         intentFilter.addAction(ACTION_DELETE)
         registerReceiver(mBroadcastReceiver, intentFilter)
         // Delay for recording
-        mRecDelay = mSharedPreferences.getInt("rec_delay", 3)
+        mRecDelay = mSharedPreferences.getInt("rec_delay", 0)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -574,8 +574,6 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
             }
         }
     }
-
-
 
     companion object {
         private const val TAG = "ScreenRecorderService"
