@@ -95,7 +95,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         audioRecordingPref.isChecked = mSharedPreferences.getBoolean("audio_recording", false)
         shakeStopPref.isChecked = mSharedPreferences.getBoolean("shake_stop", false)
         screenStopPref.isChecked = mSharedPreferences.getBoolean("screen_off_stop", false)
-        recDelayPref.value = mSharedPreferences.getInt("rec_delay", 3)
+        recDelayPref.value = mSharedPreferences.getInt("rec_delay", 0)
         // Theme preference
         themePref.setValueIndex(themePref.findIndexOfValue(
             mSharedPreferences.getString("theme_mode", "LIGHT_THEME")
