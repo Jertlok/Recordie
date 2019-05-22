@@ -7,7 +7,7 @@ apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "it.jertlok.screenrecorder"
+        applicationId "it.jertlok.recordie"
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
@@ -26,6 +26,23 @@ android {
         }
     }
 }
+
+/*
+ *     This file is part of Recordie.
+ *
+ *     Recordie is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     Recordie is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with Recordie.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 // Small method for date
 static def getDate() {
@@ -48,6 +65,4 @@ dependencies {
     implementation 'com.google.android.material:material:1.1.0-alpha06'
     // Shake detector
     implementation 'com.squareup:seismic:1.0.2'
-    // Attribouter
-    implementation 'com.github.Jertlok:attribouter:master-SNAPSHOT'
 }
