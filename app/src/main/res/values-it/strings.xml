@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~     This file is part of Recordie.
   ~
@@ -20,11 +19,14 @@
     <!-- Activity names -->
     <string name="app_name">Recordie</string>
     <string name="settings_activity_name">Impostazioni</string>
+    <string name="about_activity_name">Info</string>
 
     <!-- Menu strings -->
 
     <!-- Toast message for casting permission denied -->
-    <string name="permission_cast_denied">Permesso cast non garantito</string>
+    <string name="permission_cast_denied">Permesso cast non consentito</string>
+    <string name="permission_storage_denied">Senza questo permesso non potrai vedere i video registrati</string>
+    <string name="permission_usages_denied">L\'applicazione non può funzionare senza i permessi utente richiesti</string>
 
     <!-- Settings -->
 
@@ -41,8 +43,9 @@
     <string name="screen_stop_title">Spegni schermo per fermare</string>
     <string name="rec_delay_title">Ritardo registrazione (in secondi)</string>
     <!-- Theme configurations -->
-    <string name="theme_category">Tema</string>
-    <string name="dark_mode_title">Modalità scura</string>
+    <string name="system_theme">Automatico (sistema)</string>
+    <string name="light_theme">Chiaro</string>
+    <string name="dark_theme">Scuro</string>
 
     <!-- QS Tile -->
     <string name="qs_record_title">Registra</string>
@@ -51,6 +54,7 @@
     <string name="notif_rec_progress">Registrazione in corso</string>
     <string name="notif_rec_complete">Registrazione completa</string>
     <string name="notif_rec_stop">Ferma</string>
+    <string name="notif_rec_dimiss">Annulla</string>
 
     <!-- Share intent -->
     <string name="share_title">Condividi video</string>
@@ -61,7 +65,12 @@
 
     <!-- Alert dialog for delete action -->
     <string name="delete_dialog_title">Vuoi cancellare?</string>
-    <string name="permission_storage_denied">Senza questo permesso non potrai vedere i video registrati</string>
-    <string name="permission_usages_denied">L\'applicazione non può funzionare senza i permessi utente richiesti</string>
     <string name="empty_list">Nessun video presente :(</string>
+
+    <!-- Permission dialogs -->
+    <string name="overlay_permission_desc">L\'applicazione ha bisogno di un permesso per visualizzare il conto alla rovescia sopra altre app</string>
+    <string name="overlay_permission_title">Permesso overlay opzionale</string>
+    <string name="storage_permission_title">Permesso di archiviazione richiesto</string>
+    <string name="storage_permission_desc">L\'applicazione necessita di accedere allo spazio di archiviazione per salvare e visualizzare le varie registrazioni</string>
+    <string name="grant">Consenti</string>
 </resources>
