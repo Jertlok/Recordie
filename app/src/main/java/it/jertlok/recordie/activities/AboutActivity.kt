@@ -34,7 +34,7 @@ class AboutActivity : AppCompatActivity() {
         ThemeHelper.setTheme(this, R.style.AppTheme_Settings, R.style.AppTheme_Settings_Dark)
 
         // Set action bar title
-        supportActionBar?.title = "About"
+        supportActionBar?.title = getString(R.string.about_activity_name)
         // Set the back key on ActionBar
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
