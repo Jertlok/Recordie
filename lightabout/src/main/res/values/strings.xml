@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">Recordie</string>
+    <string name="version">Version</string>
+    <string name="rate">Rate</string>
+    <string name="rate_it">If you liked the app, feel free to rate it</string>
+    <string name="developer">Developer</string>
+    <string name="follow_on_github">Follow on Github</string>
+    <string name="follow_on_twitter">Follow on Twitter</string>
+    <string name="support">Support</string>
+    <string name="report_bugs_feedback">Report Bugs/Feedback</string>
+    <string name="report_bugs_or_request_new_features">Report Bugs or request new features</string>
+    <string name="translators">Translators</string>
+    <string name="translators_desc">Translators who helped in translating the app</string>
+    <string name="donate">Donate</string>
+    <string name="donation_desc">If you liked my work, feel free to buy me a coffee</string>
+    <string name="about">About</string>
+    <string name="developers">Developers</string>
+    <string name="twitter">Twitter</string>
+
+    <!-- Developers -->
+    <string name="main_dev_name">Jertlok</string>
+    <string name="main_dev_role">Owner / Lead developer</string>
+
+    <!-- Translators -->
+    <!-- Hindi -->
+    <string name="name_hindi">Vatsal Vala</string>
+    <string name="hindi">Hindi</string>
+    <!-- Russian -->
+    <string name="name_russian">Roker2 (Dmitry Minko)</string>
+    <string name="russian">Russian</string>
+    <!-- Portuguese -->
+    <string name="name_portugues">4PERTURE</string>
+    <string name="portuguese">Portuguese</string>
+    <!-- Swedish -->
+    <string name="name_swedish">Ante0</string>
+    <string name="swedish">Swedish</string>
+</resources>

@@ -93,6 +93,7 @@
         <item name="materialAlertDialogTheme">@style/AppTheme.AlertDialog</item>
 
         <item name="bottomAppBarStyle">@style/AppTheme.BottomAppBar.Dark</item>
+        <!-- Material card style -->
         <item name="materialCardViewStyle">@style/AppTheme.MaterialCardView.Dark</item>
         <item name="bottom_bar_ic_tint">@color/grey_200</item>
         <item name="bottom_bar_color">@color/grey_800</item>
@@ -108,12 +109,14 @@
         <item name="materialAlertDialogTheme">@style/AppTheme.AlertDialog</item>
         <!-- Button style for preferences etc. -->
         <item name="materialButtonStyle">@style/AppTheme.Button</item>
+        <!-- Material card style -->
+        <item name="materialCardViewStyle">@style/AppTheme.MaterialCardView.Dark</item>
     </style>
 
     <style name="AppTheme.Settings.Dark.ActionBar" parent="Theme.MaterialComponents">
         <item name="android:background">@color/grey_900</item>
     </style>
-
+\
     <style name="AppTheme.BottomAppBar.Dark" parent="Widget.MaterialComponents.BottomAppBar">
         <item name="android:backgroundTint">@color/grey_800</item>
     </style>

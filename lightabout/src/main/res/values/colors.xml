@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Material gray 600 -->
+    <color name="gray_600">#757575</color>
+    <!-- Gray 400 -->
+    <color name="gray_400">#BDBDBD</color>
+</resources>

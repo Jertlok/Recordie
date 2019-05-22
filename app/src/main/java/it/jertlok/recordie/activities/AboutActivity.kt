@@ -21,6 +21,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import it.jertlok.lightabout.AboutFragment
 import it.jertlok.recordie.R
 import it.jertlok.recordie.utils.ThemeHelper
 
@@ -38,11 +39,11 @@ class AboutActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
-//        supportFragmentManager
-//            .beginTransaction()
-//            .replace(android.R.id.content, SomeFragment())
-//            .addToBackStack("About")
-//            .commit()
+        supportFragmentManager
+            .beginTransaction()
+            .replace(android.R.id.content, AboutFragment())
+            .addToBackStack("About")
+            .commit()
     }
 
     override fun onBackPressed() {

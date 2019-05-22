@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:isScrollContainer="true">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="2dp">
+
+            <include layout="@layout/about_card_one"/>
+
+            <include layout="@layout/about_card_two"/>
+
+            <include layout="@layout/about_card_three"/>
+
+            <include layout="@layout/about_card_four"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>
