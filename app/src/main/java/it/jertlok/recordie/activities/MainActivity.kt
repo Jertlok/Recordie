@@ -419,7 +419,7 @@ class MainActivity : AppCompatActivity() {
                     setMessage(R.string.storage_permission_desc)
                     setFinishOnTouchOutside(false)
                     setCancelable(false)
-                    setPositiveButton(android.R.string.ok) { dialog, _ ->
+                    setPositiveButton(R.string.grant) { dialog, _ ->
                         dialog.dismiss()
                         requestPermissions(
                             arrayOf(
