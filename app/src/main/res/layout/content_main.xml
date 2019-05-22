@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~     This file is part of Recordie.
+  ~
+  ~     Recordie is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU General Public License as published by
+  ~     the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     Recordie is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU General Public License
+  ~     along with Recordie.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -18,7 +35,7 @@
             tools:showIn="@layout/activity_main"
             tools:context=".activities.MainActivity">
 
-            <it.jertlok.screenrecorder.views.VideoRecyclerView
+            <it.jertlok.recordie.views.VideoRecyclerView
                 android:id="@+id/recycler_video_view"
                 android:paddingTop="@dimen/recycler_view_top_margin"
                 android:paddingBottom="@dimen/recycler_view_bottom_margin"
