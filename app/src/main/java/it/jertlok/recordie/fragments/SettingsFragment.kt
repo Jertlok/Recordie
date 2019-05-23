@@ -132,8 +132,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
             true
         }
         themePref.setOnPreferenceChangeListener { _, newValue ->
-            mSharedPreferences.edit().putString("theme_mode", newValue as String).apply()
-            activity?.recreate()
+            if (newValue != mSharedPreferences.getString("theme_mode", "LIGHT_THEME")) {
+                mSharedPreferences.edit().putString("theme_mode", newValue as String).apply()
+                activity?.recreate()
+            }
             true
         }
 
