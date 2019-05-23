@@ -17,7 +17,6 @@
 
 package it.jertlok.recordie.adapters
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,15 +36,15 @@ import it.jertlok.recordie.utils.Utils
 class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInterface: AdapterInterface) :
     RecyclerView.Adapter<VideoAdapter.VideoHolder>() {
 
-    var selectedItems = ArrayList<ScreenVideo>()
-    var selectedHolder = ArrayList<VideoHolder>()
+    val selectedItems = ArrayList<ScreenVideo>()
+    val selectedHolder = ArrayList<VideoHolder>()
     val mCache = ThumbnailCache()
 
-    class VideoHolder(private val context: Context, view: View) : RecyclerView.ViewHolder(view) {
-        var card: MaterialCardView = view.findViewById(R.id.card)
-        var image: ImageView = view.findViewById(R.id.image)
-        var title: TextView = view.findViewById(R.id.title)
-        var duration: TextView = view.findViewById(R.id.duration)
+    class VideoHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val card: MaterialCardView = view.findViewById(R.id.card)
+        val image: ImageView = view.findViewById(R.id.image)
+        val title: TextView = view.findViewById(R.id.title)
+        val duration: TextView = view.findViewById(R.id.duration)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoHolder {
@@ -54,50 +53,51 @@ class VideoAdapter(private val videos: ArrayList<ScreenVideo>, private val mInte
             parent, false
         )
         // Add a simple animation
-        val animation = AnimationUtils.loadAnimation(parent.context, android.R.anim.fade_in)
-        animation.duration = 500
-        itemView.animation = animation
-        return VideoHolder(parent.context, itemView)
+        itemView.animation = AnimationUtils.loadAnimation(parent.context, android.R.anim.fade_in).apply {
+            duration = 500
+        }
+        return VideoHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: VideoHolder, position: Int) {
         // Get the video
         val video = videos[position]
         // Set item properties
-        holder.title.text = video.title
-        holder.duration.text = Utils.formatDuration(video.duration)
-        holder.card.setTag(R.id.fileUri, video.data)
-        // Let's create the thumbnail
-        CreateThumbnailTask(this@VideoAdapter, holder).execute(video.data)
-        // Initialise card
-        holder.card.isChecked = false
-        // Start animating
-        holder.itemView.animate()
-        // Set long click listener
-        holder.card.setOnLongClickListener {
-            cardBehaviour(holder, video)
-            true
-        }
-        holder.card.setOnClickListener {
-            if (selectedItems.size >= 1) {
+        with(holder) {
+            title.text = video.title
+            duration.text = Utils.formatDuration(video.duration)
+            card.setTag(R.id.fileUri, video.data)
+            // Let's create the thumbnail
+            CreateThumbnailTask(this@VideoAdapter, holder).execute(video.data)
+            // Initialise card
+            card.isChecked = false
+            // Start animating
+            itemView.animate()
+            // Set long click listener
+            card.setOnLongClickListener {
                 cardBehaviour(holder, video)
-            } else {
-                mInterface.playVideo(video.data)
+                true
+            }
+            card.setOnClickListener {
+                if (selectedItems.size >= 1) {
+                    cardBehaviour(holder, video)
+                } else {
+                    mInterface.playVideo(video.data)
+                }
             }
         }
     }
 
     private fun cardBehaviour(holder: VideoHolder, video: ScreenVideo) {
         if (!holder.card.isChecked) {
-            holder.card.isChecked = true
             selectedItems.add(video)
             selectedHolder.add(holder)
-            mInterface.updateCardCheck()
         } else {
-            holder.card.isChecked = false
             selectedItems.remove(video)
-            mInterface.updateCardCheck()
         }
+        holder.card.isChecked = !holder.card.isChecked
+        mInterface.updateCardCheck()
+
     }
 
     override fun getItemCount(): Int {

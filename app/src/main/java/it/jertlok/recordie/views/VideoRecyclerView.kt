@@ -25,10 +25,8 @@ import androidx.recyclerview.widget.RecyclerView
 // Based on
 // https://github.com/googlesamples/android-XYZTouristAttractions implementation by Google
 
-class VideoRecyclerView : RecyclerView {
-    constructor(context: Context) : super(context)
-    constructor(context: Context, attributeSet: AttributeSet) : super(context, attributeSet)
-    constructor(context: Context, attributeSet: AttributeSet, defStyle: Int) : super(context, attributeSet, defStyle)
+class VideoRecyclerView constructor(context: Context, attributeSet: AttributeSet, defStyle: Int):
+    RecyclerView(context, attributeSet, defStyle) {
 
     var mEmptyView: View? = null
 
