@@ -52,6 +52,7 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         val main = Intent(this, MainActivity::class.java)
+            .setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
         startActivity(main)
         finish()
     }

@@ -31,10 +31,10 @@ class ThemeHelper {
         /**
          * Sets the styles conditionally
          */
-        fun setTheme(context: Activity, lightTheme: Int, darkTheme: Int) {
+        fun setTheme(context: Activity, lightTheme: Int, darkTheme: Int) : String? {
             // Weak reference for activity - garbage collector friendly.
             val activityRef: WeakReference<Activity> = WeakReference(context)
-            val activity = activityRef.get() ?: return
+            val activity = activityRef.get() ?: return null
             // We get the UIModeManager
             val uiModeManager = activity.getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
 
@@ -52,16 +52,33 @@ class ThemeHelper {
                                 activity.setTheme(lightTheme)
                             else
                                 activity.setTheme(darkTheme)
+
+                            return "SYSTEM_THEME"
                         }
                         // Set light theme
-                        UiModeManager.MODE_NIGHT_NO -> activity.setTheme(lightTheme)
+                        UiModeManager.MODE_NIGHT_NO -> {
+                            activity.setTheme(lightTheme)
+                            return "LIGHT_THEME"
+                        }
                         // Set dark theme
-                        UiModeManager.MODE_NIGHT_YES -> activity.setTheme(darkTheme)
+                        UiModeManager.MODE_NIGHT_YES -> {
+                            activity.setTheme(darkTheme)
+                            return "DARK_THEME"
+                        }
                     }
                 }
-                "LIGHT_THEME" -> activity.setTheme(lightTheme)
-                "DARK_THEME" -> activity.setTheme(darkTheme)
+                "LIGHT_THEME" -> {
+                    activity.setTheme(lightTheme)
+                    return "LIGHT_THEME"
+                }
+                "DARK_THEME" -> {
+                    activity.setTheme(darkTheme)
+                    return "DARK_THEME"
+                }
             }
+
+            // The activity was either broken or not available.
+            return null
         }
     }
 }

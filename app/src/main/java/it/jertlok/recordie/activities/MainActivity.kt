@@ -69,6 +69,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mNavigationView: NavigationView
     private lateinit var bottomDrawer: View
     private lateinit var bottomBehaviour: BottomSheetBehavior<View>
+    // Current theme
+    private var mCurrentTheme: String? = null
     // Video list
     lateinit var mRecyclerView: VideoRecyclerView
     lateinit var mVideoAdapter: VideoAdapter
@@ -95,7 +97,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         // Set theme
-        ThemeHelper.setTheme(this, R.style.AppTheme, R.style.AppTheme_Dark)
+        mCurrentTheme = ThemeHelper.setTheme(this, R.style.AppTheme, R.style.AppTheme_Dark)
 
         // Set contents
         setContentView(R.layout.activity_main)
@@ -242,6 +244,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (mCurrentTheme != mSharedPreferences.getString("theme_mode", "LIGHT_THEME"))
+            recreate()
         // Is storage permission granted on the meantime?
         ensureStoragePermission()
         // Restore bottom behaviour
