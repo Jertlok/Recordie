@@ -7,12 +7,10 @@
     <string name="follow_on_github">Follow on Github</string>
     <string name="follow_on_twitter">Follow on Twitter</string>
     <string name="support">Support</string>
-    <string name="report_bugs_feedback">Report Bugs/Feedback</string>
-    <string name="report_bugs_or_request_new_features">Report Bugs or request new features</string>
+    <string name="report_bugs_feedback">Report bugs/feedback</string>
+    <string name="report_bugs_or_request_new_features">Report bugs or request new features</string>
     <string name="translators">Translators</string>
     <string name="translators_desc">Translators who helped in translating the app</string>
-    <string name="donate">Donate</string>
-    <string name="donation_desc">If you liked my work, feel free to buy me a coffee</string>
     <string name="about">About</string>
     <string name="developers">Developers</string>
     <string name="twitter">Twitter</string>

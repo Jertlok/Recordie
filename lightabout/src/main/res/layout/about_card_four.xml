@@ -73,49 +73,6 @@
                     android:text="@string/report_bugs_or_request_new_features" />
 
             </LinearLayout>
-    </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/donate"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingLeft="16.0dip"
-            android:paddingRight="16.0dip"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="@drawable/item_selector"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp">
-
-            <ImageView
-                android:id="@+id/icon_info23sdfg1"
-                android:layout_width="24.0dip"
-                android:layout_height="24.0dip"
-                android:src="@drawable/heart" />
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:paddingTop="8.0dip"
-                android:paddingBottom="8.0dip"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="32.0dip">
-
-                <TextView
-                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/donate" />
-
-                <TextView
-                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                    android:id="@+id/app_versiondfg11122"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/donation_desc" />
-
-            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 

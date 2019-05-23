@@ -25,7 +25,6 @@ class AboutFragment : Fragment(), View.OnClickListener {
     private lateinit var github: LinearLayout
     private lateinit var twitter: LinearLayout
     private lateinit var bugs: LinearLayout
-    private lateinit var donate: LinearLayout
     private lateinit var version: String
     private lateinit var versionText: TextView
 
@@ -50,13 +49,11 @@ class AboutFragment : Fragment(), View.OnClickListener {
         github = view.findViewById(R.id.github)
         twitter = view.findViewById(R.id.twitter)
         bugs = view.findViewById(R.id.bugs)
-        donate = view.findViewById(R.id.donate)
 
         rate.setOnClickListener(this)
         github.setOnClickListener(this)
         twitter.setOnClickListener(this)
         bugs.setOnClickListener(this)
-        donate.setOnClickListener(this)
 
         // Return the constructed view
         return view
@@ -77,10 +74,6 @@ class AboutFragment : Fragment(), View.OnClickListener {
                 "https://github.com/Jertlok")))
 
             R.id.twitter -> startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/Jertlok")))
-
-            R.id.donate -> {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://paypal.me/Jertlok")))
-            }
 
             R.id.bugs -> {
                 startActivity(Intent(Intent.ACTION_VIEW,
