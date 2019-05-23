@@ -18,6 +18,18 @@
 
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
     <shortcut
+        android:shortcutId="settings"
+        android:enabled="true"
+        android:icon="@drawable/shortcut_settings"
+        android:shortcutShortLabel="@string/settings_activity_name" >
+        <intent
+            android:action="android.intent.action.MAIN"
+            android:targetPackage="it.jertlok.recordie"
+            android:targetClass="it.jertlok.recordie.activities.SettingsActivity" />
+
+        <categories android:name="android.shortcut.settings" />
+    </shortcut>
+    <shortcut
         android:shortcutId="record"
         android:enabled="true"
         android:icon="@drawable/shortcut_record"
