@@ -3,18 +3,28 @@
 
     <!-- Languages -->
     <string-array name="languages">
+        <item>@string/chinese</item>
+        <item>@string/dutch</item>
+        <item>@string/german</item>
         <item>@string/hindi</item>
-        <item>@string/russian</item>
         <item>@string/portuguese</item>
+        <item>@string/russian</item>
+        <item>@string/spanish</item>
         <item>@string/swedish</item>
+        <item>@string/ukrainian</item>
     </string-array>
 
     <!-- Translators -->
     <string-array name="translators">
-        <item>Vatsal Vala</item>
-        <item>Roker2 (Dmitry Minko)</item>
-        <item>4PERTURE</item>
-        <item>Ante0</item>
+        <item>@string/chinese_name</item>
+        <item>@string/dutch_name</item>
+        <item>@string/german_name</item>
+        <item>@string/hindi_name</item>
+        <item>@string/portuguese_name</item>
+        <item>@string/russian_name</item>
+        <item>@string/spanish_name</item>
+        <item>@string/swedish_name</item>
+        <item>@string/ukrainian_name</item>
     </string-array>
 
     <!-- Contributors  -->
