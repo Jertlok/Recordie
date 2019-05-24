@@ -55,10 +55,11 @@ import it.jertlok.recordie.utils.ThemeHelper
 import it.jertlok.recordie.utils.Utils
 import it.jertlok.recordie.views.VideoRecyclerView
 import java.io.File
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
 
-    private var mDarkOverride = false
     private var mStoragePermissionGranted = false
     // MediaProjection API
     private lateinit var mMediaProjectionManager: MediaProjectionManager
@@ -69,6 +70,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mNavigationView: NavigationView
     private lateinit var bottomDrawer: View
     private lateinit var bottomBehaviour: BottomSheetBehavior<View>
+    // Current saved theme
+    private lateinit var mSavedTheme: String
     // Video list
     lateinit var mRecyclerView: VideoRecyclerView
     lateinit var mVideoAdapter: VideoAdapter
@@ -122,7 +125,7 @@ class MainActivity : AppCompatActivity() {
 
         // Initialise shared preferences
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        mDarkOverride = mSharedPreferences.getBoolean("dark_mode", false)
+        mSavedTheme = mSharedPreferences.getString("theme_mode", "LIGHT_THEME")!!
 
         // Setup RecyclerView
         mVideoAdapter = VideoAdapter(mVideoArray, AdapterInterfaceImpl())
@@ -242,12 +245,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        // Check if the theme has changed
+        maybeRecreate()
         // Is storage permission granted on the meantime?
         ensureStoragePermission()
         // Restore bottom behaviour
         bottomBehaviour.state = BottomSheetBehavior.STATE_HIDDEN
-        // Check for dark theme override and eventually set new mode
-        darkThemeCheck()
         // Register broadcast receiver
         registerReceiver(mBroadcastReceiver, mIntentFilter)
         // Remove all the app notifications
@@ -305,12 +308,12 @@ class MainActivity : AppCompatActivity() {
                 checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
     }
 
-    /** Small function for recreating activity in case of dark mode toggle change */
-    private fun darkThemeCheck() {
-        // If dark theme override has changed we need to recreate
-        val currentDarkOverride = mSharedPreferences.getBoolean("dark_mode", false)
-        if (mDarkOverride != currentDarkOverride) {
-            mDarkOverride = currentDarkOverride
+    /** Small function for recreating activity in case of theme changes */
+    private fun maybeRecreate() {
+        // If the theme has been changed, recreate activity
+        val currentTheme = mSharedPreferences.getString("theme_mode", "LIGHT_THEME")
+        if (mSavedTheme != currentTheme) {
+            mSavedTheme = currentTheme!!
             recreate()
         }
     }
