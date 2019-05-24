@@ -1,35 +1,34 @@
 <resources>
+
+    <!-- Main card -->
     <string name="app_name">Recordie</string>
     <string name="version">Version</string>
     <string name="rate">Rate</string>
     <string name="rate_it">If you liked the app, feel free to rate it</string>
-    <string name="developer">Developer</string>
-    <string name="follow_on_github">Follow on Github</string>
-    <string name="follow_on_twitter">Follow on Twitter</string>
-    <string name="support">Support</string>
     <string name="report_bugs_feedback">Report bugs/feedback</string>
     <string name="report_bugs_or_request_new_features">Report bugs or request new features</string>
+
+    <!-- Project owner card -->
+    <string name="owner">Owner</string>
+    <string name="owner_name">Jertlok</string>
+    <string name="owner_desc">Lead developer</string>
+    <string name="follow_on_github">Follow on Github</string>
+    <string name="follow_on_twitter">Follow on Twitter</string>
+
+    <!-- Contributors card -->
+    <string name="contributors">Contributors</string>
+
+    <!-- Contributor roles -->
+    <string name="design_help">Design help</string>
+    <string name="family_member">Family member</string>
+
+    <!-- Translators card -->
     <string name="translators">Translators</string>
-    <string name="translators_desc">Translators who helped in translating the app</string>
-    <string name="about">About</string>
-    <string name="developers">Developers</string>
-    <string name="twitter">Twitter</string>
 
-    <!-- Developers -->
-    <string name="main_dev_name">Jertlok</string>
-    <string name="main_dev_role">Owner / Lead developer</string>
-
-    <!-- Translators -->
-    <!-- Hindi -->
-    <string name="name_hindi">Vatsal Vala</string>
+    <!-- Languages -->
     <string name="hindi">Hindi</string>
-    <!-- Russian -->
-    <string name="name_russian">Roker2 (Dmitry Minko)</string>
     <string name="russian">Russian</string>
-    <!-- Portuguese -->
-    <string name="name_portugues">4PERTURE</string>
     <string name="portuguese">Portuguese</string>
-    <!-- Swedish -->
-    <string name="name_swedish">Ante0</string>
     <string name="swedish">Swedish</string>
+
 </resources>

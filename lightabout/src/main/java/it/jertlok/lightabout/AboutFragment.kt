@@ -16,7 +16,7 @@ import androidx.fragment.app.Fragment
  *
  * Converted to AndroidX and Kotlin by Jertlok
  * A lot of files have been removed as not relevant for
- * my app scopes.
+ * my app scope.
  */
 
 class AboutFragment : Fragment(), View.OnClickListener {
@@ -27,6 +27,10 @@ class AboutFragment : Fragment(), View.OnClickListener {
     private lateinit var bugs: LinearLayout
     private lateinit var version: String
     private lateinit var versionText: TextView
+    // Contributors card
+    private lateinit var contributorsLayout: LinearLayout
+    // Translators card
+    private lateinit var translatorLayout: LinearLayout
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -49,7 +53,39 @@ class AboutFragment : Fragment(), View.OnClickListener {
         github = view.findViewById(R.id.github)
         twitter = view.findViewById(R.id.twitter)
         bugs = view.findViewById(R.id.bugs)
+        contributorsLayout = view.findViewById(R.id.contributors)
+        translatorLayout = view.findViewById(R.id.translators)
 
+        // Contributors card
+        val contributors = resources.getStringArray(R.array.contributors)
+        val contributorsRoles = resources.getStringArray(R.array.contributors_roles)
+
+        contributors.forEachIndexed { index, name ->
+            // Inflate contributor layout
+            val contrib = View.inflate(view.context, R.layout.item_contibutor, null)
+            // Set name
+            contrib.findViewById<TextView>(R.id.name).text = name
+            // Set desc
+            contrib.findViewById<TextView>(R.id.description).text = contributorsRoles[index]
+            // Add created view
+            contributorsLayout.addView(contrib)
+        }
+
+        // Translators card
+        val languages = resources.getStringArray(R.array.languages)
+        val translatorNames = resources.getStringArray(R.array.translators)
+
+        languages.forEachIndexed { index, lang ->
+            val contrib = View.inflate(view.context, R.layout.item_contibutor, null)
+            // Set name
+            contrib.findViewById<TextView>(R.id.name).text = translatorNames[index]
+            // Set language
+            contrib.findViewById<TextView>(R.id.description).text = lang
+            // Add created view
+            translatorLayout.addView(contrib)
+        }
+
+        // Set onClickListener for the main elements
         rate.setOnClickListener(this)
         github.setOnClickListener(this)
         twitter.setOnClickListener(this)
@@ -70,14 +106,23 @@ class AboutFragment : Fragment(), View.OnClickListener {
                 )
             )
 
-            R.id.github -> startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(
-                "https://github.com/Jertlok")))
+            R.id.github -> startActivity(
+                Intent(
+                    Intent.ACTION_VIEW, Uri.parse(
+                        "https://github.com/Jertlok"
+                    )
+                )
+            )
 
             R.id.twitter -> startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/Jertlok")))
 
             R.id.bugs -> {
-                startActivity(Intent(Intent.ACTION_VIEW,
-                    Uri.parse("https://github.com/Jertlok/Recordie/issues")))
+                startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://github.com/Jertlok/Recordie/issues")
+                    )
+                )
             }
         }
     }

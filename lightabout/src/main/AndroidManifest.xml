@@ -5,8 +5,7 @@
 
     <application tools:ignore="GoogleAppIndexingWarning">
 
-        <activity android:name="it.jertlok.lightabout.AboutFragment"
-            android:label="@string/about" />
+        <activity android:name="it.jertlok.lightabout.AboutFragment" />
     </application>
 
 </manifest>

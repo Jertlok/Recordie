@@ -1,117 +1,163 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/card1"
-    app:cardCornerRadius="@dimen/corner_radius"
-    app:cardElevation="@dimen/card_elevation"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    app:cardCornerRadius="@dimen/corner_radius"
+    app:cardElevation="@dimen/card_elevation"
     app:cardUseCompatPadding="true">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8.0dip">
+        android:layout_marginBottom="8.0dip"
+        android:orientation="vertical">
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="72.0dip">
+            android:layout_height="72.0dip"
+            android:orientation="horizontal">
 
             <TextView
-                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:paddingLeft="16.0dip"
                 android:paddingRight="16.0dip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/app_name" />
+                android:text="@string/app_name"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
         </LinearLayout>
 
+        <!-- Version -->
         <LinearLayout
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingTop="7dp"
-            android:paddingLeft="16.0dip"
-            android:paddingRight="16.0dip"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="@drawable/item_selector"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:minHeight="48dp">
+            android:background="@drawable/item_selector"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:minHeight="48dp"
+            android:orientation="horizontal"
+            android:paddingLeft="16.0dip"
+            android:paddingTop="7dp"
+            android:paddingRight="16.0dip">
 
             <ImageView
                 android:id="@+id/icon_info"
                 android:layout_width="24.0dip"
                 android:layout_height="24.0dip"
-                android:src="@drawable/information_outline"/>
+                android:src="@drawable/information_outline" />
 
             <LinearLayout
-                android:orientation="vertical"
-                android:paddingTop="8.0dip"
-                android:paddingBottom="8.0dip"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="32.0dip">
+                android:layout_marginStart="32.0dip"
+                android:orientation="vertical"
+                android:paddingTop="8.0dip"
+                android:paddingBottom="8.0dip">
 
                 <TextView
-                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/version" />
+                    android:text="@string/version"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
                 <TextView
-                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
                     android:id="@+id/app_version"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
 
             </LinearLayout>
         </LinearLayout>
 
+        <!-- Rate -->
         <LinearLayout
             android:id="@+id/rate"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingLeft="16.0dip"
-            android:paddingRight="16.0dip"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="@drawable/item_selector"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:minHeight="48dp">
+            android:background="@drawable/item_selector"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:minHeight="48dp"
+            android:orientation="horizontal"
+            android:paddingLeft="16.0dip"
+            android:paddingRight="16.0dip">
 
             <ImageView
                 android:id="@+id/icon_info78"
                 android:layout_width="24.0dip"
                 android:layout_height="24.0dip"
-                android:src="@drawable/star"/>
+                android:src="@drawable/star" />
 
             <LinearLayout
-                android:orientation="vertical"
-                android:paddingTop="8.0dip"
-                android:paddingBottom="8.0dip"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="32.0dip">
+                android:layout_marginStart="32.0dip"
+                android:orientation="vertical"
+                android:paddingTop="8.0dip"
+                android:paddingBottom="8.0dip">
 
                 <TextView
                     android:id="@+id/ratetit"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/rate" />
+                    android:text="@string/rate"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
                 <TextView
                     android:id="@+id/ratedes"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/rate_it" />
+                    android:text="@string/rate_it"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
 
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Feedback -->
+        <LinearLayout
+            android:id="@+id/bugs"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-5dp"
+            android:background="@drawable/item_selector"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:minHeight="48dp"
+            android:orientation="horizontal"
+            android:paddingLeft="16.0dip"
+            android:paddingRight="16.0dip">
+
+            <ImageView
+                android:id="@+id/icon_infofg1"
+                android:layout_width="24.0dip"
+                android:layout_height="24.0dip"
+                android:src="@drawable/bug" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32.0dip"
+                android:orientation="vertical"
+                android:paddingTop="8.0dip"
+                android:paddingBottom="8.0dip">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/report_bugs_feedback"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+
+                <TextView
+                    android:id="@+id/app_versiondfg1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/report_bugs_or_request_new_features"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Languages -->
+    <string-array name="languages">
+        <item>@string/hindi</item>
+        <item>@string/russian</item>
+        <item>@string/portuguese</item>
+        <item>@string/swedish</item>
+    </string-array>
+
+    <!-- Translators -->
+    <string-array name="translators">
+        <item>Vatsal Vala</item>
+        <item>Roker2 (Dmitry Minko)</item>
+        <item>4PERTURE</item>
+        <item>Ante0</item>
+    </string-array>
+
+    <!-- Contributors  -->
+    <string-array name="contributors">
+        <item>Alex Cruz</item>
+        <item>Gaurav Singh</item>
+        <item>Simar Guram</item>
+    </string-array>
+
+    <!-- Contributors roles -->
+    <string-array name="contributors_roles">
+        <item>@string/family_member</item>
+        <item>@string/design_help</item>
+        <item>@string/family_member</item>
+    </string-array>
+
+</resources>
