@@ -81,16 +81,14 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 mSharedPreferences.getString("bit_rate", "8192000")
             )
         )
-        // Set summary
-        bitRatePref.summary = bitRatePref.entry
+
         // Frame rate
         frameRateListPref.setValueIndex(
             frameRateListPref.findIndexOfValue(
                 mSharedPreferences.getString("frame_rate", "30")
             )
         )
-        // Set summary
-        frameRateListPref.summary = frameRateListPref.entry
+
         // Other prefs
         audioRecordingPref.isChecked = mSharedPreferences.getBoolean("audio_recording", false)
         shakeStopPref.isChecked = mSharedPreferences.getBoolean("shake_stop", false)
@@ -101,8 +99,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
             mSharedPreferences.getString("theme_mode", "LIGHT_THEME")
             )
         )
-        // Set summary
-        themePref.summary = themePref.entry
 
         // On preference change listeners
         bitRatePref.setOnPreferenceChangeListener { _, newValue ->

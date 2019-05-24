@@ -24,12 +24,14 @@
     <ListPreference
         app:key="bit_rate_pref"
         app:title="@string/bit_rate_title"
+        app:summary="%s"
         app:entries="@array/bit_rate_aliases"
         app:entryValues="@array/bit_rate_values"/>
     
     <ListPreference
         app:key="frame_rate_pref"
         app:title="@string/frame_rate_title"
+        app:summary="%s"
         app:entries="@array/frame_rate_aliases"
         app:entryValues="@array/frame_rate_values"/>
 
@@ -71,6 +73,7 @@
     <ListPreference
         app:key="theme_mode_pref"
         app:title="@string/dark_mode_title"
+        app:summary="%s"
         app:entries="@array/theme_mode_aliases"
         app:entryValues="@array/theme_mode_values" />
 
