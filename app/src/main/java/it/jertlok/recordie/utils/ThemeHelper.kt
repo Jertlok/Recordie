@@ -46,9 +46,9 @@ class ThemeHelper {
                             val calendar = Calendar.getInstance()
                             val timeOfDay = calendar.get(Calendar.HOUR_OF_DAY)
                             // Set theme according to time
-                            // From 6am to 6pm use light theme
+                            // From 6am to 9pm use light theme - matches DirtyUnicorns
                             // TODO: remove these hardcoded values
-                            if (timeOfDay in 6..18)
+                            if (timeOfDay in 6..21)
                                 activity.setTheme(lightTheme)
                             else
                                 activity.setTheme(darkTheme)
