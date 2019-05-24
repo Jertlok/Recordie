@@ -29,7 +29,7 @@
         <!-- Material alert dialog -->
         <item name="materialAlertDialogTheme">@style/AppTheme.AlertDialog</item>
         <item name="bottom_bar_ic_tint">@color/grey_500</item>
-        <item name="bottom_bar_color">@color/white</item>
+        <item name="bottom_bar_color">@android:color/white</item>
     </style>
 
     <style name="AppTheme.Settings" parent="Theme.MaterialComponents.Light.DarkActionBar">
@@ -47,7 +47,7 @@
     </style>
 
     <style name="AppTheme.Settings.ActionBar" parent="Theme.MaterialComponents.Light.DarkActionBar">
-        <item name="android:background">@color/white</item>
+        <item name="android:background">@android:color/white</item>
     </style>
 
     <style name="AppTheme.AlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">

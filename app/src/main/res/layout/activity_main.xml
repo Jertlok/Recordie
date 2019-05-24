@@ -49,7 +49,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             app:backgroundTint="@color/colorAccent"
-            app:tint="@color/white"
+            app:tint="@android:color/white"
             app:srcCompat="@drawable/ic_record"
             app:layout_anchor="@id/bar" />
 
@@ -67,6 +67,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_sheet"
                 app:itemIconTint="?attr/bottom_bar_ic_tint"
+                app:elevation="0dp"
                 app:menu="@menu/primary"/>
         </FrameLayout>
 
