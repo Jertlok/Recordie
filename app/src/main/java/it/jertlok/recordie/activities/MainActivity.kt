@@ -18,6 +18,7 @@
 package it.jertlok.recordie.activities
 
 import android.Manifest
+import android.animation.ObjectAnimator
 import android.app.NotificationManager
 import android.content.*
 import android.content.pm.PackageManager
@@ -157,11 +158,27 @@ class MainActivity : AppCompatActivity() {
         return super.dispatchTouchEvent(ev)
     }
 
+
     /** Function for setting up all the bottom area */
     private fun setUpBottomDrawer() {
         bottomDrawer = mCoordinatorLayout.findViewById(R.id.bottom_drawer)
         bottomBehaviour = BottomSheetBehavior.from(bottomDrawer)
         bottomBehaviour.state = BottomSheetBehavior.STATE_HIDDEN
+
+        bottomBehaviour.setBottomSheetCallback(object :  BottomSheetBehavior.BottomSheetCallback() {
+            override fun onSlide(bottomSheet: View, slideOffset: Float) = Unit
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                    ObjectAnimator.ofFloat(mNavigationView, "elevation", 0f)
+                        .setDuration(500)
+                        .start()
+                } else {
+                    ObjectAnimator.ofFloat(mNavigationView, "elevation", 16f)
+                        .setDuration(250)
+                        .start()
+                }
+            }
+        })
 
         // When clicking on the menu bottom
         bottomBar.setNavigationOnClickListener {
