@@ -21,6 +21,8 @@
     <dimen name="corner_radius">8dp</dimen>
     <dimen name="card_spacing">10dp</dimen>
     <dimen name="card_elevation">6dp</dimen>
+    <!-- BottomSheet elevation -->
+    <dimen name="bottom_sheet_elevation">16dp</dimen>
 
     <!-- Recycler View constraints -->
     <dimen name="recycler_view_top_margin">8dp</dimen>

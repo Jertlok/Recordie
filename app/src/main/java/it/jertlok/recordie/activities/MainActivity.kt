@@ -73,6 +73,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mNavigationView: NavigationView
     private lateinit var bottomDrawer: View
     private lateinit var bottomBehaviour: BottomSheetBehavior<View>
+    private var bottomSheetElevation = 0f
     // Current saved theme
     private lateinit var mSavedTheme: String
     // Video list
@@ -174,17 +175,18 @@ class MainActivity : AppCompatActivity() {
         bottomDrawer = mCoordinatorLayout.findViewById(R.id.bottom_drawer)
         bottomBehaviour = BottomSheetBehavior.from(bottomDrawer)
         bottomBehaviour.state = BottomSheetBehavior.STATE_HIDDEN
+        bottomSheetElevation = resources.getDimension(R.dimen.bottom_sheet_elevation)
 
         bottomBehaviour.setBottomSheetCallback(object :  BottomSheetBehavior.BottomSheetCallback() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) = Unit
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                     ObjectAnimator.ofFloat(mNavigationView, "elevation", 0f)
-                        .setDuration(500)
+                        .setDuration(ELEVATION_FADE_OUT_DURATION)
                         .start()
                 } else {
-                    ObjectAnimator.ofFloat(mNavigationView, "elevation", 16f)
-                        .setDuration(250)
+                    ObjectAnimator.ofFloat(mNavigationView, "elevation", bottomSheetElevation)
+                        .setDuration(ELEVATION_FADE_IN_DURATION)
                         .start()
                 }
             }
@@ -580,5 +582,8 @@ class MainActivity : AppCompatActivity() {
         // Intent filter
         const val ACTION_UPDATE_FAB = "it.jertlok.activities.MainActivity.ACTION_UPDATE_FAB"
         const val ACTION_DELETE_VIDEO = "it.jertlok.activities.MainActivity.ACTION_DELETE_VIDEO"
+        // Constants for ObjectAnimator
+        const val ELEVATION_FADE_OUT_DURATION: Long = 500
+        const val ELEVATION_FADE_IN_DURATION: Long = 250
     }
 }
