@@ -25,7 +25,7 @@ import java.lang.ref.WeakReference
 
 class UpdateSingleVideoTask(context: MainActivity) : AsyncTask<String, Void, Boolean>() {
     private val activityRef: WeakReference<MainActivity> = WeakReference(context)
-    private var mDeleteAction = false
+    private var mInvalidAction = false
 
     override fun doInBackground(vararg params: String): Boolean {
         val activity = activityRef.get()
@@ -60,8 +60,10 @@ class UpdateSingleVideoTask(context: MainActivity) : AsyncTask<String, Void, Boo
                     getString(/* DURATION */ 2)
                 )
                 activity.mVideoArray.add(0, screenVideo)
+                // We successfully added our video, so let's reset it in order to avoid multiple calls
+                activity.mBoundService.resetFile()
             } else {
-                mDeleteAction = true
+                mInvalidAction = true
             }
         }
         // Close the cursor
@@ -72,7 +74,7 @@ class UpdateSingleVideoTask(context: MainActivity) : AsyncTask<String, Void, Boo
     override fun onPostExecute(result: Boolean?) {
         super.onPostExecute(result)
         val activity = activityRef.get()
-        if (activity == null || activity.isFinishing || mDeleteAction) {
+        if (activity == null || activity.isFinishing || mInvalidAction) {
             return
         }
         // Notify that the data has changed.

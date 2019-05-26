@@ -22,13 +22,16 @@ import android.animation.ObjectAnimator
 import android.app.NotificationManager
 import android.content.*
 import android.content.pm.PackageManager
+import android.database.ContentObserver
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.os.IBinder
 import android.preference.PreferenceManager
+import android.provider.MediaStore
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
@@ -56,7 +59,6 @@ import it.jertlok.recordie.utils.ThemeHelper
 import it.jertlok.recordie.utils.Utils
 import it.jertlok.recordie.views.VideoRecyclerView
 import java.io.File
-import java.util.*
 import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
@@ -91,9 +93,11 @@ class MainActivity : AppCompatActivity() {
     private val mIntentFilter = IntentFilter()
     // ScreenRecorderService
     private var mBound = false
-    private lateinit var mBoundService: ScreenRecorderService
+    lateinit var mBoundService: ScreenRecorderService
     // Service connection
     private val mConnection = LocalServiceConnection()
+    // Content observer
+    private lateinit var mContentObserver: VideoContentObserver
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -140,6 +144,13 @@ class MainActivity : AppCompatActivity() {
         // Set the various intent filters
         mIntentFilter.addAction(ACTION_DELETE_VIDEO)
         mIntentFilter.addAction(ACTION_UPDATE_FAB)
+
+        // Register video content observer
+        mContentObserver = VideoContentObserver(Handler())
+        contentResolver.registerContentObserver(
+            MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+            true, mContentObserver
+        )
     }
 
     /** Dismiss the BottomSheet when clicking outside of its boundaries */
@@ -157,7 +168,6 @@ class MainActivity : AppCompatActivity() {
         }
         return super.dispatchTouchEvent(ev)
     }
-
 
     /** Function for setting up all the bottom area */
     private fun setUpBottomDrawer() {
@@ -279,6 +289,12 @@ class MainActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         unbindService(mConnection)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Unregister content observer
+        contentResolver.unregisterContentObserver(mContentObserver)
     }
 
     override fun onPause() {
@@ -521,7 +537,6 @@ class MainActivity : AppCompatActivity() {
             when (intent?.action) {
                 ACTION_UPDATE_FAB -> {
                     conditionalFabToggle()
-                    updateLastVideo()
                 }
                 ACTION_DELETE_VIDEO -> {
                     // Let's get the fileUri from the intent
@@ -542,6 +557,20 @@ class MainActivity : AppCompatActivity() {
 
         override fun onServiceDisconnected(name: ComponentName) {
             mBound = false
+        }
+    }
+
+    private inner class VideoContentObserver(handler: Handler) : ContentObserver(handler) {
+        override fun onChange(selfChange: Boolean, uri: Uri?) {
+            if (mBoundService.mOutputFile != null) {
+                // TODO: there are some rare cases where the ContentResolver may take
+                // TODO: a while for updating the videos, maybe it's better to notify
+                // TODO: the user about the immedate change and attach some sort of AsyncTask
+                // TODO: that updates the video once the metadata are available.
+                // If the file isn't null it means we did not add the video with all the
+                // information yet.
+                updateLastVideo()
+            }
         }
     }
 

@@ -555,6 +555,10 @@ open class ScreenRecorderService : Service(), ShakeDetector.Listener {
         return file
     }
 
+    fun resetFile() {
+        mOutputFile = null
+    }
+
     /** Whether the recording is in progress or not */
     fun isRecording(): Boolean = mIsRecording
 
