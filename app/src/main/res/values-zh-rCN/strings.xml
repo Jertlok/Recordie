@@ -35,7 +35,7 @@
     <string name="frame_rate_title">帧率</string>
     <!-- Audio configurations -->
     <string name="audio_category">音频</string>
-    <string name="audio_recording_title">正在录音</string>
+    <string name="audio_recording_title">录制音频</string>
     <!-- Misc configurations -->
     <string name="misc_category">杂项设置</string>
     <string name="shake_stop_title">摇晃设备停止录像</string>
@@ -44,7 +44,7 @@
     <!-- Theme configurations -->
     <string name="theme_category">主题</string>
     <string name="dark_mode_title">应用主题</string>
-    <string name="system_theme">自动(系统)</string>
+    <string name="system_theme">自动(跟随系统)</string>
     <string name="light_theme">亮色主题</string>
     <string name="dark_theme">黑色主题</string>
     <!-- QS Tile -->

@@ -20,14 +20,15 @@
     <!-- Translators card -->
     <string name="translators">Переводчики</string>
     <!-- Languages -->
-    <string name="chinese">Chinese</string>
-    <string name="dutch">Dutch</string>
-    <string name="german">German</string>
+    <string name="chinese">Китайском</string>
+    <string name="dutch">Голландский</string>
+    <string name="french">Французский</string>
+    <string name="german">Немецкий</string>
     <string name="hindi">Хинди</string>
     <string name="portuguese">Португальский</string>
     <string name="russian">Русский</string>
-    <string name="spanish">Spanish</string>
+    <string name="spanish">Испанский</string>
     <string name="swedish">Шведский</string>
-    <string name="ukrainian">Ukrainian</string>
+    <string name="ukrainian">Украинский</string>
     <!-- Translators -->
 </resources>

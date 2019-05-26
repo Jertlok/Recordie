@@ -5,6 +5,7 @@
     <string-array name="languages">
         <item>@string/chinese</item>
         <item>@string/dutch</item>
+        <item>@string/french</item>
         <item>@string/german</item>
         <item>@string/hindi</item>
         <item>@string/portuguese</item>
@@ -18,6 +19,7 @@
     <string-array name="translators">
         <item>@string/chinese_name</item>
         <item>@string/dutch_name</item>
+        <item>@string/french_name</item>
         <item>@string/german_name</item>
         <item>@string/hindi_name</item>
         <item>@string/portuguese_name</item>
