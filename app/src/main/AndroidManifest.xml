@@ -25,6 +25,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION" />
     <uses-permission android:name="android.permission.VIBRATE"/>
 
     <application
@@ -68,7 +69,8 @@
             </intent-filter>
         </service>
 
-        <service android:name=".services.ScreenRecorderService"/>
+        <service android:name=".services.ScreenRecorderService"
+                android:foregroundServiceType="mediaProjection" />
 
         <!-- File provider -->
         <provider
