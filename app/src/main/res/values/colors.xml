@@ -24,8 +24,8 @@
     <color name="grey">#818181</color>
 
     <!-- Material colors -->
-    <color name="grey_900">#212121</color>
-    <color name="grey_800">#424242</color>
+    <color name="grey_900">#202124</color>
+    <color name="grey_800">#2a2c30</color>
     <color name="grey_500">#9E9E9E</color>
     <color name="grey_200">#EEEEEE</color>
 </resources>
