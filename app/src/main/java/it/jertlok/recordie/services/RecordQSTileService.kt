@@ -23,6 +23,7 @@ import android.os.IBinder
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import it.jertlok.recordie.activities.RecordingActivity
 
 @RequiresApi(Build.VERSION_CODES.N)
@@ -44,7 +45,11 @@ open class RecordQSTileService : TileService() {
         registerReceiver(mBroadcastReceiver, mIntentFilter)
         // Bind to ScreenRecorderService
         val intent = Intent(this, ScreenRecorderService::class.java)
-        startService(intent)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent)
+        } else {
+            startService(intent)
+        }
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE)
     }
 
@@ -69,7 +74,11 @@ open class RecordQSTileService : TileService() {
             // Stop service
             val stopIntent = Intent(this, ScreenRecorderService::class.java)
                 .setAction(ScreenRecorderService.ACTION_STOP)
-            startService(stopIntent)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(stopIntent)
+            } else {
+                startService(stopIntent)
+            }
         }
     }
 
