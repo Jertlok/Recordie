@@ -52,7 +52,7 @@
     <string name="dark_theme">Dark</string>
 
     <!-- QS Tile -->
-    <string name="qs_record_title">Record</string>
+    <string name="qs_record_title">Record screen</string>
 
     <!-- Notification -->
     <string name="notif_rec_progress">Recording in progress</string>
